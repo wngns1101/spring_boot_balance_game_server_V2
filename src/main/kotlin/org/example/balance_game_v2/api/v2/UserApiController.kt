@@ -1,9 +1,9 @@
-package org.example.balance_game_v2.api.controller.v2
+package org.example.balance_game_v2.api.v2
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.example.balance_game_v2.api.application.UserFacade
-import org.example.balance_game_v2.api.controller.v2.req.SignUpRequestDTO
+import org.example.balance_game_v2.api.v2.req.SignUpRequestDTO
 import org.example.balance_game_v2.config.USER_V2
 import org.example.balance_game_v2.config.USER_V2_PREFIX
 import org.springframework.web.bind.annotation.GetMapping

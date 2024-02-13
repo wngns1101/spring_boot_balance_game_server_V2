@@ -1,4 +1,4 @@
-package org.example.balance_game_v2.api.controller.v2.req
+package org.example.balance_game_v2.api.v2.req
 
 data class SignUpRequestDTO (
     val email: String,
@@ -7,7 +7,7 @@ data class SignUpRequestDTO (
     val userName: String,
     val birth: String
 ){
-    fun toCommand(request: SignUpRequestDTO): SignUpCommand{
+    fun toCommand(request: SignUpRequestDTO): SignUpCommand {
         return SignUpCommand(
             email = request.email,
             password = request.password,
