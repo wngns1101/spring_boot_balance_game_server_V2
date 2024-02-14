@@ -10,9 +10,8 @@ import org.example.balance_game_v2.domain.BaseEntity
 class User (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val userId: Long,
+    val userId: Long? = null,
     val email: String,
-    val password: String,
     val nickname: String,
     val realName: String,
     val birth: String,

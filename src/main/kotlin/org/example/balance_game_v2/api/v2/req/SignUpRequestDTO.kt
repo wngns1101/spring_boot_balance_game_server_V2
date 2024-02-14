@@ -12,8 +12,8 @@ data class SignUpRequestDTO (
             email = request.email,
             password = request.password,
             joinUserCommand = JoinUserCommand(
-                userEmail = request.email,
-                userName = request.userName,
+                email = request.email,
+                realName = request.userName,
                 nickname = request.nickname,
                 birth = request.birth
             )
