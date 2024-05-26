@@ -40,7 +40,7 @@ jobs:
       #
       # 3. Docker 이미지 빌드
       - name: docker image build
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo:latest
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo:latest .
 
       # 4. DockerHub 로그인
       - name: docker login
@@ -51,7 +51,7 @@ jobs:
 
       # 5. Docker Hub 이미지 푸시
       - name: docker Hub push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo:latest
 
       - name: Build API and Domain Modules
         run: ./gradlew :api:build :domain:build
