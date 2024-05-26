@@ -24,6 +24,11 @@ allprojects {
         }
     }
 
+    tasks.withType<JavaCompile> {
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
+    }
+
     tasks.withType<Test> {
         useJUnitPlatform()
     }
