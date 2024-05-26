@@ -24,13 +24,13 @@ jobs:
         run: |
           cd ./api/src/main/resources
           touch ./jwt.yml
-          echo "${{JWT}}" > ./jwt.yml
+          echo "${{secrets.JWT}}" > ./jwt.yml
 
       - name: make application.yml
         run: |
           cd ./api/src/main/resources
           touch ./application.yml
-          echo "${{APPLICATION}}" > ./application.yml
+          echo "${{secrets.APPLICATION}}" > ./application.yml
 
       # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
       # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
