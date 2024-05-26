@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/balanceGameV2?serverTimezone=Asia/Seoul&sendFractionalSeconds=false&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://3.34.44.63:3306/balanceGameV2?serverTimezone=Asia/Seoul&sendFractionalSeconds=false&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: wkrwjs4602!
     hikari:
