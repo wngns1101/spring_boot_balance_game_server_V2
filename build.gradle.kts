@@ -1,51 +1,55 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "3.2.2"
-    id("io.spring.dependency-management") version "1.1.4"
+    id("org.springframework.boot") version "3.2.3" apply false
+    id("io.spring.dependency-management") version "1.1.4" apply false
     id("org.jmailen.kotlinter") version "3.2.0"
-    kotlin("jvm") version "1.9.22"
-    kotlin("plugin.spring") version "1.9.22"
-    kotlin("plugin.jpa") version "1.9.22"
+    kotlin("jvm") version "1.9.23"
+    kotlin("plugin.spring") version "1.9.22" apply false
+    kotlin("plugin.jpa") version "1.9.22" apply false
 }
 
-group = "org.example"
-version = "0.0.1-SNAPSHOT"
+allprojects {
+    group = "org.example"
+    version = "0.0.1-SNAPSHOT"
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-}
+    repositories {
+        mavenCentral()
+    }
 
-repositories {
-    mavenCentral()
-}
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs += "-Xjsr305=strict"
+            jvmTarget = "17"
+        }
+    }
 
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    runtimeOnly("com.mysql:mysql-connector-j")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    implementation("com.google.firebase:firebase-admin:9.1.1")
-    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
-    implementation("io.github.openfeign:feign-okhttp")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
-}
-
-dependencyManagement {
-    imports{
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2021.0.1")
+    tasks.withType<Test> {
+        useJUnitPlatform()
     }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs += "-Xjsr305=strict"
-        jvmTarget = "17"
+subprojects {
+    apply(plugin = "org.springframework.boot")
+    apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+    apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
+    apply(plugin = "kotlin")
+    apply(plugin = "kotlin-kapt")
+
+    dependencies {
+        implementation("org.springframework.boot:spring-boot-starter-web")
+        implementation("org.jetbrains.kotlin:kotlin-reflect")
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
+//        implementation("org.springframework.boot:spring-boot-starter")
     }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
+//tasks.bootJar {
+//    enabled = false
+//}
+//
+//tasks.jar {
+//    enabled = true
+//}

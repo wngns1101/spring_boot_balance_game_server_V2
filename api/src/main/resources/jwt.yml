@@ -1,0 +1,5 @@
+secret-key: jwtsecretkeyjwtsecretkeyjwtsecretkey
+# 1년
+access-token-expire: 604800000
+# 10년
+refresh-token-expire: 31536000000
