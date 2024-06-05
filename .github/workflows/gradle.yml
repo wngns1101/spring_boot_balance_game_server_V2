@@ -22,7 +22,7 @@ jobs:
 
       - name: make application.yml
         run: |
-          cd ./api/src/main/resources
+          mkdir -p ./api/src/main/resources && cd ./api/src/main/resources
           touch ./jwt.yml
           echo "${{secrets.JWT}}" > ./jwt.yml
 
@@ -34,7 +34,7 @@ jobs:
 
       - name: make fcm.json
         run: |
-          cd ./domain/src/main/resources/firebase
+          mkdir -p ./domain/src/main/resources/firebase && cd ./domain/src/main/resources/firebase
           touch ./fcm.json
           echo "${{secrets.FCM}}" > ./fcm.json
 
