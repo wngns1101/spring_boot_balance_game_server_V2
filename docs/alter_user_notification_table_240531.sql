@@ -1,0 +1,1 @@
+alter table user_notification ADD isRead Boolean not null default false, algorithm=instant

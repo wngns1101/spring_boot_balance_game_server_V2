@@ -3,22 +3,13 @@ package balance_game_v2.api.v1.user
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import balance_game_v2.api.v1.user.application.UserFacade
-import balance_game_v2.api.v1.user.http.req.ChangePasswordRequestDTO
-import balance_game_v2.api.v1.user.http.req.ModifyUserInfoRequestDTO
-import balance_game_v2.api.v1.user.http.req.SignInRequestDTO
-import balance_game_v2.api.v1.user.http.req.SignUpRequestDTO
+import balance_game_v2.api.v1.user.http.req.*
 import balance_game_v2.api.v1.user.http.res.SignInResponseDTO
 import balance_game_v2.api.v1.user.http.res.SignUpResponseDTO
 import balance_game_v2.api.v1.user.http.res.UserDetailResponseDTO
 import balance_game_v2.config.USER_V2
 import balance_game_v2.config.USER_V2_PREFIX
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestAttribute
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
 
 @Tag(name = USER_V2)
 @RestController
@@ -39,7 +30,7 @@ class UserApiController(
     fun signIn(
         @RequestBody signInRequestDTO: SignInRequestDTO
     ): SignInResponseDTO {
-        return SignInResponseDTO(userFacade.signIn(signInRequestDTO.email, signInRequestDTO.password))
+        return SignInResponseDTO(userFacade.signIn(signInRequestDTO.email, signInRequestDTO.password, signInRequestDTO.pushToken))
     }
 
     @Operation(summary = "[회원-003] 회원 상세")
@@ -91,5 +82,26 @@ class UserApiController(
     ) {
         val user = userFacade.getUserByEmail(email)
         userFacade.withdraw(user.userId)
+    }
+
+    @Operation(summary = "[회원-009] 유저 알림 리스트 조회")
+    @GetMapping("/users/me/notifications")
+    fun getUserNotifications(
+        @RequestAttribute("email") email: String,
+        @RequestParam("page", defaultValue = "0") page: Int,
+        @RequestParam("size", defaultValue = "10") size: Int,
+    ): PageUserNotificationResponseDTO {
+        val user = userFacade.getUserByEmail(email)
+        return PageUserNotificationResponseDTO(userFacade.getUserNotifications(user.userId, page, size))
+    }
+
+    @Operation(summary = "[회원-010] 유저 알림 읽음 처리")
+    @PostMapping("/users/me/notifications/{userNotificationId}")
+    fun readUserNotification(
+        @RequestAttribute("email") email: String,
+        @PathVariable("userNotificationId") userNotificationId: Long,
+    ) {
+        val user = userFacade.getUserByEmail(email)
+        userFacade.readUserNotification(user.userId, userNotificationId)
     }
 }

@@ -15,4 +15,5 @@ class User(
     val birth: String,
     var phoneNumber: String,
     val invitationCode: String,
+    var pushToken: String? = null,
 ) : BaseEntity()

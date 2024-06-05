@@ -12,7 +12,8 @@ import org.springframework.core.Ordered
 class ApiFilterConfig (){
     private val includeTokenFilterPaths = arrayOf(
         "$USER_V2_PREFIX/*",
-        "$BOARD_V2_PREFIX/*"
+        "$BOARD_V2_PREFIX/*",
+        "$NOTIFICATION_V2_PREFIX/*",
     )
     @Bean
     fun tokenFilter(cookieUtils: CookieUtils, tokenManager: TokenManager): FilterRegistrationBean<ApiFilter> {

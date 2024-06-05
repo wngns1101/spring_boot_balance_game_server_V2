@@ -11,6 +11,6 @@ class BoardComment (
     val boardCommentId: Long? = null,
     val boardId: Long,
     val userId: Long,
-    val parentUserId: Long,
-    val comment: String,
+    val parentCommentId: Long? = null,
+    var comment: String,
 ): BaseEntity()

@@ -32,6 +32,12 @@ jobs:
           touch ./application.yml
           echo "${{secrets.APPLICATION}}" > ./application.yml
 
+      - name: make fcm.json
+        run: |
+          cd ./domain/src/main/resources/firebase
+          touch ./fcm.json
+          echo "${{secrets.FCM}}" > ./fcm.json
+
       # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
       # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
       - name: Setup Gradle

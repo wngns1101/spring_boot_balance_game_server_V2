@@ -1,7 +1,7 @@
 package domain.board.dto
 
 import domain.board.entity.Board
-import domain.user.dto.UserDTO
+import domain.board.entity.QBoardComment.boardComment
 import java.time.LocalDateTime
 
 data class BoardDetailDTO(
@@ -11,6 +11,7 @@ data class BoardDetailDTO(
     val content: String,
     val heartCount: Int,
     val viewCount: Int,
+    val boardComment: List<BoardCommentDTO>?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )
@@ -20,7 +21,8 @@ data class WriterDTO(
     val nickName: String,
 )
 
-fun Board.toBoardDetail(writer: WriterDTO): BoardDetailDTO {
+
+fun Board.toBoardDetail(writer: WriterDTO, boardComment: List<BoardCommentDTO>): BoardDetailDTO {
     return BoardDetailDTO(
         boardId = boardId!!,
         writer = writer,
@@ -28,6 +30,7 @@ fun Board.toBoardDetail(writer: WriterDTO): BoardDetailDTO {
         content = content,
         heartCount = heartCount,
         viewCount = viewCount,
+        boardComment = boardComment,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )

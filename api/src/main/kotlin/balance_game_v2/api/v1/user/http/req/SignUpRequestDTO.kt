@@ -9,6 +9,7 @@ data class SignUpRequestDTO(
     val userName: String,
     val birth: String,
     val phoneNumber: String,
+    val pushToken: String?,
 ) {
     fun toCommand(request: SignUpRequestDTO): SignUpCommand {
         return SignUpCommand(
@@ -19,7 +20,8 @@ data class SignUpRequestDTO(
                 realName = request.userName,
                 nickname = request.nickname,
                 birth = request.birth,
-                phoneNumber = request.phoneNumber
+                phoneNumber = request.phoneNumber,
+                pushToken = request.pushToken,
             )
         )
     }

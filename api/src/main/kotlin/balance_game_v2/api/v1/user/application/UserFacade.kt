@@ -1,8 +1,10 @@
 package balance_game_v2.api.v1.user.application
 
+import balance_game_v2.api.v1.user.http.req.PageUserNotificationResponseDTO
 import balance_game_v2.api.v1.user.http.req.SignUpCommand
 import domain.auth.AuthService
 import domain.user.UserService
+import domain.user.dto.PageUserNotificationDTO
 import domain.user.dto.UserDTO
 
 import org.springframework.stereotype.Component
@@ -19,8 +21,13 @@ class UserFacade(
         return tokenManager.makeJwtToken(authResult.first, authResult.second)
     }
 
-    fun signIn(email: String, password: String): TokenDTO {
+    fun signIn(email: String, password: String, pushToken: String?): TokenDTO {
         val auth = authService.signIn(email, password)
+
+        if (pushToken != null) {
+            val user = userService.getUserByEmail(email)
+            userService.updateUserPushToken(user.userId, pushToken)
+        }
 
         return tokenManager.makeJwtToken(auth.first, auth.second)
     }
@@ -39,5 +46,13 @@ class UserFacade(
 
     fun withdraw(userId: Long) {
         userService.withdraw(userId)
+    }
+
+    fun getUserNotifications(userId: Long, page: Int, size: Int): PageUserNotificationDTO {
+        return userService.getUserNotifications(userId, page, size)
+    }
+
+    fun readUserNotification(userId: Long, userNotificationId: Long) {
+        return userService.readUserNotification(userId, userNotificationId)
     }
 }

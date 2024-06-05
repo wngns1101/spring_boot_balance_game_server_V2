@@ -11,28 +11,33 @@ import org.springframework.context.annotation.Configuration
 
 const val USER_V2 = "유저 API"
 const val BOARD_V2 = "게임 API"
+const val NOTIFICATION_V2 = "알림 API"
 const val USER_V2_PREFIX = "/user/v2"
 const val BOARD_V2_PREFIX = "/board/v2"
+const val NOTIFICATION_V2_PREFIX = "/notification/v2"
+const val COMMON_V2 = "공통 API"
+const val COMMON_V2_PREFIX = "/common/v2"
 
 @OpenAPIDefinition(
-    info = Info(title = "balanceGame Api 명세서", version = "v2")
+    info = Info(title = "balanceGame Api 명세서", version = "v2"),
 )
-
 @Configuration
 class SwaggerConfig {
     @Bean
     fun v2Api(): GroupedOpenApi {
         val paths: Array<String> = arrayOf(
             "$USER_V2_PREFIX/**",
-            "$BOARD_V2_PREFIX/**"
+            "$BOARD_V2_PREFIX/**",
+            "$NOTIFICATION_V2_PREFIX/**",
+            "$COMMON_V2_PREFIX/**",
         )
 
         return GroupedOpenApi.builder()
             .group("v1")
             .pathsToMatch(*paths)
-            .addOpenApiCustomizer {
+            .addOpenApiCustomizer (
                 buildSecurityOpenApi(true)
-            }
+            )
             .build()
     }
 

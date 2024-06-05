@@ -7,7 +7,7 @@ import jakarta.persistence.*
 class Version (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val version: Long? = null,
+    val versionId: Long? = null,
     val currentVersion: String,
     val minimumVersion: String,
     val preferVersion: String,

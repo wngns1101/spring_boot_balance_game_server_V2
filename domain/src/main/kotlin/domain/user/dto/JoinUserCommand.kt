@@ -6,4 +6,5 @@ class JoinUserCommand(
     val realName: String,
     val birth: String,
     val phoneNumber: String,
+    val pushToken: String?
 )
