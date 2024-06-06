@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 @Component
 class CommonFacade(
     val versionService: VersionService
-){
+) {
     fun getVersion(): VersionDTO {
         return versionService.getVersion()
     }

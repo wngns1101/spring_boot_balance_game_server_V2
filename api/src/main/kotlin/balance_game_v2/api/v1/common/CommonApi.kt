@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = COMMON_V2)
 @RestController
 @RequestMapping(COMMON_V2_PREFIX)
-class CommonApi (
+class CommonApi(
     val commonFacade: CommonFacade
 ) {
     @Operation(summary = "[공통-001] 버전 조회")

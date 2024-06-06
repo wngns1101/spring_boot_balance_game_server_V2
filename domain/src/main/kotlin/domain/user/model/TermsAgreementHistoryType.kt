@@ -1,5 +1,5 @@
 package domain.user.model
 
 enum class TermsAgreementHistoryType {
-    SERVICE
+    SERVICE, MARKETING
 }

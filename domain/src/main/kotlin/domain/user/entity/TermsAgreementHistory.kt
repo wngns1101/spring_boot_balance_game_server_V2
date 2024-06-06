@@ -15,6 +15,5 @@ class TermsAgreementHistory (
     val userId: Long,
     @Enumerated(EnumType.STRING)
     val type: TermsAgreementHistoryType,
-    @Enumerated(EnumType.STRING)
-    val status: TermsAgreementHistoryStatus,
+    val status: Boolean,
 ): BaseEntity()

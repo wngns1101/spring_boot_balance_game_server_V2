@@ -1,13 +1,12 @@
 package balance_game_v2.api.v1.user.application
 
 import domain.auth.exception.InvalidTokenException
+import domain.auth.model.AuthGroup
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
-import domain.auth.model.AuthGroup
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
-import java.time.LocalDateTime
 import java.util.Date
 
 @Configuration
@@ -39,7 +38,6 @@ class TokenManager(
             .setExpiration(date)
             .signWith(secret, baseKey.toByteArray())
             .compact()
-
     }
 
     fun createRefreshToken(email: String, authGroup: AuthGroup): String {
@@ -106,7 +104,7 @@ class TokenManager(
         return TokenDTO(accessToken, refreshToken)
     }
 
-    fun refreshToken (refreshToken: String): TokenDTO {
+    fun refreshToken(refreshToken: String): TokenDTO {
         validationRefreshToken(refreshToken)
 
         val email = getUserEmailFromToken(refreshToken)

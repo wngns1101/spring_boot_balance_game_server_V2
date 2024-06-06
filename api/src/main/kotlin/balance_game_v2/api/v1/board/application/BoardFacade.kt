@@ -1,16 +1,23 @@
 package balance_game_v2.api.v1.board.application
 
-import balance_game_v2.api.v1.board.http.req.*
-import balance_game_v2.api.v1.board.http.res.*
+import balance_game_v2.api.v1.board.http.req.BoardModifyRequestDTO
+import balance_game_v2.api.v1.board.http.req.CreateBoardCommentRequestDTO
+import balance_game_v2.api.v1.board.http.req.CreateBoardRequestDTO
+import balance_game_v2.api.v1.board.http.req.DeleteBoardCommentRequestDTO
+import balance_game_v2.api.v1.board.http.req.ModifyBoardCommentRequestDTO
+import balance_game_v2.api.v1.board.http.req.toCommand
 import domain.board.BoardService
-import domain.board.dto.*
+import domain.board.dto.BoardContentDTO
+import domain.board.dto.BoardDetailDTO
+import domain.board.dto.BoardResultDTO
+import domain.board.dto.PageBoardDTO
 import domain.board.model.BoardSortCondition
 import org.springframework.stereotype.Component
 
 @Component
-class BoardFacade (
+class BoardFacade(
     val boardService: BoardService,
-){
+) {
 
     fun createBoard(userId: Long, request: CreateBoardRequestDTO) {
         boardService.createBoard(userId, request.toCommand())
@@ -55,5 +62,4 @@ class BoardFacade (
     fun deleteBoardComment(boardId: Long, userId: Long, request: DeleteBoardCommentRequestDTO) {
         return boardService.deleteBoardComment(boardId, userId, request.toCommand())
     }
-
 }

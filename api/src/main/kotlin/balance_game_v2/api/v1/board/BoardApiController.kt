@@ -1,8 +1,16 @@
 package balance_game_v2.api.v1.board
 
 import balance_game_v2.api.v1.board.application.BoardFacade
-import balance_game_v2.api.v1.board.http.req.*
-import balance_game_v2.api.v1.board.http.res.*
+import balance_game_v2.api.v1.board.http.req.BoardModifyRequestDTO
+import balance_game_v2.api.v1.board.http.req.CreateBoardCommentRequestDTO
+import balance_game_v2.api.v1.board.http.req.CreateBoardRequestDTO
+import balance_game_v2.api.v1.board.http.req.DeleteBoardCommentRequestDTO
+import balance_game_v2.api.v1.board.http.req.ModifyBoardCommentRequestDTO
+import balance_game_v2.api.v1.board.http.res.BoardContentResponseDTO
+import balance_game_v2.api.v1.board.http.res.BoardDetailResponseDTO
+import balance_game_v2.api.v1.board.http.res.BoardHeartResponseDTO
+import balance_game_v2.api.v1.board.http.res.BoardResultResponseDTO
+import balance_game_v2.api.v1.board.http.res.PageBoardResponseDTO
 import balance_game_v2.api.v1.user.application.UserFacade
 import balance_game_v2.config.BOARD_V2
 import balance_game_v2.config.BOARD_V2_PREFIX
@@ -10,7 +18,16 @@ import domain.board.model.BoardSortCondition
 import domain.board.repository.BoardResultRepository
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestAttribute
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = BOARD_V2)
 @RestController

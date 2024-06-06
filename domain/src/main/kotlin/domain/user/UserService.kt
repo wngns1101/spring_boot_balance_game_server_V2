@@ -3,14 +3,18 @@ package domain.user
 import domain.auth.AuthService
 import domain.auth.exception.NotFoundUserException
 import domain.auth.model.AuthGroup
-import domain.board.dto.PageBoardDTO
-import domain.board.dto.toPageBoardDTO
+import domain.board.exception.NotFoundException
 import domain.error.AlreadySignUpException
 import domain.user.dto.*
+import domain.user.entity.TermsAgreementHistory
 import domain.user.entity.User
+import domain.user.model.TermsAgreementHistoryType
+import domain.user.repository.TermsAgreementHistoryRepository
+import domain.notification.repository.NotificationRepository
+import domain.user.entity.UserNotification
+import domain.user.model.UserNotificationType
 import domain.user.repository.UserNotificationRepository
 import domain.user.repository.UserRepository
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,6 +24,8 @@ import java.time.LocalDateTime
 class UserService (
     private val userRepository: UserRepository,
     private val authService: AuthService,
+    private val notificationRepository: NotificationRepository,
+    private val termsAgreementHistoryRepository: TermsAgreementHistoryRepository,
     private val userNotificationRepository: UserNotificationRepository,
 ){
     @Transactional
@@ -40,6 +46,20 @@ class UserService (
         )
 
         userRepository.save(user)
+
+        val termsAgreementHistories = mutableListOf<TermsAgreementHistory>()
+
+        termsAgreementHistories += TermsAgreementHistory(userId = user.userId!!, type = TermsAgreementHistoryType.SERVICE, status = true)
+        termsAgreementHistories += TermsAgreementHistory(userId = user.userId!!, type = TermsAgreementHistoryType.MARKETING, status = joinUserCommand.isCheckedMarketing)
+
+        termsAgreementHistoryRepository.saveAll(termsAgreementHistories)
+
+        val userNotifications = mutableListOf<UserNotification>()
+
+        userNotifications += UserNotification(userId = user.userId!!, type = UserNotificationType.SERVICE, status = true)
+        userNotifications += UserNotification(userId = user.userId!!, type = UserNotificationType.MARKETING, status = joinUserCommand.isCheckedMarketing)
+
+        userNotificationRepository.saveAll(userNotifications)
 
         return authResult
     }
@@ -76,10 +96,10 @@ class UserService (
         user.pushToken = pushToken
     }
 
-    fun getUserNotifications(userId: Long, page: Int, size: Int): PageUserNotificationDTO {
+    fun getUserNotificationHistories(userId: Long, page: Int, size: Int): PageUserNotificationDTO {
         val pageable = PageRequest.of(page, size)
 
-        val notifications = userNotificationRepository.findByUserId(userId, pageable)
+        val notifications = notificationRepository.findByUserId(userId, pageable)
 
         return PageUserNotificationDTO(
             notifications = notifications.content.map { it.toDTO() },
@@ -88,9 +108,46 @@ class UserService (
     }
 
     @Transactional
-    fun readUserNotification(userId: Long, userNotificationId: Long) {
+    fun readUserNotification(userId: Long, notificationId: Long) {
         val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
-        val notification = userNotificationRepository.findById(userNotificationId).orElseThrow { NotFoundUserException() }
+        val notification = notificationRepository.findById(notificationId).orElseThrow { NotFoundUserException() }
         notification.isRead = true
+    }
+
+    @Transactional
+    fun modifyMarketingAgreement(userId: Long): Boolean {
+        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+
+        val marketingAgreement = termsAgreementHistoryRepository.findByUserIdAndType(user.userId!!, TermsAgreementHistoryType.MARKETING)
+            ?: throw NotFoundException()
+        termsAgreementHistoryRepository.delete(marketingAgreement)
+
+        val newMarketingAgreement =
+            TermsAgreementHistory(userId = userId, type = TermsAgreementHistoryType.MARKETING, status = !marketingAgreement.status)
+        termsAgreementHistoryRepository.save(newMarketingAgreement)
+
+        return newMarketingAgreement.status
+    }
+
+    fun getUserNotifications(userId: Long): List<UserNotificationDTO> {
+        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+
+        return userNotificationRepository.findAllByUserId(user.userId!!).map { it.toDTO() }
+    }
+
+    @Transactional
+    fun modifyUserNotifications(userId: Long, userNotificationId: Long): Boolean {
+        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+
+        val userNotification = userNotificationRepository.findById(userNotificationId).orElseThrow{ NotFoundUserException() }
+        userNotification.status = !userNotification.status
+
+        return userNotification.status
+    }
+
+    fun getUserInvitation(userId: Long) {
+        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+
+//      TODO: 초대코드 생성
     }
 }

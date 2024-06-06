@@ -3,6 +3,7 @@ package balance_game_v2.api.v1.filter
 import balance_game_v2.api.support.error.ErrorModel
 import balance_game_v2.api.v1.user.application.TokenManager
 import balance_game_v2.api.v1.user.http.common.CookieUtils
+import balance_game_v2.config.USER_V2_PREFIX
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.servlet.Filter
 import jakarta.servlet.FilterChain
@@ -10,7 +11,6 @@ import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import balance_game_v2.config.USER_V2_PREFIX
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -31,12 +31,12 @@ class ApiFilter(
         println(accessToken)
         println(refreshToken)
 
-        if (req.requestURI == "$USER_V2_PREFIX/sign-up"){
+        if (req.requestURI == "$USER_V2_PREFIX/sign-up") {
             chain.doFilter(req, res)
             return
         }
 
-        if (req.requestURI == "$USER_V2_PREFIX/sign-in"){
+        if (req.requestURI == "$USER_V2_PREFIX/sign-in") {
             chain.doFilter(req, res)
             return
         }

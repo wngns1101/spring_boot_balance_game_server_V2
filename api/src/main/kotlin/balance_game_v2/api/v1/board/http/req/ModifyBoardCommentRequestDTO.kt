@@ -2,7 +2,7 @@ package balance_game_v2.api.v1.board.http.req
 
 import domain.board.dto.ModifyBoardContentCommand
 
-data class ModifyBoardCommentRequestDTO (
+data class ModifyBoardCommentRequestDTO(
     val commentId: Long,
     val content: String,
 )

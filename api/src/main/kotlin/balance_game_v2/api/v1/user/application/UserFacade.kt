@@ -1,12 +1,11 @@
 package balance_game_v2.api.v1.user.application
 
-import balance_game_v2.api.v1.user.http.req.PageUserNotificationResponseDTO
 import balance_game_v2.api.v1.user.http.req.SignUpCommand
 import domain.auth.AuthService
 import domain.user.UserService
 import domain.user.dto.PageUserNotificationDTO
 import domain.user.dto.UserDTO
-
+import domain.user.dto.UserNotificationDTO
 import org.springframework.stereotype.Component
 
 @Component
@@ -48,11 +47,27 @@ class UserFacade(
         userService.withdraw(userId)
     }
 
-    fun getUserNotifications(userId: Long, page: Int, size: Int): PageUserNotificationDTO {
-        return userService.getUserNotifications(userId, page, size)
+    fun getUserNotificationHistories(userId: Long, page: Int, size: Int): PageUserNotificationDTO {
+        return userService.getUserNotificationHistories(userId, page, size)
     }
 
-    fun readUserNotification(userId: Long, userNotificationId: Long) {
-        return userService.readUserNotification(userId, userNotificationId)
+    fun readUserNotification(userId: Long, notificationId: Long) {
+        return userService.readUserNotification(userId, notificationId)
+    }
+
+    fun modifyMarketingAgreement(userId: Long): Boolean {
+        return userService.modifyMarketingAgreement(userId)
+    }
+
+    fun getUserNotifications(userId: Long): List<UserNotificationDTO> {
+        return userService.getUserNotifications(userId)
+    }
+
+    fun modifyUserNotification(userId: Long, userNotificationId: Long): Boolean {
+        return userService.modifyUserNotifications(userId, userNotificationId)
+    }
+
+    fun getUserInvitation(userId: Long): Any {
+        return userService.getUserInvitation(userId)
     }
 }

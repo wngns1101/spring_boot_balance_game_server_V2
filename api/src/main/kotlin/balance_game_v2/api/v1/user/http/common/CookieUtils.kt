@@ -4,8 +4,7 @@ import jakarta.servlet.http.Cookie
 import org.springframework.stereotype.Component
 
 @Component
-class CookieUtils()
-{
+class CookieUtils() {
     fun createCookie(key: String, value: String, httpOnly: Boolean, path: String): Cookie {
         val cookie = Cookie(key, value)
         cookie.isHttpOnly = httpOnly

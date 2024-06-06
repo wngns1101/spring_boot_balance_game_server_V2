@@ -1,20 +1,20 @@
-package domain.user
+package domain.notification
 
 import domain.user.dto.CreateUserNotificationCommand
-import domain.user.dto.UserNotificationDTO
+import domain.user.dto.NotificationDTO
 import domain.user.dto.toDTO
-import domain.user.entity.UserNotification
-import domain.user.repository.UserNotificationRepository
+import domain.notification.entity.Notification
+import domain.notification.repository.NotificationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class UserNotificationService (
-    val userNotificationRepository: UserNotificationRepository,
+class NotificationService (
+    val notificationRepository: NotificationRepository,
 ){
     @Transactional
-    fun saveNotificationHistory(userId: Long, command: CreateUserNotificationCommand): UserNotificationDTO {
-        val notification = UserNotification(
+    fun saveNotificationHistory(userId: Long, command: CreateUserNotificationCommand): NotificationDTO {
+        val notification = Notification(
             userId = userId,
             title = command.title,
             body = command.body,
@@ -22,7 +22,7 @@ class UserNotificationService (
             link = command.link,
             status = command.status,
             type = command.type,
-        ).let { userNotificationRepository.save(it) }
+        ).let { notificationRepository.save(it) }
 
         return notification.toDTO()
     }

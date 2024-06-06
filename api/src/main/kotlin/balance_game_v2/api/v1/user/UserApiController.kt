@@ -1,15 +1,29 @@
 package balance_game_v2.api.v1.user
 
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.tags.Tag
 import balance_game_v2.api.v1.user.application.UserFacade
-import balance_game_v2.api.v1.user.http.req.*
+import balance_game_v2.api.v1.user.http.req.ChangePasswordRequestDTO
+import balance_game_v2.api.v1.user.http.req.ModifyUserInfoRequestDTO
+import balance_game_v2.api.v1.user.http.req.SignInRequestDTO
+import balance_game_v2.api.v1.user.http.req.SignUpRequestDTO
+import balance_game_v2.api.v1.user.http.res.ListUserNotificationResponseDTO
+import balance_game_v2.api.v1.user.http.res.ModifyUserNotificationResponseDTO
+import balance_game_v2.api.v1.user.http.res.PageUserNotificationResponseDTO
 import balance_game_v2.api.v1.user.http.res.SignInResponseDTO
 import balance_game_v2.api.v1.user.http.res.SignUpResponseDTO
 import balance_game_v2.api.v1.user.http.res.UserDetailResponseDTO
 import balance_game_v2.config.USER_V2
 import balance_game_v2.config.USER_V2_PREFIX
-import org.springframework.web.bind.annotation.*
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestAttribute
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = USER_V2)
 @RestController
@@ -30,7 +44,13 @@ class UserApiController(
     fun signIn(
         @RequestBody signInRequestDTO: SignInRequestDTO
     ): SignInResponseDTO {
-        return SignInResponseDTO(userFacade.signIn(signInRequestDTO.email, signInRequestDTO.password, signInRequestDTO.pushToken))
+        return SignInResponseDTO(
+            userFacade.signIn(
+                signInRequestDTO.email,
+                signInRequestDTO.password,
+                signInRequestDTO.pushToken
+            )
+        )
     }
 
     @Operation(summary = "[회원-003] 회원 상세")
@@ -51,7 +71,11 @@ class UserApiController(
     ) {
         val user = userFacade.getUserByEmail(email)
 
-        userFacade.changeUserPassword(user.email, changePasswordRequestDTO.currentPassword, changePasswordRequestDTO.newPassword)
+        userFacade.changeUserPassword(
+            user.email,
+            changePasswordRequestDTO.currentPassword,
+            changePasswordRequestDTO.newPassword
+        )
     }
 
     @Operation(summary = "[회원-005] 회원 정보 수정")
@@ -84,7 +108,7 @@ class UserApiController(
         userFacade.withdraw(user.userId)
     }
 
-    @Operation(summary = "[회원-009] 유저 알림 리스트 조회")
+    @Operation(summary = "[회원-009] 유저 알림 내역 리스트 조회")
     @GetMapping("/users/me/notifications")
     fun getUserNotifications(
         @RequestAttribute("email") email: String,
@@ -92,16 +116,44 @@ class UserApiController(
         @RequestParam("size", defaultValue = "10") size: Int,
     ): PageUserNotificationResponseDTO {
         val user = userFacade.getUserByEmail(email)
-        return PageUserNotificationResponseDTO(userFacade.getUserNotifications(user.userId, page, size))
+        return PageUserNotificationResponseDTO(userFacade.getUserNotificationHistories(user.userId, page, size))
     }
 
     @Operation(summary = "[회원-010] 유저 알림 읽음 처리")
-    @PostMapping("/users/me/notifications/{userNotificationId}")
+    @PostMapping("/users/me/notifications/{notificationId}")
     fun readUserNotification(
         @RequestAttribute("email") email: String,
-        @PathVariable("userNotificationId") userNotificationId: Long,
+        @PathVariable("notificationId") notificationId: Long,
     ) {
         val user = userFacade.getUserByEmail(email)
-        userFacade.readUserNotification(user.userId, userNotificationId)
+        userFacade.readUserNotification(user.userId, notificationId)
+    }
+
+    @Operation(summary = "[회원-012] 유저 알림 설정 조회")
+    @GetMapping("/users/me/marketing")
+    fun getUserNotifications(
+        @RequestAttribute("email") email: String,
+    ): ListUserNotificationResponseDTO {
+        val user = userFacade.getUserByEmail(email)
+        return ListUserNotificationResponseDTO(userFacade.getUserNotifications(user.userId))
+    }
+
+    @Operation(summary = "[회원-013] 유저 알림 수정")
+    @PostMapping("/users/me/marketing/{userNotificationId}")
+    fun modifyUserNotification(
+        @RequestAttribute("email") email: String,
+        @PathVariable("userNotificationId") userNotificationId: Long,
+    ): ModifyUserNotificationResponseDTO {
+        val user = userFacade.getUserByEmail(email)
+        return ModifyUserNotificationResponseDTO(userFacade.modifyUserNotification(user.userId, userNotificationId))
+    }
+
+    @Operation(summary = "[회원-014] 유저 초대코드 조회")
+    @GetMapping("/users/me/invitation")
+    fun getUserInvitation(
+        @RequestAttribute("email") email: String,
+    ) {
+        val user = userFacade.getUserByEmail(email)
+// TODO: 초대 이력 가져오는 로직 추가
     }
 }

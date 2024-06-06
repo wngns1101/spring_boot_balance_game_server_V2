@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
 
 @Configuration
-class ApiFilterConfig (){
+class ApiFilterConfig() {
     private val includeTokenFilterPaths = arrayOf(
         "$USER_V2_PREFIX/*",
         "$BOARD_V2_PREFIX/*",

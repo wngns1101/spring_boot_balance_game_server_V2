@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.scheduling.annotation.EnableAsync
 
 @SpringBootApplication(
-    scanBasePackages = ["balance_game_v2","domain"]
+    scanBasePackages = ["balance_game_v2", "domain"]
 )
 
 @EntityScan(basePackages = ["domain"])

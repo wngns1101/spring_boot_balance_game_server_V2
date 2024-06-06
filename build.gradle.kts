@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "3.2.3" apply false
     id("io.spring.dependency-management") version "1.1.4" apply false
-    id("org.jmailen.kotlinter") version "3.2.0"
     kotlin("jvm") version "1.9.23"
+    id("org.jmailen.kotlinter") version "3.2.0"
     kotlin("plugin.spring") version "1.9.22" apply false
     kotlin("plugin.jpa") version "1.9.22" apply false
 }
@@ -12,6 +12,8 @@ plugins {
 allprojects {
     group = "org.example"
     version = "0.0.1-SNAPSHOT"
+
+    apply(plugin = "org.jmailen.kotlinter")
 
     repositories {
         mavenCentral()

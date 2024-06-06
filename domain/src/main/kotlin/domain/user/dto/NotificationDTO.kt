@@ -1,25 +1,27 @@
-package balance_game_v2.api.v1.notification.http.req
+package domain.user.dto
 
+import domain.notification.entity.Notification
 import domain.notification.model.NotificationStatus
 import domain.notification.model.NotificationType
-import domain.user.dto.CreateUserNotificationCommand
 
-data class CreateUserNotificationRequestDTO(
+data class NotificationDTO (
     val title: String,
     val body: String,
     val imageUrl: String,
     val link: String,
     val status: NotificationStatus,
     val type: NotificationType,
+    val isRead: Boolean,
 )
 
-fun CreateUserNotificationRequestDTO.toCommand(): CreateUserNotificationCommand {
-    return CreateUserNotificationCommand(
+fun Notification.toDTO(): NotificationDTO {
+    return NotificationDTO(
         title = title,
         body = body,
         imageUrl = imageUrl,
         link = link,
         status = status,
         type = type,
+        isRead = isRead,
     )
 }

@@ -4,7 +4,7 @@ import domain.board.dto.BoardContentCommand
 import domain.board.dto.BoardContentDTO
 import domain.board.dto.ModifyBoardCommand
 
-data class BoardModifyRequestDTO (
+data class BoardModifyRequestDTO(
     val title: String,
     val content: String,
     val boardContent: List<BoardContentDTO>,
