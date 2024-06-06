@@ -8,7 +8,6 @@ import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
-import java.io.FileInputStream
 import java.io.InputStream
 
 @Configuration
