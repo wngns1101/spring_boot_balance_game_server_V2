@@ -9,15 +9,18 @@ import com.google.firebase.messaging.Notification
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
 import java.io.FileInputStream
+import java.io.InputStream
 
 @Configuration
 class FcmClient(
-    private val firebaseConfigPath: String = "/firebase/fcm.json"
+    private val firebaseConfigPath: String = "firebase/fcm.json"
 ) {
     init {
-        val serviceAccount = FileInputStream(ClassPathResource(firebaseConfigPath).file)
+        val resource = ClassPathResource(firebaseConfigPath)
+        val inputStream: InputStream = resource.inputStream
+
         val options = FirebaseOptions.Builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+            .setCredentials(GoogleCredentials.fromStream(inputStream))
             .build()
 
         FirebaseApp.initializeApp(options)
