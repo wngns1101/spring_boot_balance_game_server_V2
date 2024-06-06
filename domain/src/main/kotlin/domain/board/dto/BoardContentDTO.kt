@@ -2,7 +2,7 @@ package domain.board.dto
 
 import domain.board.entity.BoardContent
 
-data class BoardContentDTO (
+data class BoardContentDTO(
     val boardContentId: Long,
     val title: String,
     val photoUrl: String,

@@ -3,7 +3,7 @@ package domain.user.dto
 import domain.user.entity.UserNotification
 import domain.user.model.UserNotificationType
 
-data class UserNotificationDTO (
+data class UserNotificationDTO(
     val userNotificationId: Long,
     val userId: Long,
     val type: UserNotificationType,

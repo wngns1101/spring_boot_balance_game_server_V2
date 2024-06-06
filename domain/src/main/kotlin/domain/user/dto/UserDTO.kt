@@ -3,7 +3,7 @@ package domain.user.dto
 import domain.user.entity.User
 import java.time.LocalDateTime
 
-data class UserDTO (
+data class UserDTO(
     val userId: Long,
     val nickname: String,
     val realName: String,

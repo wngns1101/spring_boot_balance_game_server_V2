@@ -1,11 +1,31 @@
 package domain.board
 
 import domain.auth.exception.NotFoundUserException
-import domain.board.dto.*
-import domain.board.entity.*
+import domain.board.dto.BoardContentDTO
+import domain.board.dto.BoardDetailDTO
+import domain.board.dto.BoardResultDTO
+import domain.board.dto.CreateBoardCommand
+import domain.board.dto.CreateBoardCommentCommand
+import domain.board.dto.DeleteBoardCommentCommand
+import domain.board.dto.ModifyBoardCommand
+import domain.board.dto.ModifyBoardContentCommand
+import domain.board.dto.PageBoardDTO
+import domain.board.dto.WriterDTO
+import domain.board.dto.toBoardDetail
+import domain.board.dto.toDTO
+import domain.board.dto.toPageBoardDTO
+import domain.board.entity.Board
+import domain.board.entity.BoardComment
+import domain.board.entity.BoardContent
+import domain.board.entity.BoardHeart
+import domain.board.entity.BoardResult
 import domain.board.exception.NotFoundException
 import domain.board.model.BoardSortCondition
-import domain.board.repository.*
+import domain.board.repository.BoardCommentRepository
+import domain.board.repository.BoardContentRepository
+import domain.board.repository.BoardHeartRepository
+import domain.board.repository.BoardRepository
+import domain.board.repository.BoardResultRepository
 import domain.error.InvalidUserException
 import domain.user.repository.UserRepository
 import org.springframework.data.domain.PageRequest
@@ -13,7 +33,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class BoardService (
+class BoardService(
     val userRepository: UserRepository,
     val boardRepository: BoardRepository,
     val boardContentRepository: BoardContentRepository,
@@ -42,7 +62,7 @@ class BoardService (
         }
     }
 
-    fun getBoards(query: String?, page: Int, size: Int, sortCondition: BoardSortCondition?): PageBoardDTO  {
+    fun getBoards(query: String?, page: Int, size: Int, sortCondition: BoardSortCondition?): PageBoardDTO {
         val pageable = PageRequest.of(page, size)
         val boards = boardRepository.search(query, pageable, sortCondition)
 
@@ -167,7 +187,6 @@ class BoardService (
             parentCommentId = boardComment.parentCommentId,
             comment = command.content
         ).let { boardCommentRepository.save(it) }
-
     }
 
     @Transactional
@@ -178,5 +197,4 @@ class BoardService (
         if (boardComment.userId != userId) throw InvalidUserException()
         boardCommentRepository.delete(boardComment)
     }
-
 }

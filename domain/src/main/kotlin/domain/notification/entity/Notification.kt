@@ -3,11 +3,17 @@ package domain.notification.entity
 import domain.BaseEntity
 import domain.notification.model.NotificationStatus
 import domain.notification.model.NotificationType
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
 @Table(name = "notification")
 @Entity
-class Notification (
+class Notification(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val userNotificationId: Long? = null,
@@ -21,4 +27,4 @@ class Notification (
     @Enumerated(EnumType.STRING)
     val status: NotificationStatus,
     var isRead: Boolean = false,
-): BaseEntity()
+) : BaseEntity()

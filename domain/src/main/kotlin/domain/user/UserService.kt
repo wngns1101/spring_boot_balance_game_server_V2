@@ -5,14 +5,18 @@ import domain.auth.exception.NotFoundUserException
 import domain.auth.model.AuthGroup
 import domain.board.exception.NotFoundException
 import domain.error.AlreadySignUpException
-import domain.user.dto.*
+import domain.notification.repository.NotificationRepository
+import domain.user.dto.JoinUserCommand
+import domain.user.dto.PageUserNotificationDTO
+import domain.user.dto.UserDTO
+import domain.user.dto.UserNotificationDTO
+import domain.user.dto.toDTO
 import domain.user.entity.TermsAgreementHistory
 import domain.user.entity.User
-import domain.user.model.TermsAgreementHistoryType
-import domain.user.repository.TermsAgreementHistoryRepository
-import domain.notification.repository.NotificationRepository
 import domain.user.entity.UserNotification
+import domain.user.model.TermsAgreementHistoryType
 import domain.user.model.UserNotificationType
+import domain.user.repository.TermsAgreementHistoryRepository
 import domain.user.repository.UserNotificationRepository
 import domain.user.repository.UserRepository
 import org.springframework.data.domain.PageRequest
@@ -21,13 +25,13 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class UserService (
+class UserService(
     private val userRepository: UserRepository,
     private val authService: AuthService,
     private val notificationRepository: NotificationRepository,
     private val termsAgreementHistoryRepository: TermsAgreementHistoryRepository,
     private val userNotificationRepository: UserNotificationRepository,
-){
+) {
     @Transactional
     fun signUp(email: String, password: String, joinUserCommand: JoinUserCommand): Pair<String, AuthGroup> {
         val authResult = authService.signUp(email, password)
@@ -71,7 +75,7 @@ class UserService (
 
     @Transactional
     fun modifyUserInfo(userId: Long, nickName: String, phoneNumber: String) {
-        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
 
         user.nickname = nickName
         user.phoneNumber = phoneNumber
@@ -79,20 +83,20 @@ class UserService (
 
     @Transactional
     fun withdraw(userId: Long) {
-        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
         user.deletedAt = LocalDateTime.now()
 
 //        TODO: 삭제 스케쥴러 추가
     }
 
     fun getUserById(userId: Long): UserDTO {
-        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
         return user.toDTO()
     }
 
     @Transactional
     fun updateUserPushToken(userId: Long, pushToken: String) {
-        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
         user.pushToken = pushToken
     }
 
@@ -109,14 +113,14 @@ class UserService (
 
     @Transactional
     fun readUserNotification(userId: Long, notificationId: Long) {
-        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
         val notification = notificationRepository.findById(notificationId).orElseThrow { NotFoundUserException() }
         notification.isRead = true
     }
 
     @Transactional
     fun modifyMarketingAgreement(userId: Long): Boolean {
-        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
 
         val marketingAgreement = termsAgreementHistoryRepository.findByUserIdAndType(user.userId!!, TermsAgreementHistoryType.MARKETING)
             ?: throw NotFoundException()
@@ -130,23 +134,23 @@ class UserService (
     }
 
     fun getUserNotifications(userId: Long): List<UserNotificationDTO> {
-        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
 
         return userNotificationRepository.findAllByUserId(user.userId!!).map { it.toDTO() }
     }
 
     @Transactional
     fun modifyUserNotifications(userId: Long, userNotificationId: Long): Boolean {
-        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
 
-        val userNotification = userNotificationRepository.findById(userNotificationId).orElseThrow{ NotFoundUserException() }
+        val userNotification = userNotificationRepository.findById(userNotificationId).orElseThrow { NotFoundUserException() }
         userNotification.status = !userNotification.status
 
         return userNotification.status
     }
 
     fun getUserInvitation(userId: Long) {
-        val user = userRepository.findById(userId).orElseThrow{ NotFoundUserException() }
+        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
 
 //      TODO: 초대코드 생성
     }

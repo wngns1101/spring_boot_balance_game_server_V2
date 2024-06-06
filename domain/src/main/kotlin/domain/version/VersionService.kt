@@ -6,9 +6,9 @@ import domain.version.repository.VersionRepository
 import org.springframework.stereotype.Service
 
 @Service
-class VersionService (
+class VersionService(
     val versionRepository: VersionRepository
-){
+) {
     fun getVersion(): VersionDTO {
         return versionRepository.findTopByOrderByVersionIdDesc().toDTO()
     }

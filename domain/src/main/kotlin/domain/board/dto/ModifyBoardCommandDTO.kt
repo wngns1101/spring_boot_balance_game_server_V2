@@ -1,4 +1,3 @@
 package domain.board.dto
 
-class ModifyBoardCommandDTO {
-}
+class ModifyBoardCommandDTO

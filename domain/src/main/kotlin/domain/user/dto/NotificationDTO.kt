@@ -4,7 +4,7 @@ import domain.notification.entity.Notification
 import domain.notification.model.NotificationStatus
 import domain.notification.model.NotificationType
 
-data class NotificationDTO (
+data class NotificationDTO(
     val title: String,
     val body: String,
     val imageUrl: String,

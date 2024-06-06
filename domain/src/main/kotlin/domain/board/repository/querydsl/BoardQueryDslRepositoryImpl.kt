@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Component
 
 @Component
-class BoardQueryDslRepositoryImpl:
+class BoardQueryDslRepositoryImpl :
     BoardQueryDslRepository,
     QuerydslRepositorySupport(Board::class.java) {
     override fun search(query: String?, pageable: Pageable, sortCondition: BoardSortCondition?): Page<Board> {

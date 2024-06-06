@@ -1,12 +1,12 @@
 package domain.auth
 
-import domain.auth.exception.PasswordMismatchException
-import jakarta.transaction.Transactional
 import domain.auth.entity.Auth
 import domain.auth.exception.NotSignUpUserException
+import domain.auth.exception.PasswordMismatchException
 import domain.auth.model.AuthGroup
 import domain.auth.repository.AuthRepository
 import domain.error.AlreadyExistEmailException
+import jakarta.transaction.Transactional
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 

@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
 import java.io.FileInputStream
 
-
 @Configuration
 class FcmClient(
     private val firebaseConfigPath: String = "/firebase/fcm.json"

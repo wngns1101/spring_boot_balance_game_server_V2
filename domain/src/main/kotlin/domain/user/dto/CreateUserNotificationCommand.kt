@@ -3,7 +3,7 @@ package domain.user.dto
 import domain.notification.model.NotificationStatus
 import domain.notification.model.NotificationType
 
-data class CreateUserNotificationCommand (
+data class CreateUserNotificationCommand(
     val title: String,
     val body: String,
     val imageUrl: String,

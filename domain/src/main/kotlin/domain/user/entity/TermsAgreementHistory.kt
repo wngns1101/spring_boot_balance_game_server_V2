@@ -1,14 +1,18 @@
 package domain.user.entity
 
 import domain.BaseEntity
-import domain.user.model.TermsAgreementHistoryStatus
 import domain.user.model.TermsAgreementHistoryType
-import jakarta.persistence.*
-
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
 @Table(name = "terms_agreement_history")
 @Entity
-class TermsAgreementHistory (
+class TermsAgreementHistory(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val termsAgreementHistoryId: Long? = null,
@@ -16,4 +20,4 @@ class TermsAgreementHistory (
     @Enumerated(EnumType.STRING)
     val type: TermsAgreementHistoryType,
     val status: Boolean,
-): BaseEntity()
+) : BaseEntity()

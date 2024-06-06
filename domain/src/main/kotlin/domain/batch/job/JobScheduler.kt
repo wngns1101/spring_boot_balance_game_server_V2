@@ -1,7 +1,14 @@
 package domain.batch.job
 
 import jakarta.annotation.PostConstruct
-import org.quartz.*
+import org.quartz.CronScheduleBuilder
+import org.quartz.Job
+import org.quartz.JobBuilder
+import org.quartz.JobDataMap
+import org.quartz.JobDetail
+import org.quartz.Scheduler
+import org.quartz.Trigger
+import org.quartz.TriggerBuilder
 import org.springframework.stereotype.Service
 
 @Service
@@ -10,8 +17,7 @@ class JobScheduler(
 ) {
 
     @PostConstruct
-    fun run()
-    {
+    fun run() {
 //        runJob(
 //            job = TestJob::class.java,
 //            desc = "스케쥴링 테스트",
@@ -38,11 +44,9 @@ class JobScheduler(
             .setJobData(jobDataMap)
             .withDescription(desc)
             .build()
-
     }
 
     private fun jobTrigger(exp: String): Trigger {
         return TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(exp)).build()
     }
-
 }

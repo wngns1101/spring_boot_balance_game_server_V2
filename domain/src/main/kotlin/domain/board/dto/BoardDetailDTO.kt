@@ -21,7 +21,6 @@ data class WriterDTO(
     val nickName: String,
 )
 
-
 fun Board.toBoardDetail(writer: WriterDTO, boardComment: List<BoardCommentDTO>): BoardDetailDTO {
     return BoardDetailDTO(
         boardId = boardId!!,

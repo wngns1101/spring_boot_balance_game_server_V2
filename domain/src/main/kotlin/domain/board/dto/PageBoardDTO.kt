@@ -3,12 +3,12 @@ package domain.board.dto
 import domain.board.entity.Board
 import java.time.LocalDateTime
 
-data class PageBoardDTO (
+data class PageBoardDTO(
     val boards: List<BoardListDTO>,
     val totalPage: Int,
 )
 
-data class BoardListDTO (
+data class BoardListDTO(
     val boardId: Long,
     val title: String,
     val viewCount: Int,

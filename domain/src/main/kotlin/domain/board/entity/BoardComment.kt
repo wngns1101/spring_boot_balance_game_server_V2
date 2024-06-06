@@ -1,11 +1,15 @@
 package domain.board.entity
 
-import jakarta.persistence.*
 import domain.BaseEntity
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
 @Entity
 @Table(name = "board_comment")
-class BoardComment (
+class BoardComment(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val boardCommentId: Long? = null,
@@ -13,4 +17,4 @@ class BoardComment (
     val userId: Long,
     val parentCommentId: Long? = null,
     var comment: String,
-): BaseEntity()
+) : BaseEntity()

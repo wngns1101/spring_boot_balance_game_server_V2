@@ -1,3 +1,3 @@
 package domain.error
 
-class InvalidUserException: BusinessException()
+class InvalidUserException : BusinessException()

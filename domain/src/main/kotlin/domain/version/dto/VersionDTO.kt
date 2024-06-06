@@ -2,7 +2,7 @@ package domain.version.dto
 
 import domain.version.entity.Version
 
-class VersionDTO (
+class VersionDTO(
     val currentVersion: String,
     val minimumVersion: String,
     val preferVersion: String,

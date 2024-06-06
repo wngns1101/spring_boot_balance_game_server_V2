@@ -2,7 +2,6 @@ package domain.batch.job
 
 import org.quartz.JobExecutionContext
 import org.slf4j.LoggerFactory
-
 import org.springframework.scheduling.quartz.QuartzJobBean
 
 class TestJob : QuartzJobBean() {

@@ -1,3 +1,3 @@
 package domain.board.exception
 
-class NotFoundException: RuntimeException()
+class NotFoundException : RuntimeException()
