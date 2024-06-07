@@ -6,23 +6,20 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
-import com.google.gson.JsonParser
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.Resource
+import java.io.FileInputStream
 
 @Configuration
 class FcmClient(
-    private val firebaseConfigPath: String = "firebase/fcm.json"
+    @Value("classpath:firebase/fcm.json")
+    private val resource: Resource,
 ) {
     init {
-        val resource = ClassPathResource(firebaseConfigPath)
-        val inputStream = resource.inputStream
-        val jsonString = inputStream.bufferedReader().use { it.readText() }
-        val jsonElement = JsonParser.parseString(jsonString)
-        val credentials = GoogleCredentials.fromStream(jsonElement.toString().byteInputStream())
-
-        val options = FirebaseOptions.Builder()
-            .setCredentials(credentials)
+        val serviceAccount = FileInputStream(resource.file)
+        val options = FirebaseOptions.builder()
+            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
             .build()
 
         FirebaseApp.initializeApp(options)
