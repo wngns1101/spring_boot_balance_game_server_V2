@@ -18,11 +18,11 @@ class JobScheduler(
 
     @PostConstruct
     fun run() {
-//        runJob(
-//            job = TestJob::class.java,
-//            desc = "스케쥴링 테스트",
-//            exp = "5 * * * * ?"
-//        )
+        runJob(
+            job = TestJob::class.java,
+            desc = "알림 예약 스케쥴링 테스트",
+            exp = "5 * * * * ?"
+        )
     }
 
     fun runJob(job: Class<out Job>, desc: String, params: Map<String, Any>? = null, exp: String) {

@@ -131,7 +131,7 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-009] 게시글 댓글 작성")
-    @PostMapping("/boards/{boardId}/comment")
+    @PostMapping("/comments/{boardId}/comment")
     fun createBoardComment(
         @RequestAttribute("email") email: String,
         @PathVariable("boardId") boardId: Long,
@@ -143,7 +143,7 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-010] 게시글 댓글 수정")
-    @PutMapping("/boards/{boardId}/comment")
+    @PutMapping("/comments/{boardId}/comment")
     fun modifyBoardComment(
         @RequestAttribute("email") email: String,
         @PathVariable("boardId") boardId: Long,
@@ -164,5 +164,27 @@ class BoardApiController(
         val user = userFacade.getUserByEmail(email)
 
         boardFacade.deleteBoardComment(boardId, user.userId, request)
+    }
+
+    @Operation(summary = "[게임-012] 게시글 신고")
+    @PostMapping("/boards/{boardId}/report")
+    fun createBoardReport(
+        @RequestAttribute("email") email: String,
+        @PathVariable("boardId") boardId: Long,
+    ) {
+        val user = userFacade.getUserByEmail(email)
+
+        boardFacade.createBoardReport(boardId, user.userId)
+    }
+
+    @Operation(summary = "[게임-013] 댓글 신고")
+    @PostMapping("/comments/{boardCommentId}/report")
+    fun createBoardCommentReport(
+        @RequestAttribute("email") email: String,
+        @PathVariable("boardCommentId") boardCommentId: Long,
+    ) {
+        val user = userFacade.getUserByEmail(email)
+
+        boardFacade.createBoardCommentReport(boardCommentId, user.userId)
     }
 }

@@ -62,4 +62,12 @@ class BoardFacade(
     fun deleteBoardComment(boardId: Long, userId: Long, request: DeleteBoardCommentRequestDTO) {
         return boardService.deleteBoardComment(boardId, userId, request.toCommand())
     }
+
+    fun createBoardReport(boardId: Long, userId: Long) {
+        boardService.createBoardReport(boardId, userId)
+    }
+
+    fun createBoardCommentReport(boardCommentId: Long, userId: Long) {
+        boardService.createBoardCommentReport(boardCommentId, userId)
+    }
 }

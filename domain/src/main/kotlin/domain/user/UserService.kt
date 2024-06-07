@@ -10,14 +10,17 @@ import domain.user.dto.JoinUserCommand
 import domain.user.dto.PageUserNotificationDTO
 import domain.user.dto.UserDTO
 import domain.user.dto.UserNotificationDTO
+import domain.user.dto.UserReportDTO
 import domain.user.dto.toDTO
 import domain.user.entity.TermsAgreementHistory
 import domain.user.entity.User
 import domain.user.entity.UserNotification
+import domain.user.entity.UserReport
 import domain.user.model.TermsAgreementHistoryType
 import domain.user.model.UserNotificationType
 import domain.user.repository.TermsAgreementHistoryRepository
 import domain.user.repository.UserNotificationRepository
+import domain.user.repository.UserReportRepository
 import domain.user.repository.UserRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -31,6 +34,7 @@ class UserService(
     private val notificationRepository: NotificationRepository,
     private val termsAgreementHistoryRepository: TermsAgreementHistoryRepository,
     private val userNotificationRepository: UserNotificationRepository,
+    private val userReportRepository: UserReportRepository,
 ) {
     @Transactional
     fun signUp(email: String, password: String, joinUserCommand: JoinUserCommand): Pair<String, AuthGroup> {
@@ -153,5 +157,21 @@ class UserService(
         val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
 
 //      TODO: 초대코드 생성
+    }
+
+    @Transactional
+    fun createUserReport(userId: Long, targetUserId: Long) {
+        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
+
+        UserReport(
+            userId = userId,
+            targetUserId = targetUserId,
+        ).let { userReportRepository.save(it) }
+    }
+
+    fun getUserReports(userId: Long): List<UserReportDTO> {
+        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
+
+        return userReportRepository.findAllByUserId(userId).map { it.toDTO() }
     }
 }

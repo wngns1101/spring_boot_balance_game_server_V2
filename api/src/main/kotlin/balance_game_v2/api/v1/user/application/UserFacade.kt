@@ -2,10 +2,14 @@ package balance_game_v2.api.v1.user.application
 
 import balance_game_v2.api.v1.user.http.req.SignUpCommand
 import domain.auth.AuthService
+import domain.board.BoardService
+import domain.board.dto.BoardCommentReportDTO
+import domain.board.dto.BoardReportDTO
 import domain.user.UserService
 import domain.user.dto.PageUserNotificationDTO
 import domain.user.dto.UserDTO
 import domain.user.dto.UserNotificationDTO
+import domain.user.dto.UserReportDTO
 import org.springframework.stereotype.Component
 
 @Component
@@ -13,6 +17,7 @@ class UserFacade(
     private val userService: UserService,
     private val authService: AuthService,
     private val tokenManager: TokenManager,
+    private val boardService: BoardService,
 ) {
     fun signUp(userCommand: SignUpCommand): TokenDTO {
         val authResult = userService.signUp(userCommand.email, userCommand.password, userCommand.joinUserCommand)
@@ -69,5 +74,21 @@ class UserFacade(
 
     fun getUserInvitation(userId: Long): Any {
         return userService.getUserInvitation(userId)
+    }
+
+    fun createUserReport(userId: Long, targetUserId: Long) {
+        return userService.createUserReport(userId, targetUserId)
+    }
+
+    fun getUserReports(userId: Long): List<UserReportDTO> {
+        return userService.getUserReports(userId)
+    }
+
+    fun getBoardReports(userId: Long): List<BoardReportDTO> {
+        return boardService.getBoardReports(userId)
+    }
+
+    fun getBoardCommentReports(userId: Long): List<BoardCommentReportDTO> {
+        return boardService.getBoardCommentReports(userId)
     }
 }

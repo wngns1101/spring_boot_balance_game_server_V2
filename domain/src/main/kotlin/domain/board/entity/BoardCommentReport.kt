@@ -8,11 +8,11 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "comment_report")
-class CommentReport(
+@Table(name = "board_comment_report")
+class BoardCommentReport(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val commentReportId: Long = 0,
-    val commentId: Long,
+    val boardCommentReportId: Long = 0,
+    val boardCommentId: Long,
     val userId: Long,
 ) : BaseEntity()

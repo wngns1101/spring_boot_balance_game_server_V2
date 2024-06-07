@@ -5,7 +5,10 @@ import balance_game_v2.api.v1.user.http.req.ChangePasswordRequestDTO
 import balance_game_v2.api.v1.user.http.req.ModifyUserInfoRequestDTO
 import balance_game_v2.api.v1.user.http.req.SignInRequestDTO
 import balance_game_v2.api.v1.user.http.req.SignUpRequestDTO
+import balance_game_v2.api.v1.user.http.res.ListBoardCommentReportResponseDTO
+import balance_game_v2.api.v1.user.http.res.ListBoardReportResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListUserNotificationResponseDTO
+import balance_game_v2.api.v1.user.http.res.ListUserReportResponseDTO
 import balance_game_v2.api.v1.user.http.res.ModifyUserNotificationResponseDTO
 import balance_game_v2.api.v1.user.http.res.PageUserNotificationResponseDTO
 import balance_game_v2.api.v1.user.http.res.SignInResponseDTO
@@ -154,6 +157,43 @@ class UserApiController(
         @RequestAttribute("email") email: String,
     ) {
         val user = userFacade.getUserByEmail(email)
-// TODO: 초대 이력 가져오는 로직 추가
+//       TODO: 초대 이력 가져오는 로직 추가
+    }
+
+    @Operation(summary = "[회원-015] 유저 신고")
+    @PostMapping("/users/{userId}/report")
+    fun createUserReport(
+        @RequestAttribute("email") email: String,
+        @PathVariable("userId") targetUserId: Long,
+    ) {
+        val user = userFacade.getUserByEmail(email)
+        userFacade.createUserReport(user.userId, targetUserId)
+    }
+
+    @Operation(summary = "[회원-016] 신고한 유저 내역 조회")
+    @GetMapping("/users/me/userReports")
+    fun getUserReports(
+        @RequestAttribute("email") email: String,
+    ): ListUserReportResponseDTO {
+        val user = userFacade.getUserByEmail(email)
+        return ListUserReportResponseDTO(userFacade.getUserReports(user.userId))
+    }
+
+    @Operation(summary = "[회원-017] 신고한 게시글 내역 조회")
+    @GetMapping("/users/me/boardReports")
+    fun getBoardReports(
+        @RequestAttribute("email") email: String,
+    ): ListBoardReportResponseDTO {
+        val user = userFacade.getUserByEmail(email)
+        return ListBoardReportResponseDTO(userFacade.getBoardReports(user.userId))
+    }
+
+    @Operation(summary = "[회원-018] 신고한 댓글 내역 조회")
+    @GetMapping("/users/me/boardCommentReports")
+    fun getBoardCommentReports(
+        @RequestAttribute("email") email: String,
+    ): ListBoardCommentReportResponseDTO {
+        val user = userFacade.getUserByEmail(email)
+        return ListBoardCommentReportResponseDTO(userFacade.getBoardCommentReports(user.userId))
     }
 }

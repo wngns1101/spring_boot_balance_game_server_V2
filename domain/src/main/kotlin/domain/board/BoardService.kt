@@ -1,8 +1,10 @@
 package domain.board
 
 import domain.auth.exception.NotFoundUserException
+import domain.board.dto.BoardCommentReportDTO
 import domain.board.dto.BoardContentDTO
 import domain.board.dto.BoardDetailDTO
+import domain.board.dto.BoardReportDTO
 import domain.board.dto.BoardResultDTO
 import domain.board.dto.CreateBoardCommand
 import domain.board.dto.CreateBoardCommentCommand
@@ -16,14 +18,18 @@ import domain.board.dto.toDTO
 import domain.board.dto.toPageBoardDTO
 import domain.board.entity.Board
 import domain.board.entity.BoardComment
+import domain.board.entity.BoardCommentReport
 import domain.board.entity.BoardContent
 import domain.board.entity.BoardHeart
+import domain.board.entity.BoardReport
 import domain.board.entity.BoardResult
 import domain.board.exception.NotFoundException
 import domain.board.model.BoardSortCondition
+import domain.board.repository.BoardCommentReportRepository
 import domain.board.repository.BoardCommentRepository
 import domain.board.repository.BoardContentRepository
 import domain.board.repository.BoardHeartRepository
+import domain.board.repository.BoardReportRepository
 import domain.board.repository.BoardRepository
 import domain.board.repository.BoardResultRepository
 import domain.error.InvalidUserException
@@ -40,6 +46,8 @@ class BoardService(
     val boardHeartRepository: BoardHeartRepository,
     val boardResultRepository: BoardResultRepository,
     val boardCommentRepository: BoardCommentRepository,
+    val boardReportRepository: BoardReportRepository,
+    val boardCommentReportRepository: BoardCommentReportRepository,
 ) {
     @Transactional
     fun createBoard(userId: Long, command: CreateBoardCommand) {
@@ -196,5 +204,33 @@ class BoardService(
 
         if (boardComment.userId != userId) throw InvalidUserException()
         boardCommentRepository.delete(boardComment)
+    }
+
+    @Transactional
+    fun createBoardReport(boardId: Long, userId: Long) {
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+
+        BoardReport(
+            boardId = board.boardId!!,
+            userId = userId,
+        ).let { boardReportRepository.save(it) }
+    }
+
+    @Transactional
+    fun createBoardCommentReport(boardCommentId: Long, userId: Long) {
+        val boardComment = boardCommentRepository.findById(boardCommentId).orElseThrow { NotFoundException() }
+
+        BoardCommentReport(
+            boardCommentId = boardComment.boardId,
+            userId = userId,
+        ).let { boardCommentReportRepository.save(it) }
+    }
+
+    fun getBoardReports(userId: Long): List<BoardReportDTO> {
+        return boardReportRepository.findAllByUserId(userId).map { it.toDTO() }
+    }
+
+    fun getBoardCommentReports(userId: Long): List<BoardCommentReportDTO> {
+        return boardCommentReportRepository.findAllByUserId(userId).map { it.toDTO() }
     }
 }
