@@ -7,10 +7,8 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
 import com.google.gson.JsonParser
-import com.google.gson.stream.JsonReader
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
-import java.io.InputStreamReader
 
 @Configuration
 class FcmClient(
