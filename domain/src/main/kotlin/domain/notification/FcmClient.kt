@@ -19,12 +19,9 @@ class FcmClient(
     init {
         val resource = ClassPathResource(firebaseConfigPath)
         val inputStream = resource.inputStream
-        val jsonReader = JsonReader(InputStreamReader(inputStream)).apply {
-            isLenient = true
-        }
-
-        val jsonElement = JsonParser.parseReader(jsonReader)
-        val credentials = GoogleCredentials.fromStream(jsonElement.asJsonObject.toString().byteInputStream())
+        val jsonString = inputStream.bufferedReader().use { it.readText() }
+        val jsonElement = JsonParser.parseString(jsonString)
+        val credentials = GoogleCredentials.fromStream(jsonElement.toString().byteInputStream())
 
         val options = FirebaseOptions.Builder()
             .setCredentials(credentials)
