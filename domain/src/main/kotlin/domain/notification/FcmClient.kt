@@ -9,7 +9,6 @@ import com.google.firebase.messaging.Notification
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.Resource
-import java.io.FileInputStream
 
 @Configuration
 class FcmClient(
@@ -17,7 +16,7 @@ class FcmClient(
     private val resource: Resource,
 ) {
     init {
-        val serviceAccount = FileInputStream(resource.file)
+        val serviceAccount = resource.inputStream
         val options = FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(serviceAccount))
             .build()
