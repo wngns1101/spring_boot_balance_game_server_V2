@@ -39,7 +39,7 @@ jobs:
       - name: make fcm.json
         run: |
           mkdir -p ./domain/src/main/resources/firebase && cd ./domain/src/main/resources/firebase
-          echo "${{GOOGLE_SERVICES_JSON}}" > ./fcm.json
+          echo "$GOOGLE_SERVICES_JSON" > ./fcm.json
 
       # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
       # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
