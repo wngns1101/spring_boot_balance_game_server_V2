@@ -9,7 +9,7 @@ import com.google.firebase.messaging.Notification
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.Resource
-import java.io.FileInputStream
+import java.io.IOException
 
 @Configuration
 class FcmClient(
@@ -17,13 +17,21 @@ class FcmClient(
     private val resource: Resource,
 ) {
     init {
-        val serviceAccount = FileInputStream(resource.file)
-        println(serviceAccount)
-        val options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .build()
+        try {
+            initFirebase()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
 
-        FirebaseApp.initializeApp(options)
+    @Throws(IOException::class)
+    private fun initFirebase() {
+        resource.inputStream.use { serviceAccount ->
+            val options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .build()
+            FirebaseApp.initializeApp(options)
+        }
     }
 
     fun send(token: String, title: String, body: String, link: String) {
