@@ -1,6 +1,5 @@
 package balance_game_v2.api.v1.user.application
 
-import domain.auth.exception.InvalidTokenException
 import domain.auth.model.AuthGroup
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
@@ -68,34 +67,30 @@ class TokenManager(
 
     fun getUserEmailFromToken(token: String): String {
         val claims = getClaimsFromToken(token)
-        return claims.get("email").toString()
+        return claims["email"].toString()
     }
 
     fun getAuthGroupFromToken(token: String): AuthGroup {
         val claims = getClaimsFromToken(token)
-        return claims.get("authGroup") as AuthGroup
+        return AuthGroup.valueOf(claims["authGroup"] as String)
     }
 
     fun isTokenExpired(token: String): Boolean {
         val date = Date()
         val claims = getClaimsFromToken(token)
-        return if (claims.expiration.before(date)) false else true
+        return claims.expiration.before(date)
     }
 
-    fun validationAccessToken(accessToken: String) {
+    fun validationAccessToken(accessToken: String): Boolean {
         val claims = getClaimsFromToken(accessToken)
 
-        if (claims["tokenType"] != "accessToken") {
-            throw InvalidTokenException()
-        }
+        return claims["tokenType"] == "accessToken"
     }
 
-    fun validationRefreshToken(refreshToken: String) {
+    fun validationRefreshToken(refreshToken: String): Boolean {
         val claims = getClaimsFromToken(refreshToken)
 
-        if (claims["tokenType"] != "refreshToken") {
-            throw InvalidTokenException()
-        }
+        return claims["tokenType"] == "refreshToken"
     }
 
     fun makeJwtToken(email: String, authGroup: AuthGroup): TokenDTO {
@@ -105,8 +100,6 @@ class TokenManager(
     }
 
     fun refreshToken(refreshToken: String): TokenDTO {
-        validationRefreshToken(refreshToken)
-
         val email = getUserEmailFromToken(refreshToken)
         val authGroup = getAuthGroupFromToken(refreshToken)
 

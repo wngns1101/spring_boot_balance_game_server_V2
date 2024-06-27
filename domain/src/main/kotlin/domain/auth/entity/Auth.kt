@@ -20,4 +20,5 @@ class Auth(
     val authGroup: AuthGroup,
     val email: String,
     var password: String,
+    var refreshToken: String? = null,
 ) : BaseEntity()

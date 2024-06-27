@@ -49,10 +49,21 @@ class AuthService(
 
     @Transactional
     fun changeUserPassword(email: String, currentPassword: String, newPassword: String) {
-        val auth = authRepository.findByEmailAndDeletedAtIsNull(email)
+        val auth = authRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotSignUpUserException()
 
-        if (!encoder.matches(currentPassword, auth!!.password)) throw PasswordMismatchException()
+        if (!encoder.matches(currentPassword, auth.password)) throw PasswordMismatchException()
 
         auth.password = encoder.encode(newPassword)
+    }
+
+    @Transactional
+    fun updateToken(email: String, refreshToken: String) {
+        val auth = authRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotSignUpUserException()
+        auth.refreshToken = refreshToken
+    }
+
+    fun validationToken(email: String, token: String): Boolean {
+        val auth = authRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotSignUpUserException()
+        return auth.refreshToken.equals(token)
     }
 }

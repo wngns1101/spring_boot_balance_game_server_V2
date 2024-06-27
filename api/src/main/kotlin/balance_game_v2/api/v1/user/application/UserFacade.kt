@@ -1,5 +1,9 @@
 package balance_game_v2.api.v1.user.application
 
+import balance_game_v2.api.v1.user.http.exception.ExpiredTokenException
+import balance_game_v2.api.v1.user.http.exception.InvalidTokenTypeException
+import balance_game_v2.api.v1.user.http.exception.NotEqualsTokenException
+import balance_game_v2.api.v1.user.http.exception.UnknownException
 import balance_game_v2.api.v1.user.http.req.SignUpCommand
 import domain.auth.AuthService
 import domain.board.BoardService
@@ -21,8 +25,11 @@ class UserFacade(
 ) {
     fun signUp(userCommand: SignUpCommand): TokenDTO {
         val authResult = userService.signUp(userCommand.email, userCommand.password, userCommand.joinUserCommand)
+        val tokens = tokenManager.makeJwtToken(authResult.first, authResult.second)
 
-        return tokenManager.makeJwtToken(authResult.first, authResult.second)
+        authService.updateToken(authResult.first, tokens.refreshToken)
+
+        return tokens
     }
 
     fun signIn(email: String, password: String, pushToken: String?): TokenDTO {
@@ -33,7 +40,10 @@ class UserFacade(
             userService.updateUserPushToken(user.userId, pushToken)
         }
 
-        return tokenManager.makeJwtToken(auth.first, auth.second)
+        val tokens = tokenManager.makeJwtToken(auth.first, auth.second)
+        authService.updateToken(auth.first, tokens.refreshToken)
+
+        return tokens
     }
 
     fun getUserByEmail(email: String): UserDTO {
@@ -90,5 +100,30 @@ class UserFacade(
 
     fun getBoardCommentReports(userId: Long): List<BoardCommentReportDTO> {
         return boardService.getBoardCommentReports(userId)
+    }
+
+    fun reIssue(token: String): TokenDTO {
+        try {
+            if (tokenManager.validationRefreshToken(token)) {
+                if (tokenManager.isTokenExpired(token)) {
+                    throw ExpiredTokenException()
+                }
+
+                val email = tokenManager.getUserEmailFromToken(token)
+
+                if (authService.validationToken(email, token)) {
+                    val authGroup = tokenManager.getAuthGroupFromToken(token)
+                    val tokens = tokenManager.makeJwtToken(email, authGroup)
+                    authService.updateToken(email, tokens.refreshToken)
+                    return tokens
+                } else {
+                    throw NotEqualsTokenException()
+                }
+            } else {
+                throw InvalidTokenTypeException()
+            }
+        } catch (e: InvalidTokenTypeException) {
+            throw UnknownException()
+        }
     }
 }
