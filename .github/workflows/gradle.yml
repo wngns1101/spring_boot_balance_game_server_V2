@@ -63,7 +63,7 @@ jobs:
       #
       # 3. Docker 이미지 빌드
       - name: docker image build
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/github-actions-demo:latest .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/balance-game-server:latest .
 
       # 4. DockerHub 로그인
       - name: docker login
@@ -74,4 +74,16 @@ jobs:
 
       # 5. Docker Hub 이미지 푸시
       - name: docker Hub push
-        run: docker push ${{secrets.DOCKER_USERNAME}}/github-actions-demo:latest
+        run: docker push ${{secrets.DOCKER_USERNAME}}/balance-game-server:latest
+
+      - name: AWS Credential
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_SSH_HOST }}
+          username: ${{ secrets.AWS_SSH_USERNAME }}
+          key: ${{ secrets.AWS_KEY }}
+          script: |
+            sudo docker rm -f balance-game-server
+            sudo docker pull ${{secrets.DOCKER_USERNAME}}/balance-game-server:latest
+            sudo docker run -d --name server -e TZ=Asia/Seoul -p 8080:8080 ${{secrets.DOCKER_USERNAME}}/balance-game-server
+
