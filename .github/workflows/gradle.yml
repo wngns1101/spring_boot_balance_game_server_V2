@@ -77,7 +77,7 @@ jobs:
         run: docker push ${{secrets.DOCKER_USERNAME}}/balance-game-server:latest
 
       - name: AWS Credential
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.AWS_SSH_HOST }}
           username: ${{ secrets.AWS_SSH_USERNAME }}
