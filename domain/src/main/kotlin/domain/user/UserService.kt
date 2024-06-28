@@ -18,6 +18,8 @@ import domain.user.entity.UserNotification
 import domain.user.entity.UserReport
 import domain.user.model.TermsAgreementHistoryType
 import domain.user.model.UserNotificationType
+import domain.user.repository.AdjectiveNameRepository
+import domain.user.repository.AnimalNameRepository
 import domain.user.repository.TermsAgreementHistoryRepository
 import domain.user.repository.UserNotificationRepository
 import domain.user.repository.UserReportRepository
@@ -35,6 +37,8 @@ class UserService(
     private val termsAgreementHistoryRepository: TermsAgreementHistoryRepository,
     private val userNotificationRepository: UserNotificationRepository,
     private val userReportRepository: UserReportRepository,
+    private val adjectiveNameRepository: AdjectiveNameRepository,
+    private val animalNameRepository: AnimalNameRepository,
 ) {
     @Transactional
     fun signUp(email: String, password: String, joinUserCommand: JoinUserCommand): Pair<String, AuthGroup> {
@@ -45,7 +49,7 @@ class UserService(
 
         val user = User(
             email = joinUserCommand.email,
-            nickname = joinUserCommand.nickname,
+            nickname = nicknameMaker(),
             realName = joinUserCommand.realName,
             birth = joinUserCommand.birth,
             phoneNumber = joinUserCommand.phoneNumber,
@@ -57,15 +61,31 @@ class UserService(
 
         val termsAgreementHistories = mutableListOf<TermsAgreementHistory>()
 
-        termsAgreementHistories += TermsAgreementHistory(userId = user.userId!!, type = TermsAgreementHistoryType.SERVICE, status = true)
-        termsAgreementHistories += TermsAgreementHistory(userId = user.userId!!, type = TermsAgreementHistoryType.MARKETING, status = joinUserCommand.isCheckedMarketing)
+        termsAgreementHistories += TermsAgreementHistory(
+            userId = user.userId!!,
+            type = TermsAgreementHistoryType.SERVICE,
+            status = true
+        )
+        termsAgreementHistories += TermsAgreementHistory(
+            userId = user.userId!!,
+            type = TermsAgreementHistoryType.MARKETING,
+            status = joinUserCommand.isCheckedMarketing
+        )
 
         termsAgreementHistoryRepository.saveAll(termsAgreementHistories)
 
         val userNotifications = mutableListOf<UserNotification>()
 
-        userNotifications += UserNotification(userId = user.userId!!, type = UserNotificationType.SERVICE, status = true)
-        userNotifications += UserNotification(userId = user.userId!!, type = UserNotificationType.MARKETING, status = joinUserCommand.isCheckedMarketing)
+        userNotifications += UserNotification(
+            userId = user.userId!!,
+            type = UserNotificationType.SERVICE,
+            status = true
+        )
+        userNotifications += UserNotification(
+            userId = user.userId!!,
+            type = UserNotificationType.MARKETING,
+            status = joinUserCommand.isCheckedMarketing
+        )
 
         userNotificationRepository.saveAll(userNotifications)
 
@@ -126,12 +146,17 @@ class UserService(
     fun modifyMarketingAgreement(userId: Long): Boolean {
         val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
 
-        val marketingAgreement = termsAgreementHistoryRepository.findByUserIdAndType(user.userId!!, TermsAgreementHistoryType.MARKETING)
-            ?: throw NotFoundException()
+        val marketingAgreement =
+            termsAgreementHistoryRepository.findByUserIdAndType(user.userId!!, TermsAgreementHistoryType.MARKETING)
+                ?: throw NotFoundException()
         termsAgreementHistoryRepository.delete(marketingAgreement)
 
         val newMarketingAgreement =
-            TermsAgreementHistory(userId = userId, type = TermsAgreementHistoryType.MARKETING, status = !marketingAgreement.status)
+            TermsAgreementHistory(
+                userId = userId,
+                type = TermsAgreementHistoryType.MARKETING,
+                status = !marketingAgreement.status
+            )
         termsAgreementHistoryRepository.save(newMarketingAgreement)
 
         return newMarketingAgreement.status
@@ -147,7 +172,8 @@ class UserService(
     fun modifyUserNotifications(userId: Long, userNotificationId: Long): Boolean {
         val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
 
-        val userNotification = userNotificationRepository.findById(userNotificationId).orElseThrow { NotFoundUserException() }
+        val userNotification =
+            userNotificationRepository.findById(userNotificationId).orElseThrow { NotFoundUserException() }
         userNotification.status = !userNotification.status
 
         return userNotification.status
@@ -173,5 +199,26 @@ class UserService(
         val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
 
         return userReportRepository.findAllByUserId(userId).map { it.toDTO() }
+    }
+
+    private fun nicknameMaker(): String {
+        val animalNames = animalNameRepository.findAll().map { it.name }
+        val adjectiveNames = adjectiveNameRepository.findAll().map { it.name }
+        val nickname: String
+
+        while (true) {
+            val randomAnimalName = animalNames.random()
+            val randomAdjectiveName = adjectiveNames.random()
+            val randomNum = (1..100).random()
+
+            val combineNickname = "$randomAdjectiveName$randomAnimalName$randomNum"
+
+            if (!userRepository.existsUserByNickname(combineNickname)) {
+                nickname = combineNickname
+                break
+            }
+        }
+
+        return nickname
     }
 }
