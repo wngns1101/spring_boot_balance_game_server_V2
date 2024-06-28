@@ -82,6 +82,7 @@ jobs:
           host: ${{ secrets.AWS_SSH_HOST }}
           username: ${{ secrets.AWS_SSH_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
+          port: ${{ secrets.AWS_PORT}}
           script: |
             sudo docker rm -f balance-game-server
             sudo docker pull ${{secrets.DOCKER_USERNAME}}/balance-game-server:latest
