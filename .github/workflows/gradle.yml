@@ -92,6 +92,6 @@ jobs:
           script: |
             sudo docker rm -f balance-game-server
             sudo docker pull ${{secrets.DOCKER_USERNAME}}/balance-game-server:latest
-            sudo docker run -d --name balance-game-server -e TZ=Asia/Seoul -p 8080:8080 ${{secrets.DOCKER_USERNAME}}/balance-game-server
+            sudo docker run -d --name balance-game-server -e TZ=Asia/Seoul -p 80:80 ${{secrets.DOCKER_USERNAME}}/balance-game-server
             sudo docker rmi $(docker images -f "dangling=true" -q)
 
