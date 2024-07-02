@@ -41,6 +41,12 @@ jobs:
           mkdir -p ./domain/src/main/resources/firebase && cd ./domain/src/main/resources/firebase
           echo "$GOOGLE_SERVICES_JSON" > ./fcm.json
 
+      - name: make slack.yml
+        run: |
+          cd ./api/src/main/resources
+          touch ./slack.yml
+          echo "${{secrets.SLACK}}" > ./slack.yml
+
       # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
       # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
       - name: Setup Gradle
@@ -87,5 +93,5 @@ jobs:
             sudo docker rm -f balance-game-server
             sudo docker pull ${{secrets.DOCKER_USERNAME}}/balance-game-server:latest
             sudo docker run -d --name balance-game-server -e TZ=Asia/Seoul -p 8080:8080 ${{secrets.DOCKER_USERNAME}}/balance-game-server
-            sudo docker image prune -a
+            sudo docker rmi $(docker images -f "dangling=true" -q)
 

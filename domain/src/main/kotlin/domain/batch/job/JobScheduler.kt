@@ -21,7 +21,7 @@ class JobScheduler(
         runJob(
             job = TestJob::class.java,
             desc = "알림 예약 스케쥴링 테스트",
-            exp = "* * 10 * * ?"
+            exp = "1 1 10 * * ?"
         )
     }
 
