@@ -17,6 +17,9 @@ class HostFilter : Filter {
 
         val host = req.getHeader("Host")
         println(host)
+        println(dns)
+        println(host.equals(dns))
+        println(host.equals(dns.toString()))
         if (!host.equals("localhost") && !host.equals(dns)) {
             response.getWriter().write("Forbidden")
             response.getWriter().flush()
