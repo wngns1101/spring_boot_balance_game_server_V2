@@ -5,7 +5,7 @@ import domain.user.dto.JoinUserCommand
 data class SignUpRequestDTO(
     val email: String,
     val password: String,
-    val userName: String,
+    val realName: String,
     val birth: String,
     val phoneNumber: String,
     val pushToken: String?,
@@ -17,7 +17,7 @@ data class SignUpRequestDTO(
             password = request.password,
             joinUserCommand = JoinUserCommand(
                 email = request.email,
-                realName = request.userName,
+                realName = request.realName,
                 birth = request.birth,
                 phoneNumber = request.phoneNumber,
                 pushToken = request.pushToken,

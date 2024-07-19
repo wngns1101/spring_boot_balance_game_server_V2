@@ -66,4 +66,8 @@ class AuthService(
         val auth = authRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotSignUpUserException()
         return auth.refreshToken.equals(token)
     }
+
+    fun checkDuplicateEmail(email: String): Boolean {
+        return authRepository.existsByEmail(email)
+    }
 }

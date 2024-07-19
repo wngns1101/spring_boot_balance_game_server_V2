@@ -23,8 +23,8 @@ class BoardFacade(
         boardService.createBoard(userId, request.toCommand())
     }
 
-    fun getBoards(query: String?, page: Int, size: Int, sortCondition: BoardSortCondition?): PageBoardDTO {
-        return boardService.getBoards(query, page, size, sortCondition)
+    fun getBoards(query: String?, page: Int, size: Int, sortCondition: BoardSortCondition?, themeId: Long): PageBoardDTO {
+        return boardService.getBoards(query, page, size, sortCondition, themeId)
     }
 
     fun getBoardDetail(boardId: Long): BoardDetailDTO {

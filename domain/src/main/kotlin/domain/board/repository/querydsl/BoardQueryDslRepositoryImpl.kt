@@ -15,9 +15,14 @@ import org.springframework.stereotype.Component
 class BoardQueryDslRepositoryImpl :
     BoardQueryDslRepository,
     QuerydslRepositorySupport(Board::class.java) {
-    override fun search(query: String?, pageable: Pageable, sortCondition: BoardSortCondition?): Page<Board> {
+    override fun search(
+        query: String?,
+        pageable: Pageable,
+        sortCondition: BoardSortCondition?,
+        themeId: Long
+    ): Page<Board> {
         val result = from(board)
-            .where(searchCondition(query))
+            .where(searchCondition(query), board.themeId.eq(themeId))
             .orderBy(*sortCondition(sortCondition))
             .offset(pageable.offset)
             .limit((pageable.pageSize).toLong())
@@ -38,11 +43,8 @@ private fun sortCondition(sortCondition: BoardSortCondition?): Array<OrderSpecif
         BoardSortCondition.DATE -> {
             arrayOf(board.updatedAt.desc())
         }
-        BoardSortCondition.HEART -> {
-            arrayOf(board.heartCount.desc())
-        }
-        BoardSortCondition.VIEW_COUNT -> {
-            arrayOf(board.viewCount.desc())
+        BoardSortCondition.LIKE -> {
+            arrayOf(board.likeCount.desc())
         }
     }
 }

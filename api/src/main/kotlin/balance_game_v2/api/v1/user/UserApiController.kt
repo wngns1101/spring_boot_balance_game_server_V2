@@ -4,9 +4,11 @@ import balance_game_v2.api.v1.user.application.TokenManager
 import balance_game_v2.api.v1.user.application.UserFacade
 import balance_game_v2.api.v1.user.http.exception.InvalidTokenTypeException
 import balance_game_v2.api.v1.user.http.req.ChangePasswordRequestDTO
+import balance_game_v2.api.v1.user.http.req.CheckEmailRequestDTO
 import balance_game_v2.api.v1.user.http.req.ModifyUserInfoRequestDTO
 import balance_game_v2.api.v1.user.http.req.SignInRequestDTO
 import balance_game_v2.api.v1.user.http.req.SignUpRequestDTO
+import balance_game_v2.api.v1.user.http.res.CheckEmailResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListBoardCommentReportResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListBoardReportResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListUserNotificationResponseDTO
@@ -210,7 +212,6 @@ class UserApiController(
         res: HttpServletResponse,
     ): ReIssueResponseDTO {
         var token = req.getHeader("Authorization")
-        println("여긴?")
         println(token)
         token = try {
             token.split(" ")[1]
@@ -219,5 +220,13 @@ class UserApiController(
         }
 
         return ReIssueResponseDTO(userFacade.reIssue(token))
+    }
+
+    @Operation(summary = "[회원-020] 이메일 중복확인")
+    @PostMapping("/check-email")
+    fun getReIssue(
+        req: CheckEmailRequestDTO,
+    ): CheckEmailResponseDTO {
+        return CheckEmailResponseDTO(userFacade.checkDuplicateEmail(req.email))
     }
 }

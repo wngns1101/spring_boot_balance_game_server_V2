@@ -12,7 +12,8 @@ data class BoardListDTO(
     val boardId: Long,
     val title: String,
     val viewCount: Int,
-    val heartCount: Int,
+    val likeCount: Int,
+    val dislikeCount: Int,
     val updatedAt: LocalDateTime,
 )
 
@@ -21,7 +22,8 @@ fun Board.toPageBoardDTO(): BoardListDTO {
         boardId = boardId!!,
         title = title,
         viewCount = viewCount,
-        heartCount = heartCount,
+        likeCount = likeCount,
+        dislikeCount = dislikeCount,
         updatedAt = updatedAt,
     )
 }

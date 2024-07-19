@@ -1,6 +1,5 @@
 package domain.board.entity
 
-import domain.BaseEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -8,11 +7,11 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "board_content")
-class BoardContent(
+@Table(name = "board_content_item")
+class BoardContentItem(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val boardContentId: Long? = null,
-    val boardId: Long,
-    val title: String,
-) : BaseEntity()
+    val boardContentItemId: Long? = null,
+    val boardContentId: Long,
+    var item: String,
+)

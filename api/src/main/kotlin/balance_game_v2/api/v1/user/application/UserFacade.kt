@@ -126,4 +126,8 @@ class UserFacade(
             throw UnknownException()
         }
     }
+
+    fun checkDuplicateEmail(email: String): Boolean {
+        return authService.checkDuplicateEmail(email)
+    }
 }

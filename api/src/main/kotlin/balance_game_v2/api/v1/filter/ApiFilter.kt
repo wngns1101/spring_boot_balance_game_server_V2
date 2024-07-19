@@ -28,7 +28,8 @@ class ApiFilter(
 
         if (req.requestURI == "$USER_V2_PREFIX/sign-up" ||
             req.requestURI == "$USER_V2_PREFIX/sign-in" ||
-            req.requestURI == "$USER_V2_PREFIX/users/me/re-issue"
+            req.requestURI == "$USER_V2_PREFIX/users/me/re-issue" ||
+            req.requestURI == "$USER_V2_PREFIX/check-email"
         ) {
             chain.doFilter(req, res)
             return

@@ -20,15 +20,19 @@ import domain.board.entity.Board
 import domain.board.entity.BoardComment
 import domain.board.entity.BoardCommentReport
 import domain.board.entity.BoardContent
+import domain.board.entity.BoardContentItem
 import domain.board.entity.BoardHeart
+import domain.board.entity.BoardKeyword
 import domain.board.entity.BoardReport
 import domain.board.entity.BoardResult
 import domain.board.exception.NotFoundException
 import domain.board.model.BoardSortCondition
 import domain.board.repository.BoardCommentReportRepository
 import domain.board.repository.BoardCommentRepository
+import domain.board.repository.BoardContentItemRepository
 import domain.board.repository.BoardContentRepository
 import domain.board.repository.BoardHeartRepository
+import domain.board.repository.BoardKeywordRepository
 import domain.board.repository.BoardReportRepository
 import domain.board.repository.BoardRepository
 import domain.board.repository.BoardResultRepository
@@ -48,31 +52,51 @@ class BoardService(
     val boardCommentRepository: BoardCommentRepository,
     val boardReportRepository: BoardReportRepository,
     val boardCommentReportRepository: BoardCommentReportRepository,
+    val boardContentItemRepository: BoardContentItemRepository,
+    val boardKeywordRepository: BoardKeywordRepository,
 ) {
     @Transactional
     fun createBoard(userId: Long, command: CreateBoardCommand) {
         val savedBoard = Board(
+            themeId = command.themeId,
             userId = userId,
             title = command.title,
-            content = command.content,
+            introduce = command.introduce,
         ).let {
             boardRepository.save(it)
         }
 
-        command.boardContent.map {
-            BoardContent(
+        command.keywords.map {
+            BoardKeyword(
                 boardId = savedBoard.boardId!!,
-                title = it.title,
-                photoUrl = it.photoUrl,
+                keyword = it,
             )
         }.let {
-            boardContentRepository.saveAll(it)
+            boardKeywordRepository.saveAll(it)
+        }
+
+        command.boardContents.map { it ->
+            val savedBoardContent = BoardContent(
+                boardId = savedBoard.boardId!!,
+                title = it.title,
+            ).let {
+                boardContentRepository.save(it)
+            }
+
+            it.items.map {
+                BoardContentItem(
+                    boardContentId = savedBoardContent.boardContentId!!,
+                    item = it,
+                )
+            }.let {
+                boardContentItemRepository.saveAll(it)
+            }
         }
     }
 
-    fun getBoards(query: String?, page: Int, size: Int, sortCondition: BoardSortCondition?): PageBoardDTO {
+    fun getBoards(query: String?, page: Int, size: Int, sortCondition: BoardSortCondition?, themeId: Long): PageBoardDTO {
         val pageable = PageRequest.of(page, size)
-        val boards = boardRepository.search(query, pageable, sortCondition)
+        val boards = boardRepository.search(query, pageable, sortCondition, themeId)
 
         return PageBoardDTO(
             boards = boards.content.map { it.toPageBoardDTO() },
@@ -107,7 +131,7 @@ class BoardService(
             val boardHeart = boardHeartRepository.findByBoardIdAndUserId(boardId, userId)
             boardHeartRepository.delete(boardHeart)
 
-            board.heartCount -= 1
+            board.likeCount -= 1
             return false
         } else {
             BoardHeart(
@@ -115,7 +139,7 @@ class BoardService(
                 userId = userId,
             ).let { boardHeartRepository.save(it) }
 
-            board.heartCount += 1
+            board.likeCount += 1
             return true
         }
     }
@@ -155,7 +179,7 @@ class BoardService(
     fun modifyBoard(boardId: Long, command: ModifyBoardCommand) {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
         board.title = command.title
-        board.content = command.content
+        board.introduce = command.content
 
         val boardContents = boardContentRepository.findAllByBoardId(board.boardId!!)
         boardContentRepository.deleteAll(boardContents)
@@ -163,8 +187,7 @@ class BoardService(
         command.boardContent.map {
             BoardContent(
                 boardId = board.boardId,
-                title = it.title,
-                photoUrl = it.photoUrl,
+                title = it.title
             )
         }.let { boardContentRepository.saveAll(it) }
     }

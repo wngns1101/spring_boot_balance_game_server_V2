@@ -56,10 +56,11 @@ class BoardApiController(
         @RequestParam("page", defaultValue = "0") page: Int,
         @RequestParam("size", defaultValue = "10") size: Int,
         @RequestParam("sortCondition") sortCondition: BoardSortCondition?,
+        @RequestParam("themeId") themeId: Long,
     ): PageBoardResponseDTO {
         val user = userFacade.getUserByEmail(email)
 
-        return PageBoardResponseDTO(boardFacade.getBoards(query, page, size, sortCondition))
+        return PageBoardResponseDTO(boardFacade.getBoards(query, page, size, sortCondition, themeId))
     }
 
     @Operation(summary = "[게임-003] 게임 상세 조회")

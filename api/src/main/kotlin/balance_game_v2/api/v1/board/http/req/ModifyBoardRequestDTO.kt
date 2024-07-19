@@ -21,6 +21,6 @@ fun BoardModifyRequestDTO.toCommand(): ModifyBoardCommand {
 fun BoardContentDTO.toCommand(): BoardContentCommand {
     return BoardContentCommand(
         title = title,
-        photoUrl = photoUrl,
+        items = emptyList(),
     )
 }

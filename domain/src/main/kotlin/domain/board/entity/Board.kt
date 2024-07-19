@@ -14,8 +14,10 @@ class Board(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val boardId: Long? = null,
     val userId: Long,
+    val themeId: Long,
     var title: String,
-    var content: String,
-    var heartCount: Int = 0,
+    var introduce: String,
+    var likeCount: Int = 0,
+    var dislikeCount: Int = 0,
     var viewCount: Int = 0,
 ) : BaseEntity()
