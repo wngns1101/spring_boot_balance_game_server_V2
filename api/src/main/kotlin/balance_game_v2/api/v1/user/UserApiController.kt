@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -238,7 +239,7 @@ class UserApiController(
     }
 
     @Operation(summary = "[회원-021] 프로필 업로드")
-    @PostMapping("/profile")
+    @PostMapping("/profile", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun profile(
         @RequestPart file: MultipartFile,
     ): String {
