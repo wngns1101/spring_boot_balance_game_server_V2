@@ -1,5 +1,6 @@
 package balance_game_v2.api.v1.user
 
+import balance_game_v2.api.client.S3Config
 import balance_game_v2.api.v1.user.application.TokenManager
 import balance_game_v2.api.v1.user.application.UserFacade
 import balance_game_v2.api.v1.user.http.exception.InvalidTokenTypeException
@@ -21,6 +22,8 @@ import balance_game_v2.api.v1.user.http.res.SignUpResponseDTO
 import balance_game_v2.api.v1.user.http.res.UserDetailResponseDTO
 import balance_game_v2.config.USER_V2
 import balance_game_v2.config.USER_V2_PREFIX
+import com.amazonaws.services.s3.model.ObjectMetadata
+import com.amazonaws.services.s3.model.PutObjectRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
@@ -33,7 +36,10 @@ import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
+import java.util.UUID
 
 @Tag(name = USER_V2)
 @RestController
@@ -41,6 +47,7 @@ import org.springframework.web.bind.annotation.RestController
 class UserApiController(
     private val userFacade: UserFacade,
     private val tokenManager: TokenManager,
+    private val s3Config: S3Config,
 ) {
     @Operation(summary = "[회원-001] 회원가입")
     @PostMapping("/sign-up")
@@ -225,8 +232,34 @@ class UserApiController(
     @Operation(summary = "[회원-020] 이메일 중복확인")
     @PostMapping("/check-email")
     fun getReIssue(
-        req: CheckEmailRequestDTO,
+        @RequestBody req: CheckEmailRequestDTO,
     ): CheckEmailResponseDTO {
         return CheckEmailResponseDTO(userFacade.checkDuplicateEmail(req.email))
+    }
+
+    @Operation(summary = "[회원-021] 프로필 업로드")
+    @PostMapping("/profile")
+    fun profile(
+        @RequestPart file: MultipartFile,
+    ): String {
+        val objectMetadata = ObjectMetadata().apply {
+            this.contentType = file.contentType
+            this.contentLength = file.size
+        }
+
+        val objectKey = "profiles/${UUID.randomUUID()}-${file.originalFilename}"
+
+        val putObjectRequest = PutObjectRequest(
+            "balance-game-bucket",
+            objectKey,
+            file.inputStream,
+            objectMetadata,
+        )
+
+        s3Config.amazonS3Client().putObject(putObjectRequest)
+
+        val publicUrl = "https://balance-game-bucket.s3.amazonaws.com/$objectKey"
+
+        return publicUrl
     }
 }

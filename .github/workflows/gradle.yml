@@ -47,6 +47,12 @@ jobs:
           touch ./slack.yml
           echo "${{secrets.SLACK}}" > ./slack.yml
 
+      - name: make aws.yml
+        run: |
+          cd ./api/src/main/resources
+          touch ./aws.yml
+          echo "${{secrets.AWS}}" > ./aws.yml
+
       # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
       # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
       - name: Setup Gradle
