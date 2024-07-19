@@ -7,4 +7,5 @@ class JoinUserCommand(
     val phoneNumber: String,
     val pushToken: String?,
     val isCheckedMarketing: Boolean,
+    val profileUrl: String?
 )

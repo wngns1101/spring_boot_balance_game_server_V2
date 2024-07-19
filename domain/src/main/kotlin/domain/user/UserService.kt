@@ -55,6 +55,7 @@ class UserService(
             phoneNumber = joinUserCommand.phoneNumber,
             invitationCode = "",
             pushToken = joinUserCommand.pushToken,
+            profileUrl = joinUserCommand.profileUrl,
         )
 
         userRepository.save(user)

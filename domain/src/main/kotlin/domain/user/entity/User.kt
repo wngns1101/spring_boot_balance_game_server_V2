@@ -20,4 +20,5 @@ class User(
     var phoneNumber: String,
     val invitationCode: String,
     var pushToken: String? = null,
+    var profileUrl: String? = null,
 ) : BaseEntity()
