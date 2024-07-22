@@ -15,9 +15,11 @@ data class BoardListDTO(
     val likeCount: Int,
     val dislikeCount: Int,
     val updatedAt: LocalDateTime,
+    val keywords: List<String>,
+    val introduce: String,
 )
 
-fun Board.toPageBoardDTO(): BoardListDTO {
+fun Board.toPageBoardDTO(boardKeywords: List<BoardKeywordDTO>): BoardListDTO {
     return BoardListDTO(
         boardId = boardId!!,
         title = title,
@@ -25,5 +27,7 @@ fun Board.toPageBoardDTO(): BoardListDTO {
         likeCount = likeCount,
         dislikeCount = dislikeCount,
         updatedAt = updatedAt,
+        keywords = boardKeywords.map { it.keyword },
+        introduce = introduce
     )
 }
