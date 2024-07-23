@@ -10,5 +10,6 @@ enum class ErrorCodes(val httpStatus: HttpStatus, val message: String) {
     ALREADY_SIGN_UP_ERROR(HttpStatus.BAD_REQUEST, "이미 가입된 유저"),
     NOT_SIGN_UP_USER_ERROR(HttpStatus.BAD_REQUEST, "가입되지 않은 유저"),
     PASSWORD_MISMATCH_ERROR(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다"),
-    NOT_EQUALS_TOKEN_ERROR(HttpStatus.BAD_REQUEST, "토큰이 일치하지 않습니다")
+    NOT_EQUALS_TOKEN_ERROR(HttpStatus.BAD_REQUEST, "토큰이 일치하지 않습니다"),
+    NOT_EXIST_TOKEN_ERROR(HttpStatus.BAD_REQUEST, "토큰이 존재하지 않습니다")
 }

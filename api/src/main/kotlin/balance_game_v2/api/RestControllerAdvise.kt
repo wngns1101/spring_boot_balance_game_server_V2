@@ -7,6 +7,7 @@ import balance_game_v2.api.v1.user.application.TokenManager
 import balance_game_v2.api.v1.user.http.exception.ExpiredTokenException
 import balance_game_v2.api.v1.user.http.exception.InvalidTokenTypeException
 import balance_game_v2.api.v1.user.http.exception.NotEqualsTokenException
+import balance_game_v2.api.v1.user.http.exception.NotExistTokenException
 import domain.auth.exception.NotSignUpUserException
 import domain.auth.exception.PasswordMismatchException
 import domain.error.AlreadyExistEmailException
@@ -38,6 +39,7 @@ class RestControllerAdvise(
             is ExpiredTokenException -> createResponse(ErrorCodes.EXPIRED_TOKEN_ERROR)
             is InvalidTokenTypeException -> createResponse(ErrorCodes.INVALID_TOKEN_TYPE_ERROR)
             is NotEqualsTokenException -> createResponse(ErrorCodes.NOT_EQUALS_TOKEN_ERROR)
+            is NotExistTokenException -> createResponse(ErrorCodes.NOT_EXIST_TOKEN_ERROR)
             else -> createResponse(ErrorCodes.UNKNOWN_ERROR)
         }
     }

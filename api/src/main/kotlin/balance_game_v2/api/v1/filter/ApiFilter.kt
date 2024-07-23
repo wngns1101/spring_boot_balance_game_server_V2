@@ -29,7 +29,7 @@ class ApiFilter(
         if (req.requestURI == "$USER_V2_PREFIX/sign-up" ||
             req.requestURI == "$USER_V2_PREFIX/sign-in" ||
             req.requestURI == "$USER_V2_PREFIX/users/me/re-issue" ||
-            req.requestURI == "$USER_V2_PREFIX/check-email" ||
+            req.requestURI == "$USER_V2_PREFIX/check-account-name" ||
             req.requestURI == "$USER_V2_PREFIX/profile"
         ) {
             chain.doFilter(req, res)
@@ -39,7 +39,7 @@ class ApiFilter(
         token = try {
             token.split(" ")[1]
         } catch (e: Exception) {
-            sendError(res, ErrorCodes.INVALID_TOKEN_TYPE_ERROR)
+            sendError(res, ErrorCodes.NOT_EXIST_TOKEN_ERROR)
             return
         }
 
