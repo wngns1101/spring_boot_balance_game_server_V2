@@ -11,6 +11,7 @@ data class SignUpRequestDTO(
     val pushToken: String?,
     val isCheckedMarketing: Boolean,
     val profileUrl: String?,
+    val nickName: String?,
 ) {
     fun toCommand(request: SignUpRequestDTO): SignUpCommand {
         return SignUpCommand(
@@ -24,6 +25,7 @@ data class SignUpRequestDTO(
                 pushToken = request.pushToken,
                 isCheckedMarketing = request.isCheckedMarketing,
                 profileUrl = request.profileUrl,
+                nickName = request.nickName,
             )
         )
     }

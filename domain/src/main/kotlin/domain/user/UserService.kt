@@ -49,7 +49,7 @@ class UserService(
 
         val user = User(
             accountName = joinUserCommand.accountName,
-            nickname = nicknameMaker(),
+            nickname = joinUserCommand.nickName ?: nicknameMaker(),
             realName = joinUserCommand.realName,
             birth = joinUserCommand.birth,
             email = joinUserCommand.email,
