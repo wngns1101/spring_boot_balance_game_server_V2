@@ -17,26 +17,26 @@ class AuthService(
     final val encoder = BCryptPasswordEncoder(10)
 
     @Transactional
-    fun signUp(email: String, password: String): Pair<String, AuthGroup> {
-        if (authRepository.existsByEmail(email)) throw AlreadyExistEmailException()
+    fun signUp(accountName: String, password: String): Pair<String, AuthGroup> {
+        if (authRepository.existsByAccountName(accountName)) throw AlreadyExistEmailException()
 
         val auth = Auth(
-            email = email,
+            accountName = accountName,
             password = convertPassword(password),
             authGroup = AuthGroup.USER,
         )
 
         authRepository.save(auth)
 
-        return Pair(email, auth.authGroup)
+        return Pair(accountName, auth.authGroup)
     }
 
-    fun signIn(email: String, password: String): Pair<String, AuthGroup> {
-        val auth = authRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotSignUpUserException()
+    fun signIn(accountName: String, password: String): Pair<String, AuthGroup> {
+        val auth = authRepository.findByAccountNameAndDeletedAtIsNull(accountName) ?: throw NotSignUpUserException()
 
         if (!verificationPassword(password, auth.password)) throw PasswordMismatchException()
 
-        return Pair(auth.email, auth.authGroup)
+        return Pair(auth.accountName, auth.authGroup)
     }
 
     fun convertPassword(password: String): String {
@@ -48,8 +48,8 @@ class AuthService(
     }
 
     @Transactional
-    fun changeUserPassword(email: String, currentPassword: String, newPassword: String) {
-        val auth = authRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotSignUpUserException()
+    fun changeUserPassword(accountName: String, currentPassword: String, newPassword: String) {
+        val auth = authRepository.findByAccountNameAndDeletedAtIsNull(accountName) ?: throw NotSignUpUserException()
 
         if (!encoder.matches(currentPassword, auth.password)) throw PasswordMismatchException()
 
@@ -57,17 +57,17 @@ class AuthService(
     }
 
     @Transactional
-    fun updateToken(email: String, refreshToken: String) {
-        val auth = authRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotSignUpUserException()
+    fun updateToken(accountName: String, refreshToken: String) {
+        val auth = authRepository.findByAccountNameAndDeletedAtIsNull(accountName) ?: throw NotSignUpUserException()
         auth.refreshToken = refreshToken
     }
 
-    fun validationToken(email: String, token: String): Boolean {
-        val auth = authRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotSignUpUserException()
+    fun validationToken(accountName: String, token: String): Boolean {
+        val auth = authRepository.findByAccountNameAndDeletedAtIsNull(accountName) ?: throw NotSignUpUserException()
         return auth.refreshToken.equals(token)
     }
 
-    fun checkDuplicateEmail(email: String): Boolean {
-        return authRepository.existsByEmail(email)
+    fun checkDuplicateEmail(accountName: String): Boolean {
+        return authRepository.existsByAccountName(accountName)
     }
 }

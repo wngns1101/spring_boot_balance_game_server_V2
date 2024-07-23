@@ -23,7 +23,7 @@ class NotificationApi(
     @Operation(method = "[알림-001] 테스트 알림 발송")
     @PostMapping("/test")
     fun testNotification(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") email: String,
         @RequestBody request: CreateUserNotificationRequestDTO,
     ) {
         val user = userFacade.getUserByEmail(email)

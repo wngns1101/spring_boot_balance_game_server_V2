@@ -50,7 +50,7 @@ class ApiFilter(
                     return
                 }
                 val email = tokenManager.getUserEmailFromToken(token)
-                req.setAttribute("email", email)
+                req.setAttribute("accountName", email)
 
                 chain.doFilter(req, res)
             } else {

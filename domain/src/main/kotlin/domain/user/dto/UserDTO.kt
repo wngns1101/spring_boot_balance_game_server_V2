@@ -7,9 +7,9 @@ data class UserDTO(
     val userId: Long,
     val nickname: String,
     val realName: String,
-    val email: String,
+    val accountName: String,
     val birth: String,
-    val phoneNumber: String,
+    val email: String,
     val invitationCode: String,
     val pushToken: String? = null,
     val updatedAt: LocalDateTime
@@ -20,9 +20,9 @@ fun User.toDTO(): UserDTO {
         userId = userId!!,
         nickname = nickname,
         realName = realName,
-        email = email,
+        accountName = accountName,
         birth = birth,
-        phoneNumber = phoneNumber,
+        email = email,
         invitationCode = invitationCode,
         pushToken = pushToken,
         updatedAt = updatedAt

@@ -65,7 +65,7 @@ class UserApiController(
     ): SignInResponseDTO {
         return SignInResponseDTO(
             userFacade.signIn(
-                signInRequestDTO.email,
+                signInRequestDTO.accountName,
                 signInRequestDTO.password,
                 signInRequestDTO.pushToken
             )
@@ -75,9 +75,9 @@ class UserApiController(
     @Operation(summary = "[회원-003] 회원 상세")
     @GetMapping("/users/me")
     fun userDetail(
-        @RequestAttribute("email") email: String
+        @RequestAttribute("accountName") accountName: String
     ): UserDetailResponseDTO {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
 
         return UserDetailResponseDTO(user)
     }
@@ -85,10 +85,10 @@ class UserApiController(
     @Operation(summary = "[회원-004] 회원 비밀번호 변경")
     @PostMapping("/users/me/change-password")
     fun changeUserPassword(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
         @RequestBody changePasswordRequestDTO: ChangePasswordRequestDTO,
     ) {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
 
         userFacade.changeUserPassword(
             user.email,
@@ -100,12 +100,12 @@ class UserApiController(
     @Operation(summary = "[회원-005] 회원 정보 수정")
     @PutMapping("/users/me")
     fun modifyUserInfo(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
         @RequestBody modifyUserInfoRequestDTO: ModifyUserInfoRequestDTO,
     ) {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
 
-        userFacade.modifyUserInfo(user.userId, modifyUserInfoRequestDTO.nickName, modifyUserInfoRequestDTO.phoneNumber)
+        userFacade.modifyUserInfo(user.userId, modifyUserInfoRequestDTO.nickName)
     }
 
     @Operation(summary = "[회원-006] 비밀번호 찾기")
@@ -121,95 +121,95 @@ class UserApiController(
     @Operation(summary = "[회원-008] 회원 탈퇴")
     @PostMapping("/users/me/withdraw")
     fun withdraw(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
     ) {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
         userFacade.withdraw(user.userId)
     }
 
     @Operation(summary = "[회원-009] 유저 알림 내역 리스트 조회")
     @GetMapping("/users/me/notifications")
     fun getUserNotifications(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
         @RequestParam("page", defaultValue = "0") page: Int,
         @RequestParam("size", defaultValue = "10") size: Int,
     ): PageUserNotificationResponseDTO {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
         return PageUserNotificationResponseDTO(userFacade.getUserNotificationHistories(user.userId, page, size))
     }
 
     @Operation(summary = "[회원-010] 유저 알림 읽음 처리")
     @PostMapping("/users/me/notifications/{notificationId}")
     fun readUserNotification(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
         @PathVariable("notificationId") notificationId: Long,
     ) {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
         userFacade.readUserNotification(user.userId, notificationId)
     }
 
     @Operation(summary = "[회원-012] 유저 알림 설정 조회")
     @GetMapping("/users/me/marketing")
     fun getUserNotifications(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
     ): ListUserNotificationResponseDTO {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
         return ListUserNotificationResponseDTO(userFacade.getUserNotifications(user.userId))
     }
 
     @Operation(summary = "[회원-013] 유저 알림 수정")
     @PostMapping("/users/me/marketing/{userNotificationId}")
     fun modifyUserNotification(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
         @PathVariable("userNotificationId") userNotificationId: Long,
     ): ModifyUserNotificationResponseDTO {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
         return ModifyUserNotificationResponseDTO(userFacade.modifyUserNotification(user.userId, userNotificationId))
     }
 
     @Operation(summary = "[회원-014] 유저 초대코드 조회")
     @GetMapping("/users/me/invitation")
     fun getUserInvitation(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
     ) {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
 //       TODO: 초대 이력 가져오는 로직 추가
     }
 
     @Operation(summary = "[회원-015] 유저 신고")
     @PostMapping("/users/{userId}/report")
     fun createUserReport(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
         @PathVariable("userId") targetUserId: Long,
     ) {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
         userFacade.createUserReport(user.userId, targetUserId)
     }
 
     @Operation(summary = "[회원-016] 신고한 유저 내역 조회")
     @GetMapping("/users/me/userReports")
     fun getUserReports(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
     ): ListUserReportResponseDTO {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
         return ListUserReportResponseDTO(userFacade.getUserReports(user.userId))
     }
 
     @Operation(summary = "[회원-017] 신고한 게시글 내역 조회")
     @GetMapping("/users/me/boardReports")
     fun getBoardReports(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
     ): ListBoardReportResponseDTO {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
         return ListBoardReportResponseDTO(userFacade.getBoardReports(user.userId))
     }
 
     @Operation(summary = "[회원-018] 신고한 댓글 내역 조회")
     @GetMapping("/users/me/boardCommentReports")
     fun getBoardCommentReports(
-        @RequestAttribute("email") email: String,
+        @RequestAttribute("accountName") accountName: String,
     ): ListBoardCommentReportResponseDTO {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByEmail(accountName)
         return ListBoardCommentReportResponseDTO(userFacade.getBoardCommentReports(user.userId))
     }
 
@@ -230,12 +230,12 @@ class UserApiController(
         return ReIssueResponseDTO(userFacade.reIssue(token))
     }
 
-    @Operation(summary = "[회원-020] 이메일 중복확인")
-    @PostMapping("/check-email")
+    @Operation(summary = "[회원-020] 아이디 중복확인")
+    @PostMapping("/check-account-name")
     fun getReIssue(
         @RequestBody req: CheckEmailRequestDTO,
     ): CheckEmailResponseDTO {
-        return CheckEmailResponseDTO(userFacade.checkDuplicateEmail(req.email))
+        return CheckEmailResponseDTO(userFacade.checkDuplicateEmail(req.accountName))
     }
 
     @Operation(summary = "[회원-021] 프로필 업로드")

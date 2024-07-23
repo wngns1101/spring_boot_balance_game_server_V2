@@ -41,18 +41,18 @@ class UserService(
     private val animalNameRepository: AnimalNameRepository,
 ) {
     @Transactional
-    fun signUp(email: String, password: String, joinUserCommand: JoinUserCommand): Pair<String, AuthGroup> {
-        val authResult = authService.signUp(email, password)
-        val userResult = userRepository.findByEmailAndDeletedAtIsNull(authResult.first)
+    fun signUp(accountName: String, password: String, joinUserCommand: JoinUserCommand): Pair<String, AuthGroup> {
+        val authResult = authService.signUp(accountName, password)
+        val userResult = userRepository.findByAccountNameAndDeletedAtIsNull(authResult.first)
 
         if (userResult != null) throw AlreadySignUpException()
 
         val user = User(
-            email = joinUserCommand.email,
+            accountName = joinUserCommand.accountName,
             nickname = nicknameMaker(),
             realName = joinUserCommand.realName,
             birth = joinUserCommand.birth,
-            phoneNumber = joinUserCommand.phoneNumber,
+            email = joinUserCommand.email,
             invitationCode = "",
             pushToken = joinUserCommand.pushToken,
             profileUrl = joinUserCommand.profileUrl,
@@ -93,17 +93,16 @@ class UserService(
         return authResult
     }
 
-    fun getUserByEmail(email: String): UserDTO {
-        val user = userRepository.findByEmailAndDeletedAtIsNull(email)
+    fun getUserByEmail(accountName: String): UserDTO {
+        val user = userRepository.findByAccountNameAndDeletedAtIsNull(accountName)
         user.let { return user!!.toDTO() }
     }
 
     @Transactional
-    fun modifyUserInfo(userId: Long, nickName: String, phoneNumber: String) {
+    fun modifyUserInfo(userId: Long, nickName: String) {
         val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
 
         user.nickname = nickName
-        user.phoneNumber = phoneNumber
     }
 
     @Transactional

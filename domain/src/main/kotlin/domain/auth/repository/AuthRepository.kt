@@ -6,9 +6,9 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface AuthRepository : JpaRepository<Auth, Long> {
-    fun existsByEmail(email: String): Boolean
+    fun existsByAccountName(id: String): Boolean
 
-    fun findByEmailAndDeletedAtIsNull(email: String): Auth?
+    fun findByAccountNameAndDeletedAtIsNull(id: String): Auth?
 
-    fun findByEmail(email: String): Auth?
+    fun findByAccountName(id: String): Auth?
 }

@@ -24,7 +24,7 @@ class UserFacade(
     private val boardService: BoardService,
 ) {
     fun signUp(userCommand: SignUpCommand): TokenDTO {
-        val authResult = userService.signUp(userCommand.email, userCommand.password, userCommand.joinUserCommand)
+        val authResult = userService.signUp(userCommand.accountName, userCommand.password, userCommand.joinUserCommand)
         val tokens = tokenManager.makeJwtToken(authResult.first, authResult.second)
 
         authService.updateToken(authResult.first, tokens.refreshToken)
@@ -54,8 +54,8 @@ class UserFacade(
         authService.changeUserPassword(email, currentPassword, newPassword)
     }
 
-    fun modifyUserInfo(userId: Long, nickname: String, phoneNumber: String) {
-        userService.modifyUserInfo(userId, nickname, phoneNumber)
+    fun modifyUserInfo(userId: Long, nickname: String) {
+        userService.modifyUserInfo(userId, nickname)
     }
 
     fun withdraw(userId: Long) {

@@ -1,10 +1,10 @@
 package domain.user.dto
 
 class JoinUserCommand(
-    val email: String,
+    val accountName: String,
     val realName: String,
     val birth: String,
-    val phoneNumber: String,
+    val email: String,
     val pushToken: String?,
     val isCheckedMarketing: Boolean,
     val profileUrl: String?

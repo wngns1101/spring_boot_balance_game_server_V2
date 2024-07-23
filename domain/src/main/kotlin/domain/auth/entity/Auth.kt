@@ -18,7 +18,7 @@ class Auth(
     val authId: Long? = null,
     @Enumerated(value = EnumType.STRING)
     val authGroup: AuthGroup,
-    val email: String,
+    val accountName: String,
     var password: String,
     var refreshToken: String? = null,
 ) : BaseEntity()
