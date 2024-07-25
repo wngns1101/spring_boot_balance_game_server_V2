@@ -20,4 +20,5 @@ dependencies {
     runtimeOnly ("io.jsonwebtoken:jjwt-impl:0.11.2")
     runtimeOnly ("io.jsonwebtoken:jjwt-jackson:0.11.2")
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.174")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
 }
