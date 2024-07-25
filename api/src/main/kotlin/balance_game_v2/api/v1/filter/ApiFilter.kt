@@ -30,7 +30,9 @@ class ApiFilter(
             req.requestURI == "$USER_V2_PREFIX/sign-in" ||
             req.requestURI == "$USER_V2_PREFIX/users/me/re-issue" ||
             req.requestURI == "$USER_V2_PREFIX/check-account-name" ||
-            req.requestURI == "$USER_V2_PREFIX/profile"
+            req.requestURI == "$USER_V2_PREFIX/profile" ||
+            req.requestURI == "$USER_V2_PREFIX/email-certificate" ||
+            req.requestURI == "$USER_V2_PREFIX/check-email-certificate"
         ) {
             chain.doFilter(req, res)
             return

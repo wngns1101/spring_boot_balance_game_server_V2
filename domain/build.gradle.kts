@@ -20,6 +20,7 @@ dependencies {
     implementation ("org.springframework.boot:spring-boot-starter")
     implementation("com.google.firebase:firebase-admin:9.2.0")
     implementation("org.springframework.boot:spring-boot-starter-quartz")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
 }
 
 idea {

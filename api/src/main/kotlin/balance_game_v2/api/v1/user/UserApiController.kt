@@ -5,10 +5,13 @@ import balance_game_v2.api.v1.user.application.TokenManager
 import balance_game_v2.api.v1.user.application.UserFacade
 import balance_game_v2.api.v1.user.http.exception.InvalidTokenTypeException
 import balance_game_v2.api.v1.user.http.req.ChangePasswordRequestDTO
+import balance_game_v2.api.v1.user.http.req.CheckEmailCertificateRequestDTO
 import balance_game_v2.api.v1.user.http.req.CheckEmailRequestDTO
+import balance_game_v2.api.v1.user.http.req.EmailCertificateRequestDTO
 import balance_game_v2.api.v1.user.http.req.ModifyUserInfoRequestDTO
 import balance_game_v2.api.v1.user.http.req.SignInRequestDTO
 import balance_game_v2.api.v1.user.http.req.SignUpRequestDTO
+import balance_game_v2.api.v1.user.http.res.CheckEmailCertificateResponseDTO
 import balance_game_v2.api.v1.user.http.res.CheckEmailResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListBoardCommentReportResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListBoardReportResponseDTO
@@ -262,5 +265,21 @@ class UserApiController(
         val publicUrl = "https://balance-game-bucket.s3.amazonaws.com/$objectKey"
 
         return publicUrl
+    }
+
+    @Operation(summary = "[회원-022] 이메일 인증")
+    @PostMapping("/email-certificate")
+    fun send(
+        @RequestBody request: EmailCertificateRequestDTO,
+    ) {
+        userFacade.sendAuthCodeForEmailCertificate(request.email, UUID.randomUUID().toString().substring(0, 8))
+    }
+
+    @Operation(summary = "[회원-023] 인증번호 확인")
+    @PostMapping("/check-email-certificate")
+    fun send(
+        @RequestBody request: CheckEmailCertificateRequestDTO,
+    ): CheckEmailCertificateResponseDTO {
+        return CheckEmailCertificateResponseDTO(userFacade.checkEmailCertificate(request.email, request.code))
     }
 }
