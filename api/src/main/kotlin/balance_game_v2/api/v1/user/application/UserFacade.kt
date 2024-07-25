@@ -172,8 +172,6 @@ class UserFacade(
     fun checkEmailCertificate(email: String, code: String): Boolean {
         val existCertificate = certificateRepository.findById(email).orElseThrow { NotFoundException() }
 
-        println(existCertificate.code)
-
         return existCertificate.code == code
     }
 }
