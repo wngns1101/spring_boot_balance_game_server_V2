@@ -12,7 +12,8 @@ data class UserDTO(
     val email: String,
     val invitationCode: String,
     val pushToken: String? = null,
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime,
+    val profileUrl: String?,
 )
 
 fun User.toDTO(): UserDTO {
@@ -25,6 +26,7 @@ fun User.toDTO(): UserDTO {
         email = email,
         invitationCode = invitationCode,
         pushToken = pushToken,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        profileUrl = profileUrl,
     )
 }
