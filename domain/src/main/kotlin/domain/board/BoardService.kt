@@ -99,9 +99,9 @@ class BoardService(
         val boards = boardRepository.search(query, pageable, sortCondition, themeId)
         val boardIds = boards.content.mapNotNull { it.boardId }
 
-        val boardKeywordsMap = boardIds.associateWith { boardId ->
-            boardKeywordRepository.findAllByBoardId(boardId).map { it.toDTO() }
-        }
+        val boardKeywords = boardKeywordRepository.findAllByBoardIdIn(boardIds)
+        val boardKeywordsMap = boardKeywords.groupBy { it.boardId }
+            .mapValues { it.value.map { it.toDTO() } }
 
         return PageBoardDTO(
             boards = boards.content.map {

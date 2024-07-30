@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface BoardKeywordRepository : JpaRepository<BoardKeyword, Int> {
     fun findAllByBoardId(boardId: Long): List<BoardKeyword>
+    fun findAllByBoardIdIn(boardIds: List<Long>): List<BoardKeyword>
 }

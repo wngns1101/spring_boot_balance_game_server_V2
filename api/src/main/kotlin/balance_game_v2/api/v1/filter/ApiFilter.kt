@@ -4,6 +4,7 @@ import balance_game_v2.api.support.error.ErrorCodes
 import balance_game_v2.api.support.error.ErrorModel
 import balance_game_v2.api.v1.user.application.TokenManager
 import balance_game_v2.api.v1.user.http.common.CookieUtils
+import balance_game_v2.config.BOARD_V2_PREFIX
 import balance_game_v2.config.USER_V2_PREFIX
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.servlet.Filter
@@ -32,7 +33,8 @@ class ApiFilter(
             req.requestURI == "$USER_V2_PREFIX/check-account-name" ||
             req.requestURI == "$USER_V2_PREFIX/profile" ||
             req.requestURI == "$USER_V2_PREFIX/email-certificate" ||
-            req.requestURI == "$USER_V2_PREFIX/check-email-certificate"
+            req.requestURI == "$USER_V2_PREFIX/check-email-certificate" ||
+            req.requestURI == "$BOARD_V2_PREFIX/boards"
         ) {
             chain.doFilter(req, res)
             return
