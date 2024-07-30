@@ -1,4 +1,4 @@
-package domain.board.entity
+package domain.theme.entity
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -13,4 +13,5 @@ class Theme(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val themeId: Long? = null,
     val theme: String,
+    val iconUrl: String,
 )
