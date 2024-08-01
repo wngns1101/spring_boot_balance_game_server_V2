@@ -60,7 +60,7 @@ class UserFacade(
         return tokens
     }
 
-    fun getUserByEmail(email: String): UserDTO {
+    fun getUserByAccountName(email: String): UserDTO {
         return userService.getUserByEmail(email)
     }
 

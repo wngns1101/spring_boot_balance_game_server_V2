@@ -50,7 +50,7 @@ class AuthService(
     @Transactional
     fun changeUserPassword(accountName: String, currentPassword: String, newPassword: String) {
         val auth = authRepository.findByAccountNameAndDeletedAtIsNull(accountName) ?: throw NotSignUpUserException()
-
+        println(auth)
         if (!encoder.matches(currentPassword, auth.password)) throw PasswordMismatchException()
 
         auth.password = encoder.encode(newPassword)

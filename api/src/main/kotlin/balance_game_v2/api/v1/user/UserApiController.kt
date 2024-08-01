@@ -80,7 +80,7 @@ class UserApiController(
     fun userDetail(
         @RequestAttribute("accountName") accountName: String
     ): UserDetailResponseDTO {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         return UserDetailResponseDTO(user)
     }
@@ -91,10 +91,10 @@ class UserApiController(
         @RequestAttribute("accountName") accountName: String,
         @RequestBody changePasswordRequestDTO: ChangePasswordRequestDTO,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         userFacade.changeUserPassword(
-            user.email,
+            user.accountName,
             changePasswordRequestDTO.currentPassword,
             changePasswordRequestDTO.newPassword
         )
@@ -106,7 +106,7 @@ class UserApiController(
         @RequestAttribute("accountName") accountName: String,
         @RequestBody modifyUserInfoRequestDTO: ModifyUserInfoRequestDTO,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         userFacade.modifyUserInfo(user.userId, modifyUserInfoRequestDTO.nickName)
     }
@@ -126,7 +126,7 @@ class UserApiController(
     fun withdraw(
         @RequestAttribute("accountName") accountName: String,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
         userFacade.withdraw(user.userId)
     }
 
@@ -137,7 +137,7 @@ class UserApiController(
         @RequestParam("page", defaultValue = "0") page: Int,
         @RequestParam("size", defaultValue = "10") size: Int,
     ): PageUserNotificationResponseDTO {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
         return PageUserNotificationResponseDTO(userFacade.getUserNotificationHistories(user.userId, page, size))
     }
 
@@ -147,7 +147,7 @@ class UserApiController(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("notificationId") notificationId: Long,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
         userFacade.readUserNotification(user.userId, notificationId)
     }
 
@@ -156,7 +156,7 @@ class UserApiController(
     fun getUserNotifications(
         @RequestAttribute("accountName") accountName: String,
     ): ListUserNotificationResponseDTO {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
         return ListUserNotificationResponseDTO(userFacade.getUserNotifications(user.userId))
     }
 
@@ -166,7 +166,7 @@ class UserApiController(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("userNotificationId") userNotificationId: Long,
     ): ModifyUserNotificationResponseDTO {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
         return ModifyUserNotificationResponseDTO(userFacade.modifyUserNotification(user.userId, userNotificationId))
     }
 
@@ -175,7 +175,7 @@ class UserApiController(
     fun getUserInvitation(
         @RequestAttribute("accountName") accountName: String,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 //       TODO: 초대 이력 가져오는 로직 추가
     }
 
@@ -185,7 +185,7 @@ class UserApiController(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("userId") targetUserId: Long,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
         userFacade.createUserReport(user.userId, targetUserId)
     }
 
@@ -194,7 +194,7 @@ class UserApiController(
     fun getUserReports(
         @RequestAttribute("accountName") accountName: String,
     ): ListUserReportResponseDTO {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
         return ListUserReportResponseDTO(userFacade.getUserReports(user.userId))
     }
 
@@ -203,7 +203,7 @@ class UserApiController(
     fun getBoardReports(
         @RequestAttribute("accountName") accountName: String,
     ): ListBoardReportResponseDTO {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
         return ListBoardReportResponseDTO(userFacade.getBoardReports(user.userId))
     }
 
@@ -212,7 +212,7 @@ class UserApiController(
     fun getBoardCommentReports(
         @RequestAttribute("accountName") accountName: String,
     ): ListBoardCommentReportResponseDTO {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
         return ListBoardCommentReportResponseDTO(userFacade.getBoardCommentReports(user.userId))
     }
 

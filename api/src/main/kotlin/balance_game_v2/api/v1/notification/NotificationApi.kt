@@ -26,7 +26,7 @@ class NotificationApi(
         @RequestAttribute("accountName") email: String,
         @RequestBody request: CreateUserNotificationRequestDTO,
     ) {
-        val user = userFacade.getUserByEmail(email)
+        val user = userFacade.getUserByAccountName(email)
         notificationFacade.send(user.userId, request)
     }
 }

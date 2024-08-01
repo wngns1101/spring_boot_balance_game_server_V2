@@ -43,7 +43,7 @@ class BoardApiController(
         @RequestAttribute("accountName") accountName: String,
         @RequestBody request: CreateBoardRequestDTO,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         boardFacade.createBoard(user.userId, request)
     }
@@ -69,7 +69,7 @@ class BoardApiController(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
     ): BoardDetailResponseDTO {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         return BoardDetailResponseDTO(boardFacade.getBoardDetail(boardId))
     }
@@ -80,7 +80,7 @@ class BoardApiController(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
     ): BoardHeartResponseDTO {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         return BoardHeartResponseDTO(boardFacade.boardHeart(boardId, user.userId))
     }
@@ -91,7 +91,7 @@ class BoardApiController(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
     ): BoardContentResponseDTO {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         return BoardContentResponseDTO(boardFacade.getBoardContents(boardId))
     }
@@ -103,7 +103,7 @@ class BoardApiController(
         @PathVariable("boardId") boardId: Long,
         @RequestParam("boardContentId") boardContentId: Long,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         return boardFacade.createBoardResult(boardId, boardContentId, user.userId)
     }
@@ -114,7 +114,7 @@ class BoardApiController(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
     ): BoardResultResponseDTO {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         return BoardResultResponseDTO(boardFacade.getBoardResult(boardId))
     }
@@ -126,7 +126,7 @@ class BoardApiController(
         @PathVariable("boardId") boardId: Long,
         @RequestBody request: BoardModifyRequestDTO
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         boardFacade.modifyBoard(boardId, request)
     }
@@ -138,7 +138,7 @@ class BoardApiController(
         @PathVariable("boardId") boardId: Long,
         @RequestBody request: CreateBoardCommentRequestDTO,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         boardFacade.createBoardComment(boardId, user.userId, request)
     }
@@ -150,7 +150,7 @@ class BoardApiController(
         @PathVariable("boardId") boardId: Long,
         @RequestBody request: ModifyBoardCommentRequestDTO,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         boardFacade.modifyBoardComment(boardId, user.userId, request)
     }
@@ -162,7 +162,7 @@ class BoardApiController(
         @PathVariable("boardId") boardId: Long,
         @RequestBody request: DeleteBoardCommentRequestDTO,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         boardFacade.deleteBoardComment(boardId, user.userId, request)
     }
@@ -173,7 +173,7 @@ class BoardApiController(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         boardFacade.createBoardReport(boardId, user.userId)
     }
@@ -184,7 +184,7 @@ class BoardApiController(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardCommentId") boardCommentId: Long,
     ) {
-        val user = userFacade.getUserByEmail(accountName)
+        val user = userFacade.getUserByAccountName(accountName)
 
         boardFacade.createBoardCommentReport(boardCommentId, user.userId)
     }
