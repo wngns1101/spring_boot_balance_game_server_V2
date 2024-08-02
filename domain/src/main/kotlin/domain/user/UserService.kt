@@ -99,10 +99,11 @@ class UserService(
     }
 
     @Transactional
-    fun modifyUserInfo(userId: Long, nickName: String) {
+    fun modifyUserInfo(userId: Long, nickName: String, profileUrl: String?) {
         val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
 
         user.nickname = nickName
+        user.profileUrl = profileUrl
     }
 
     @Transactional

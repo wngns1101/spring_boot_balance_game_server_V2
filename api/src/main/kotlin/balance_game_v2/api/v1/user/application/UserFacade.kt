@@ -68,8 +68,8 @@ class UserFacade(
         authService.changeUserPassword(email, currentPassword, newPassword)
     }
 
-    fun modifyUserInfo(userId: Long, nickname: String) {
-        userService.modifyUserInfo(userId, nickname)
+    fun modifyUserInfo(userId: Long, nickname: String, profileUrl: String?) {
+        userService.modifyUserInfo(userId, nickname, profileUrl)
     }
 
     fun withdraw(userId: Long) {

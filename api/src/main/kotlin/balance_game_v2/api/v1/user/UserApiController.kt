@@ -108,7 +108,7 @@ class UserApiController(
     ) {
         val user = userFacade.getUserByAccountName(accountName)
 
-        userFacade.modifyUserInfo(user.userId, modifyUserInfoRequestDTO.nickName)
+        userFacade.modifyUserInfo(user.userId, modifyUserInfoRequestDTO.nickName, modifyUserInfoRequestDTO.profileUrl)
     }
 
     @Operation(summary = "[회원-006] 비밀번호 찾기")
