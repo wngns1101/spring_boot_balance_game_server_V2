@@ -12,6 +12,7 @@ import domain.board.dto.BoardDetailDTO
 import domain.board.dto.BoardResultDTO
 import domain.board.dto.PageBoardDTO
 import domain.board.model.BoardSortCondition
+import domain.domain.board.dto.SimpleBoardDTO
 import org.springframework.stereotype.Component
 
 @Component
@@ -69,5 +70,9 @@ class BoardFacade(
 
     fun createBoardCommentReport(boardCommentId: Long, userId: Long) {
         boardService.createBoardCommentReport(boardCommentId, userId)
+    }
+
+    fun todayRecommendGame(): SimpleBoardDTO {
+        return boardService.todayRecommendGame()
     }
 }

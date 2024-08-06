@@ -11,11 +11,11 @@ import balance_game_v2.api.v1.board.http.res.BoardDetailResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardHeartResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardResultResponseDTO
 import balance_game_v2.api.v1.board.http.res.PageBoardResponseDTO
+import balance_game_v2.api.v1.board.http.res.TodayRecommendGameResponseDTO
 import balance_game_v2.api.v1.user.application.UserFacade
 import balance_game_v2.config.BOARD_V2
 import balance_game_v2.config.BOARD_V2_PREFIX
 import domain.board.model.BoardSortCondition
-import domain.board.repository.BoardResultRepository
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController
 class BoardApiController(
     val userFacade: UserFacade,
     val boardFacade: BoardFacade,
-    private val boardResultRepository: BoardResultRepository,
 ) {
     @Operation(summary = "[게임-001] 게임 등록")
     @PostMapping("/board")
@@ -187,5 +186,11 @@ class BoardApiController(
         val user = userFacade.getUserByAccountName(accountName)
 
         boardFacade.createBoardCommentReport(boardCommentId, user.userId)
+    }
+
+    @Operation(summary = "[게임-014] 오늘의 추천 밸런스 게임 조회")
+    @GetMapping("/boards/today-recommend-game")
+    fun todayRecommendGame(): TodayRecommendGameResponseDTO {
+        return TodayRecommendGameResponseDTO(boardFacade.todayRecommendGame())
     }
 }

@@ -30,6 +30,17 @@ class BoardQueryDslRepositoryImpl :
 
         return PageImpl(result.results, pageable, result.total)
     }
+
+    override fun todayRecommendGame(): List<Board> {
+        val maxViewCount = from(board)
+            .orderBy(board.viewCount.desc())
+            .limit(1)
+            .fetchOne()
+
+        return from(board)
+            .where(board.viewCount.eq(maxViewCount.viewCount))
+            .fetch()
+    }
 }
 
 private fun searchCondition(query: String?): BooleanExpression? {

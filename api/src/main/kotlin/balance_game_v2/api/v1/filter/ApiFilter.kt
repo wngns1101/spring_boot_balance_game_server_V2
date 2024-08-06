@@ -34,7 +34,8 @@ class ApiFilter(
             req.requestURI == "$USER_V2_PREFIX/profile" ||
             req.requestURI == "$USER_V2_PREFIX/email-certificate" ||
             req.requestURI == "$USER_V2_PREFIX/check-email-certificate" ||
-            req.requestURI == "$BOARD_V2_PREFIX/boards"
+            req.requestURI == "$BOARD_V2_PREFIX/boards" ||
+            req.requestURI == "$BOARD_V2_PREFIX/boards/today-recommend-game"
         ) {
             chain.doFilter(req, res)
             return

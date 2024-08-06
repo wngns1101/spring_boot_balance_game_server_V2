@@ -36,6 +36,8 @@ import domain.board.repository.BoardKeywordRepository
 import domain.board.repository.BoardReportRepository
 import domain.board.repository.BoardRepository
 import domain.board.repository.BoardResultRepository
+import domain.domain.board.dto.SimpleBoardDTO
+import domain.domain.board.dto.toSimpleBoard
 import domain.error.InvalidUserException
 import domain.user.repository.UserRepository
 import org.springframework.data.domain.PageRequest
@@ -264,5 +266,10 @@ class BoardService(
 
     fun getBoardCommentReports(userId: Long): List<BoardCommentReportDTO> {
         return boardCommentReportRepository.findAllByUserId(userId).map { it.toDTO() }
+    }
+
+    fun todayRecommendGame(): SimpleBoardDTO {
+        println(boardRepository.todayRecommendGame().toString())
+        return boardRepository.todayRecommendGame().random().toSimpleBoard()
     }
 }
