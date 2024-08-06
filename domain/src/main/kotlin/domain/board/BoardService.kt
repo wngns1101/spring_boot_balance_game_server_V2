@@ -269,7 +269,10 @@ class BoardService(
     }
 
     fun todayRecommendGame(): SimpleBoardDTO {
-        println(boardRepository.todayRecommendGame().toString())
         return boardRepository.todayRecommendGame().random().toSimpleBoard()
+    }
+
+    fun getMyBoardCount(userId: Long): Int {
+        return boardRepository.countBoardByUserId(userId)
     }
 }

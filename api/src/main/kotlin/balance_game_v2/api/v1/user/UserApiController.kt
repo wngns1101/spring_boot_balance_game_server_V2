@@ -1,6 +1,7 @@
 package balance_game_v2.api.v1.user
 
 import balance_game_v2.api.client.S3Config
+import balance_game_v2.api.v1.board.application.BoardFacade
 import balance_game_v2.api.v1.user.application.TokenManager
 import balance_game_v2.api.v1.user.application.UserFacade
 import balance_game_v2.api.v1.user.http.exception.InvalidTokenTypeException
@@ -17,6 +18,7 @@ import balance_game_v2.api.v1.user.http.res.ListBoardCommentReportResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListBoardReportResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListUserNotificationResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListUserReportResponseDTO
+import balance_game_v2.api.v1.user.http.res.MainUserInfoResponseDTO
 import balance_game_v2.api.v1.user.http.res.ModifyUserNotificationResponseDTO
 import balance_game_v2.api.v1.user.http.res.PageUserNotificationResponseDTO
 import balance_game_v2.api.v1.user.http.res.ReIssueResponseDTO
@@ -52,6 +54,7 @@ class UserApiController(
     private val userFacade: UserFacade,
     private val tokenManager: TokenManager,
     private val s3Config: S3Config,
+    private val boardFacade: BoardFacade,
 ) {
     @Operation(summary = "[회원-001] 회원가입")
     @PostMapping("/sign-up")
@@ -281,5 +284,21 @@ class UserApiController(
         @RequestBody request: CheckEmailCertificateRequestDTO,
     ): CheckEmailCertificateResponseDTO {
         return CheckEmailCertificateResponseDTO(userFacade.checkEmailCertificate(request.email, request.code))
+    }
+
+    @Operation(summary = "[회원-024] 메인 유저 정보 조회")
+    @GetMapping("/main/userInfo")
+    fun getUserInfo(
+        @RequestAttribute("accountName") accountName: String,
+    ): MainUserInfoResponseDTO {
+        val user = userFacade.getUserByAccountName(accountName)
+
+        val myBoardCount = boardFacade.getMyBoardCount(user.userId)
+
+        return MainUserInfoResponseDTO(
+            userId = user.userId,
+            nickName = user.nickname,
+            myBoardCount = myBoardCount
+        )
     }
 }
