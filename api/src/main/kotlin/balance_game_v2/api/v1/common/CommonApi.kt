@@ -35,7 +35,7 @@ class CommonApi(
     }
 
     @Operation(summary = "[공통-003] 공지사항 조회")
-    @GetMapping("/announcement")
+    @GetMapping("/announcements")
     fun getAnnouncement(
         @RequestParam("searchCondition") condition: SearchCondition,
     ): AnnouncementResponseDTO {
@@ -43,7 +43,7 @@ class CommonApi(
     }
 
     @Operation(summary = "[공통-004] 공지사항 상세 조회")
-    @GetMapping("/announcement/{announcementId}")
+    @GetMapping("/announcements/{announcementId}")
     fun getAnnouncementDetail(
         @PathVariable("announcementId") announcementId: Long,
     ): AnnouncementDetailResponseDTO {
