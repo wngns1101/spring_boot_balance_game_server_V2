@@ -50,15 +50,12 @@ class BoardApiController(
     @Operation(summary = "[게임-002] 게임 리스트 조회(페이징)")
     @GetMapping("/boards")
     fun getBoards(
-//        @RequestAttribute("accountName") accountName: String,
         @RequestParam("query") query: String?,
         @RequestParam("page", defaultValue = "0") page: Int,
         @RequestParam("size", defaultValue = "10") size: Int,
         @RequestParam("sortCondition") sortCondition: BoardSortCondition?,
         @RequestParam("themeId") themeId: Long,
     ): PageBoardResponseDTO {
-//        val user = userFacade.getUserByEmail(accountName)
-
         return PageBoardResponseDTO(boardFacade.getBoards(query, page, size, sortCondition, themeId))
     }
 
