@@ -126,14 +126,23 @@ class BoardService(
 
         val writer = userRepository.findById(board.userId).orElseThrow { NotFoundUserException() }
 
-        val boardReviewIds = boardReviewRepository.findAllByBoardId(boardId).mapNotNull { it.boardReviewId }
+        val boardReviews = boardReviewRepository.findAllByBoardId(boardId)
+
+        val previewBoardReviewKeywords = if (boardReviews == null) {
+            emptyList()
+        } else {
+            boardReviewKeywordRepository.findAllByBoardReviewIdIn(boardReviews.map { it.boardReviewId!! })
+                .shuffled()
+                .take(3)
+                .map { it.toDTO() }
+        }
 
         return board.toBoardDetail(
             WriterDTO(
                 writer.userId!!,
                 writer.nickname,
             ),
-            emptyList()
+            previewBoardReviewKeywords
         )
     }
 
