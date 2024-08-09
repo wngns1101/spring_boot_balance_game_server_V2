@@ -2,10 +2,10 @@ package balance_game_v2.api.v1.board
 
 import balance_game_v2.api.v1.board.application.BoardFacade
 import balance_game_v2.api.v1.board.http.req.BoardModifyRequestDTO
-import balance_game_v2.api.v1.board.http.req.CreateBoardCommentRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardRequestDTO
-import balance_game_v2.api.v1.board.http.req.DeleteBoardCommentRequestDTO
-import balance_game_v2.api.v1.board.http.req.ModifyBoardCommentRequestDTO
+import balance_game_v2.api.v1.board.http.req.CreateBoardReviewRequestDTO
+import balance_game_v2.api.v1.board.http.req.DeleteBoardReviewRequestDTO
+import balance_game_v2.api.v1.board.http.req.ModifyBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.res.BoardContentResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardDetailResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardHeartResponseDTO
@@ -62,11 +62,8 @@ class BoardApiController(
     @Operation(summary = "[게임-003] 게임 상세 조회")
     @GetMapping("/boards/{boardId}")
     fun getBoardDetail(
-        @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
     ): BoardDetailResponseDTO {
-        val user = userFacade.getUserByAccountName(accountName)
-
         return BoardDetailResponseDTO(boardFacade.getBoardDetail(boardId))
     }
 
@@ -127,40 +124,39 @@ class BoardApiController(
         boardFacade.modifyBoard(boardId, request)
     }
 
-    @Operation(summary = "[게임-009] 게시글 댓글 작성")
+    @Operation(summary = "[게임-009] 게시글 리뷰 작성")
     @PostMapping("/comments/{boardId}/comment")
     fun createBoardComment(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
-        @RequestBody request: CreateBoardCommentRequestDTO,
+        @RequestBody request: CreateBoardReviewRequestDTO,
     ) {
         val user = userFacade.getUserByAccountName(accountName)
 
-        boardFacade.createBoardComment(boardId, user.userId, request)
+        boardFacade.createBoardReview(boardId, user.userId, request)
     }
 
     @Operation(summary = "[게임-010] 게시글 댓글 수정")
     @PutMapping("/comments/{boardId}/comment")
-    fun modifyBoardComment(
+    fun modifyBoardReview(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
-        @RequestBody request: ModifyBoardCommentRequestDTO,
+        @RequestBody request: ModifyBoardReviewRequestDTO,
     ) {
         val user = userFacade.getUserByAccountName(accountName)
 
-        boardFacade.modifyBoardComment(boardId, user.userId, request)
+        boardFacade.modifyBoardReview(boardId, user.userId, request)
     }
 
-    @Operation(summary = "[게임-011] 게시글 게임 삭제")
-    @DeleteMapping("/boards/{boardId}")
-    fun deleteBoardComment(
+    @Operation(summary = "[게임-011] 게시글 리뷰 삭제")
+    @DeleteMapping("/boards/{boardId}/comment")
+    fun deleteBoardReview(
         @RequestAttribute("accountName") accountName: String,
-        @PathVariable("boardId") boardId: Long,
-        @RequestBody request: DeleteBoardCommentRequestDTO,
+        @RequestBody request: DeleteBoardReviewRequestDTO,
     ) {
         val user = userFacade.getUserByAccountName(accountName)
 
-        boardFacade.deleteBoardComment(boardId, user.userId, request)
+        boardFacade.deleteBoardReview(user.userId, request)
     }
 
     @Operation(summary = "[게임-012] 게시글 신고")

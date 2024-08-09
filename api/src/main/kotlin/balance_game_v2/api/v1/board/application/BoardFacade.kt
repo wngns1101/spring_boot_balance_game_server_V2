@@ -1,10 +1,10 @@
 package balance_game_v2.api.v1.board.application
 
 import balance_game_v2.api.v1.board.http.req.BoardModifyRequestDTO
-import balance_game_v2.api.v1.board.http.req.CreateBoardCommentRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardRequestDTO
-import balance_game_v2.api.v1.board.http.req.DeleteBoardCommentRequestDTO
-import balance_game_v2.api.v1.board.http.req.ModifyBoardCommentRequestDTO
+import balance_game_v2.api.v1.board.http.req.CreateBoardReviewRequestDTO
+import balance_game_v2.api.v1.board.http.req.DeleteBoardReviewRequestDTO
+import balance_game_v2.api.v1.board.http.req.ModifyBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.toCommand
 import domain.board.BoardService
 import domain.board.dto.BoardContentDTO
@@ -52,16 +52,16 @@ class BoardFacade(
         return boardService.modifyBoard(boardId, request.toCommand())
     }
 
-    fun createBoardComment(boardId: Long, userId: Long, request: CreateBoardCommentRequestDTO) {
-        return boardService.createBoardComment(boardId, userId, request.toCommand())
+    fun createBoardReview(boardId: Long, userId: Long, request: CreateBoardReviewRequestDTO) {
+        return boardService.createBoardReview(boardId, userId, request.toCommand())
     }
 
-    fun modifyBoardComment(boardId: Long, userId: Long, request: ModifyBoardCommentRequestDTO) {
-        return boardService.modifyBoardComment(boardId, userId, request.toCommand())
+    fun modifyBoardReview(boardId: Long, userId: Long, request: ModifyBoardReviewRequestDTO) {
+        return boardService.modifyBoardReview(boardId, userId, request.toCommand())
     }
 
-    fun deleteBoardComment(boardId: Long, userId: Long, request: DeleteBoardCommentRequestDTO) {
-        return boardService.deleteBoardComment(boardId, userId, request.toCommand())
+    fun deleteBoardReview(userId: Long, request: DeleteBoardReviewRequestDTO) {
+        return boardService.deleteBoardReview(userId, request.toCommand())
     }
 
     fun createBoardReport(boardId: Long, userId: Long) {

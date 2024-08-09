@@ -1,41 +1,43 @@
 package domain.board
 
 import domain.auth.exception.NotFoundUserException
-import domain.board.dto.BoardCommentReportDTO
 import domain.board.dto.BoardContentDTO
 import domain.board.dto.BoardDetailDTO
-import domain.board.dto.BoardReportDTO
 import domain.board.dto.BoardResultDTO
 import domain.board.dto.CreateBoardCommand
-import domain.board.dto.CreateBoardCommentCommand
-import domain.board.dto.DeleteBoardCommentCommand
+import domain.board.dto.CreateBoardReviewCommand
+import domain.board.dto.DeleteBoardReviewCommand
 import domain.board.dto.ModifyBoardCommand
-import domain.board.dto.ModifyBoardContentCommand
+import domain.board.dto.ModifyBoardReviewCommand
 import domain.board.dto.PageBoardDTO
 import domain.board.dto.WriterDTO
 import domain.board.dto.toBoardDetail
 import domain.board.dto.toDTO
 import domain.board.dto.toPageBoardDTO
 import domain.board.entity.Board
-import domain.board.entity.BoardComment
 import domain.board.entity.BoardCommentReport
 import domain.board.entity.BoardContent
 import domain.board.entity.BoardContentItem
+import domain.board.entity.BoardEvaluationHistory
 import domain.board.entity.BoardHeart
 import domain.board.entity.BoardKeyword
 import domain.board.entity.BoardReport
 import domain.board.entity.BoardResult
+import domain.board.entity.BoardReview
+import domain.board.entity.BoardReviewKeyword
 import domain.board.exception.NotFoundException
 import domain.board.model.BoardSortCondition
 import domain.board.repository.BoardCommentReportRepository
-import domain.board.repository.BoardCommentRepository
 import domain.board.repository.BoardContentItemRepository
 import domain.board.repository.BoardContentRepository
+import domain.board.repository.BoardEvaluationHistoryRepository
 import domain.board.repository.BoardHeartRepository
 import domain.board.repository.BoardKeywordRepository
 import domain.board.repository.BoardReportRepository
 import domain.board.repository.BoardRepository
 import domain.board.repository.BoardResultRepository
+import domain.board.repository.BoardReviewKeywordRepository
+import domain.board.repository.BoardReviewRepository
 import domain.domain.board.dto.SimpleBoardDTO
 import domain.domain.board.dto.toSimpleBoard
 import domain.error.InvalidUserException
@@ -46,16 +48,18 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class BoardService(
-    val userRepository: UserRepository,
-    val boardRepository: BoardRepository,
-    val boardContentRepository: BoardContentRepository,
-    val boardHeartRepository: BoardHeartRepository,
-    val boardResultRepository: BoardResultRepository,
-    val boardCommentRepository: BoardCommentRepository,
-    val boardReportRepository: BoardReportRepository,
-    val boardCommentReportRepository: BoardCommentReportRepository,
-    val boardContentItemRepository: BoardContentItemRepository,
-    val boardKeywordRepository: BoardKeywordRepository,
+    private val userRepository: UserRepository,
+    private val boardRepository: BoardRepository,
+    private val boardReviewKeywordRepository: BoardReviewKeywordRepository,
+    private val boardHeartRepository: BoardHeartRepository,
+    private val boardResultRepository: BoardResultRepository,
+    private val boardReviewRepository: BoardReviewRepository,
+    private val boardReportRepository: BoardReportRepository,
+    private val boardCommentReportRepository: BoardCommentReportRepository,
+    private val boardContentItemRepository: BoardContentItemRepository,
+    private val boardKeywordRepository: BoardKeywordRepository,
+    private val boardContentRepository: BoardContentRepository,
+    private val boardEvaluationHistoryRepository: BoardEvaluationHistoryRepository
 ) {
     @Transactional
     fun createBoard(userId: Long, command: CreateBoardCommand) {
@@ -122,14 +126,14 @@ class BoardService(
 
         val writer = userRepository.findById(board.userId).orElseThrow { NotFoundUserException() }
 
-        val boardComment = boardCommentRepository.findAllByBoardId(board.boardId!!).map { it.toDTO() }
+        val boardReviewIds = boardReviewRepository.findAllByBoardId(boardId).mapNotNull { it.boardReviewId }
 
         return board.toBoardDetail(
             WriterDTO(
                 writer.userId!!,
                 writer.nickname,
             ),
-            boardComment
+            emptyList()
         )
     }
 
@@ -204,40 +208,65 @@ class BoardService(
     }
 
     @Transactional
-    fun createBoardComment(boardId: Long, userId: Long, command: CreateBoardCommentCommand) {
+    fun createBoardReview(boardId: Long, userId: Long, command: CreateBoardReviewCommand) {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
 
-        BoardComment(
+        BoardEvaluationHistory(
             boardId = board.boardId!!,
             userId = userId,
-            parentCommentId = command.parentCommentId,
+            isLike = command.isLike,
+            isDislike = command.isDislike,
+        ).let { boardEvaluationHistoryRepository.save(it) }
+
+        val boardReview = BoardReview(
+            boardId = board.boardId,
+            userId = userId,
             comment = command.comment
-        ).let { boardCommentRepository.save(it) }
+        ).let { boardReviewRepository.save(it) }
+
+        command.keywords.map {
+            BoardReviewKeyword(
+                boardReviewId = boardReview.boardReviewId!!,
+                userId = userId,
+                keyword = it,
+            )
+        }.let { boardReviewKeywordRepository.saveAll(it) }
     }
 
     @Transactional
-    fun modifyBoardComment(boardId: Long, userId: Long, command: ModifyBoardContentCommand) {
+    fun modifyBoardReview(boardId: Long, userId: Long, command: ModifyBoardReviewCommand) {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
-        val boardComment = boardCommentRepository.findById(command.commentId).orElseThrow { NotFoundException() }
+        val boardReview = boardReviewRepository.findById(command.boardReviewId).orElseThrow { NotFoundException() }
 
-        if (boardComment.userId != userId) throw InvalidUserException()
+        if (boardReview.userId != userId) throw InvalidUserException()
+        boardReview.comment = command.comment
 
-        boardCommentRepository.delete(boardComment)
-        BoardComment(
-            boardId = board.boardId!!,
-            userId = userId,
-            parentCommentId = boardComment.parentCommentId,
-            comment = command.content
-        ).let { boardCommentRepository.save(it) }
+        boardReviewKeywordRepository.findAllByBoardReviewId(boardReview.boardReviewId!!)
+            .let {
+                boardReviewKeywordRepository.deleteAll(it)
+            }
+
+        command.keywords.map {
+            BoardReviewKeyword(
+                boardReviewId = boardReview.boardReviewId,
+                userId = userId,
+                keyword = it,
+            )
+        }.let {
+            boardReviewKeywordRepository.saveAll(it)
+        }
     }
 
     @Transactional
-    fun deleteBoardComment(boardId: Long, userId: Long, command: DeleteBoardCommentCommand) {
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
-        val boardComment = boardCommentRepository.findById(command.commentId).orElseThrow { NotFoundException() }
+    fun deleteBoardReview(userId: Long, command: DeleteBoardReviewCommand) {
+        val boardReview = boardReviewRepository.findById(command.boardReviewId).orElseThrow { NotFoundException() }
 
-        if (boardComment.userId != userId) throw InvalidUserException()
-        boardCommentRepository.delete(boardComment)
+        if (boardReview.userId != userId) throw InvalidUserException()
+
+        boardReviewRepository.delete(boardReview)
+
+        boardReviewKeywordRepository.findAllByBoardReviewId(boardReview.boardReviewId!!)
+            .let { boardReviewKeywordRepository.deleteAll(it) }
     }
 
     @Transactional
@@ -252,7 +281,7 @@ class BoardService(
 
     @Transactional
     fun createBoardCommentReport(boardCommentId: Long, userId: Long) {
-        val boardComment = boardCommentRepository.findById(boardCommentId).orElseThrow { NotFoundException() }
+        val boardComment = boardReviewRepository.findById(boardCommentId).orElseThrow { NotFoundException() }
 
         BoardCommentReport(
             boardCommentId = boardComment.boardId,
@@ -260,13 +289,13 @@ class BoardService(
         ).let { boardCommentReportRepository.save(it) }
     }
 
-    fun getBoardReports(userId: Long): List<BoardReportDTO> {
-        return boardReportRepository.findAllByUserId(userId).map { it.toDTO() }
-    }
-
-    fun getBoardCommentReports(userId: Long): List<BoardCommentReportDTO> {
-        return boardCommentReportRepository.findAllByUserId(userId).map { it.toDTO() }
-    }
+//    fun getBoardReports(userId: Long): List<BoardReportDTO> {
+//        return boardReportRepository.findAllByUserId(userId).map { it.toDTO() }
+//    }
+//
+//    fun getBoardCommentReports(userId: Long): List<BoardCommentReportDTO> {
+//        return boardCommentReportRepository.findAllByUserId(userId).map { it.toDTO() }
+//    }
 
     fun todayRecommendGame(): SimpleBoardDTO {
         return boardRepository.todayRecommendGame().random().toSimpleBoard()

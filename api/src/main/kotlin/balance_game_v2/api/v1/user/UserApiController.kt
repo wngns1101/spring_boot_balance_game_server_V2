@@ -14,8 +14,6 @@ import balance_game_v2.api.v1.user.http.req.SignInRequestDTO
 import balance_game_v2.api.v1.user.http.req.SignUpRequestDTO
 import balance_game_v2.api.v1.user.http.res.CheckEmailCertificateResponseDTO
 import balance_game_v2.api.v1.user.http.res.CheckEmailResponseDTO
-import balance_game_v2.api.v1.user.http.res.ListBoardCommentReportResponseDTO
-import balance_game_v2.api.v1.user.http.res.ListBoardReportResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListUserNotificationResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListUserReportResponseDTO
 import balance_game_v2.api.v1.user.http.res.MainUserInfoResponseDTO
@@ -201,23 +199,23 @@ class UserApiController(
         return ListUserReportResponseDTO(userFacade.getUserReports(user.userId))
     }
 
-    @Operation(summary = "[회원-017] 신고한 게시글 내역 조회")
-    @GetMapping("/users/me/boardReports")
-    fun getBoardReports(
-        @RequestAttribute("accountName") accountName: String,
-    ): ListBoardReportResponseDTO {
-        val user = userFacade.getUserByAccountName(accountName)
-        return ListBoardReportResponseDTO(userFacade.getBoardReports(user.userId))
-    }
-
-    @Operation(summary = "[회원-018] 신고한 댓글 내역 조회")
-    @GetMapping("/users/me/boardCommentReports")
-    fun getBoardCommentReports(
-        @RequestAttribute("accountName") accountName: String,
-    ): ListBoardCommentReportResponseDTO {
-        val user = userFacade.getUserByAccountName(accountName)
-        return ListBoardCommentReportResponseDTO(userFacade.getBoardCommentReports(user.userId))
-    }
+//    @Operation(summary = "[회원-017] 신고한 게시글 내역 조회")
+//    @GetMapping("/users/me/boardReports")
+//    fun getBoardReports(
+//        @RequestAttribute("accountName") accountName: String,
+//    ): ListBoardReportResponseDTO {
+//        val user = userFacade.getUserByAccountName(accountName)
+//        return ListBoardReportResponseDTO(userFacade.getBoardReports(user.userId))
+//    }
+//
+//    @Operation(summary = "[회원-018] 신고한 댓글 내역 조회")
+//    @GetMapping("/users/me/boardCommentReports")
+//    fun getBoardCommentReports(
+//        @RequestAttribute("accountName") accountName: String,
+//    ): ListBoardCommentReportResponseDTO {
+//        val user = userFacade.getUserByAccountName(accountName)
+//        return ListBoardCommentReportResponseDTO(userFacade.getBoardCommentReports(user.userId))
+//    }
 
     @Operation(summary = "[회원-019] 토큰 재발급")
     @PostMapping("/users/me/re-issue")

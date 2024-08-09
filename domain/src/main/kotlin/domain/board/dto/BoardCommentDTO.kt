@@ -1,21 +1,19 @@
 package domain.board.dto
 
-import domain.board.entity.BoardComment
+import domain.board.entity.BoardReview
 
-data class BoardCommentDTO(
-    val boardCommentId: Long? = null,
+data class BoardReviewDTO(
+    val boardReviewId: Long? = null,
     val boardId: Long,
     val userId: Long,
-    val parentCommentId: Long? = null,
     val comment: String,
 )
 
-fun BoardComment.toDTO(): BoardCommentDTO {
-    return BoardCommentDTO(
-        boardCommentId = boardCommentId,
+fun BoardReview.toDTO(): BoardReviewDTO {
+    return BoardReviewDTO(
+        boardReviewId = boardReviewId,
         boardId = boardId,
         userId = userId,
-        parentCommentId = parentCommentId,
         comment = comment,
     )
 }

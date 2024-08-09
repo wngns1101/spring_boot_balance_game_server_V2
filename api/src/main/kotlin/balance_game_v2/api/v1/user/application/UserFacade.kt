@@ -7,8 +7,6 @@ import balance_game_v2.api.v1.user.http.exception.UnknownException
 import balance_game_v2.api.v1.user.http.req.SignUpCommand
 import domain.auth.AuthService
 import domain.board.BoardService
-import domain.board.dto.BoardCommentReportDTO
-import domain.board.dto.BoardReportDTO
 import domain.board.exception.NotFoundException
 import domain.user.UserService
 import domain.user.dto.PageUserNotificationDTO
@@ -108,13 +106,13 @@ class UserFacade(
         return userService.getUserReports(userId)
     }
 
-    fun getBoardReports(userId: Long): List<BoardReportDTO> {
-        return boardService.getBoardReports(userId)
-    }
-
-    fun getBoardCommentReports(userId: Long): List<BoardCommentReportDTO> {
-        return boardService.getBoardCommentReports(userId)
-    }
+//    fun getBoardReports(userId: Long): List<BoardReportDTO> {
+//        return boardService.getBoardReports(userId)
+//    }
+//
+//    fun getBoardCommentReports(userId: Long): List<BoardCommentReportDTO> {
+//        return boardService.getBoardCommentReports(userId)
+//    }
 
     fun reIssue(token: String): TokenDTO {
         try {

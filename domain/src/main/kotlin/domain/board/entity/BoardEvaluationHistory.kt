@@ -8,13 +8,13 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "board_comment")
-class BoardComment(
+@Table(name = "board_evaluation_history")
+class BoardEvaluationHistory(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val boardCommentId: Long? = null,
+    val boardEvaluationHistoryId: Long? = null,
     val boardId: Long,
     val userId: Long,
-    val parentCommentId: Long? = null,
-    var comment: String,
+    val isLike: Boolean,
+    val isDislike: Boolean,
 ) : BaseEntity()
