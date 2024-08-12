@@ -2,6 +2,7 @@ package domain.board.repository.querydsl
 
 import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.Expressions
 import domain.board.entity.Board
 import domain.board.entity.QBoard.board
 import domain.board.model.BoardSortCondition
@@ -39,6 +40,17 @@ class BoardQueryDslRepositoryImpl :
 
         return from(board)
             .where(board.viewCount.eq(maxViewCount.viewCount))
+            .fetch()
+    }
+
+    override fun relatedBoards(boardId: Long, themeId: Long): List<Board> {
+        return from(board)
+            .where(
+                board.boardId.ne(boardId),
+                board.themeId.eq(themeId),
+            )
+            .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
+            .limit(10)
             .fetch()
     }
 }

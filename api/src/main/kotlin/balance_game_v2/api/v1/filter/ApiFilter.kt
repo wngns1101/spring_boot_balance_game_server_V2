@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
-import java.util.regex.Pattern
 
 class ApiFilter(
     private val cookieUtils: CookieUtils,
@@ -28,8 +27,6 @@ class ApiFilter(
 
         var token = req.getHeader("Authorization")
 
-        println(req.requestURI)
-
         if (req.requestURI == "$USER_V2_PREFIX/sign-up" ||
             req.requestURI == "$USER_V2_PREFIX/sign-in" ||
             req.requestURI == "$USER_V2_PREFIX/users/me/re-issue" ||
@@ -38,17 +35,10 @@ class ApiFilter(
             req.requestURI == "$USER_V2_PREFIX/email-certificate" ||
             req.requestURI == "$USER_V2_PREFIX/check-email-certificate" ||
             req.requestURI == "$BOARD_V2_PREFIX/boards" ||
-            req.requestURI == "$BOARD_V2_PREFIX/boards/today-recommend-game"
+            req.requestURI == "$BOARD_V2_PREFIX/boards/today-recommend-game" ||
+            req.requestURI == "$BOARD_V2_PREFIX/public/**" ||
+            req.requestURI.startsWith("$BOARD_V2_PREFIX/public/")
         ) {
-            chain.doFilter(req, res)
-            return
-        }
-
-        // 정규표현식
-        val boardUriPattern = "^${Pattern.quote(BOARD_V2_PREFIX)}/boards/\\d+$"
-        val boardUriMatcher = Pattern.compile(boardUriPattern).matcher(req.requestURI)
-
-        if (boardUriMatcher.matches()) {
             chain.doFilter(req, res)
             return
         }

@@ -313,4 +313,18 @@ class BoardService(
     fun getMyBoardCount(userId: Long): Int {
         return boardRepository.countBoardByUserId(userId)
     }
+
+    fun getMyBoards(userId: Long): List<SimpleBoardDTO> {
+        return boardRepository.findAllByUserId(userId).map {
+            it.toSimpleBoard()
+        }
+    }
+
+    fun relatedBoards(boardId: Long): List<SimpleBoardDTO> {
+        val board = boardRepository.findById(boardId).orElseThrow { NotFoundException() }
+
+        return boardRepository.relatedBoards(boardId, board.themeId).map {
+            it.toSimpleBoard()
+        }
+    }
 }

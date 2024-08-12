@@ -10,7 +10,9 @@ import balance_game_v2.api.v1.board.http.res.BoardContentResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardDetailResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardHeartResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardResultResponseDTO
+import balance_game_v2.api.v1.board.http.res.GetMyBoardsResponseDTO
 import balance_game_v2.api.v1.board.http.res.PageBoardResponseDTO
+import balance_game_v2.api.v1.board.http.res.RelatedBoardsResponseDTO
 import balance_game_v2.api.v1.board.http.res.TodayRecommendGameResponseDTO
 import balance_game_v2.api.v1.user.application.UserFacade
 import balance_game_v2.config.BOARD_V2
@@ -60,7 +62,7 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-003] 게임 상세 조회")
-    @GetMapping("/boards/{boardId}")
+    @GetMapping("/public/boards/{boardId}")
     fun getBoardDetail(
         @PathVariable("boardId") boardId: Long,
     ): BoardDetailResponseDTO {
@@ -185,5 +187,23 @@ class BoardApiController(
     @GetMapping("/boards/today-recommend-game")
     fun todayRecommendGame(): TodayRecommendGameResponseDTO {
         return TodayRecommendGameResponseDTO(boardFacade.todayRecommendGame())
+    }
+
+    @Operation(summary = "[게임-015] 내 게임 조회")
+    @GetMapping("/boards/me/")
+    fun getMyBoards(
+        @RequestAttribute("accountName") accountName: String,
+    ): GetMyBoardsResponseDTO {
+        val user = userFacade.getUserByAccountName(accountName)
+
+        return GetMyBoardsResponseDTO(boardFacade.getMyBoards(user.userId))
+    }
+
+    @Operation(summary = "[게임-016] 관련있는 게임 API")
+    @GetMapping("/public/boards/{boardId}/related-boards")
+    fun relatedBoards(
+        @PathVariable("boardId") boardId: Long,
+    ): RelatedBoardsResponseDTO {
+        return RelatedBoardsResponseDTO(boardFacade.relatedBoards(boardId))
     }
 }

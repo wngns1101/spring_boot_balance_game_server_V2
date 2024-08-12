@@ -79,4 +79,12 @@ class BoardFacade(
     fun getMyBoardCount(userId: Long): Int {
         return boardService.getMyBoardCount(userId)
     }
+
+    fun getMyBoards(userId: Long): List<SimpleBoardDTO> {
+        return boardService.getMyBoards(userId)
+    }
+
+    fun relatedBoards(boardId: Long): List<SimpleBoardDTO> {
+        return boardService.relatedBoards(boardId)
+    }
 }
