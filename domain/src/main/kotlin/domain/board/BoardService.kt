@@ -38,7 +38,9 @@ import domain.board.repository.BoardRepository
 import domain.board.repository.BoardResultRepository
 import domain.board.repository.BoardReviewKeywordRepository
 import domain.board.repository.BoardReviewRepository
+import domain.domain.board.dto.CreateBoardResultRequestCommand
 import domain.domain.board.dto.SimpleBoardDTO
+import domain.domain.board.dto.toDTO
 import domain.domain.board.dto.toSimpleBoard
 import domain.error.InvalidUserException
 import domain.user.repository.UserRepository
@@ -59,7 +61,7 @@ class BoardService(
     private val boardContentItemRepository: BoardContentItemRepository,
     private val boardKeywordRepository: BoardKeywordRepository,
     private val boardContentRepository: BoardContentRepository,
-    private val boardEvaluationHistoryRepository: BoardEvaluationHistoryRepository
+    private val boardEvaluationHistoryRepository: BoardEvaluationHistoryRepository,
 ) {
     @Transactional
     fun createBoard(userId: Long, command: CreateBoardCommand) {
@@ -171,30 +173,64 @@ class BoardService(
     fun getBoardContents(boardId: Long): List<BoardContentDTO> {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
         val boardContents = boardContentRepository.findAllByBoardId(boardId)
+        val boardContentIds = boardContents.mapNotNull { it.boardContentId }
 
-        return boardContents.map { it.toDTO() }
+        val boardContentItems = boardContentItemRepository.findAllByBoardContentIdIn(boardContentIds)
+
+        val boardContentResults = boardResultRepository.findAllByBoardContentItemIdIn(boardContentItems.mapNotNull { it.boardContentItemId })
+            .groupingBy {
+                it.boardContentItemId
+            }.eachCount()
+
+        val boardContentMap = boardContentItems.map {
+            it.toDTO(boardContentResults[it.boardContentItemId] ?: 0)
+        }.groupBy { it.boardContentId }
+
+        return boardContents.map {
+            it.toDTO(
+                boardContentMap[it.boardContentId]!!
+            )
+        }
     }
 
     @Transactional
-    fun createBoardResult(boardId: Long, boardContentId: Long, userId: Long) {
+    fun createBoardResult(boardId: Long, command: List<CreateBoardResultRequestCommand>, userId: Long) {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
 
-        BoardResult(
-            boardId = board.boardId!!,
-            boardContentId = boardContentId,
-            userId = userId
-        ).let { boardResultRepository.save(it) }
+        boardResultRepository.findAllByBoardIdAndUserId(boardId, userId)
+            .let { boardResultRepository.deleteAll(it) }
+
+        command.map {
+            BoardResult(
+                boardContentItemId = it.boardContentItemId,
+                boardContentId = it.boardContentId,
+                boardId = board.boardId!!,
+                userId = userId,
+            )
+        }.let { boardResultRepository.saveAll(it) }
     }
 
     fun getBoardResult(boardId: Long): List<BoardResultDTO> {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+        val boardContents = boardContentRepository.findAllByBoardId(boardId)
+        val boardContentIds = boardContents.mapNotNull { it.boardContentId }
 
-        val results = boardResultRepository.findAllByBoardId(board.boardId!!).groupBy { it.boardContentId }.mapValues { it.value.size }
+        val boardContentItems = boardContentItemRepository.findAllByBoardContentIdIn(boardContentIds)
 
-        return results.map {
+        val boardContentResults = boardResultRepository.findAllByBoardContentItemIdIn(boardContentItems.mapNotNull { it.boardContentItemId })
+            .groupingBy {
+                it.boardContentItemId
+            }.eachCount()
+
+        val boardContentMap = boardContentItems.map {
+            it.toDTO(boardContentResults[it.boardContentItemId] ?: 0)
+        }.groupBy { it.boardContentId }
+
+        return boardContents.map {
             BoardResultDTO(
-                boardContentId = it.key,
-                count = it.value
+                boardContentId = it.boardContentId!!,
+                title = it.title,
+                boardContentItems = boardContentMap[it.boardContentId]!!,
             )
         }
     }

@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface BoardContentItemRepository : JpaRepository<BoardContentItem, Int>
+interface BoardContentItemRepository : JpaRepository<BoardContentItem, Long> {
+    fun findAllByBoardContentIdIn(boardContentIds: List<Long>): List<BoardContentItem>
+}

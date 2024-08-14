@@ -3,6 +3,7 @@ package balance_game_v2.api.v1.board
 import balance_game_v2.api.v1.board.application.BoardFacade
 import balance_game_v2.api.v1.board.http.req.BoardModifyRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardRequestDTO
+import balance_game_v2.api.v1.board.http.req.CreateBoardResultRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.DeleteBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.ModifyBoardReviewRequestDTO
@@ -92,15 +93,15 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-006] 게시글 게임 결과 등록")
-    @PostMapping("/boards/{boardId}/content")
+    @PostMapping("/boards/{boardId}/result")
     fun createBoardResult(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
-        @RequestParam("boardContentId") boardContentId: Long,
+        @RequestBody request: List<CreateBoardResultRequestDTO>,
     ) {
         val user = userFacade.getUserByAccountName(accountName)
 
-        return boardFacade.createBoardResult(boardId, boardContentId, user.userId)
+        return boardFacade.createBoardResult(boardId, request, user.userId)
     }
 
     @Operation(summary = "[게임-007] 게시글 게임 결과 조회")
@@ -190,7 +191,7 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-015] 내 게임 조회")
-    @GetMapping("/boards/me/")
+    @GetMapping("/boards/me")
     fun getMyBoards(
         @RequestAttribute("accountName") accountName: String,
     ): GetMyBoardsResponseDTO {

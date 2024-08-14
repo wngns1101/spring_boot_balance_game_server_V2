@@ -2,6 +2,7 @@ package balance_game_v2.api.v1.board.application
 
 import balance_game_v2.api.v1.board.http.req.BoardModifyRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardRequestDTO
+import balance_game_v2.api.v1.board.http.req.CreateBoardResultRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.DeleteBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.ModifyBoardReviewRequestDTO
@@ -40,8 +41,8 @@ class BoardFacade(
         return boardService.getBoardContents(boardId)
     }
 
-    fun createBoardResult(boardId: Long, boardContentId: Long, userId: Long) {
-        boardService.createBoardResult(boardId, boardContentId, userId)
+    fun createBoardResult(boardId: Long, request: List<CreateBoardResultRequestDTO>, userId: Long) {
+        boardService.createBoardResult(boardId, request.map { it.toCommand() }, userId)
     }
 
     fun getBoardResult(boardId: Long): List<BoardResultDTO> {

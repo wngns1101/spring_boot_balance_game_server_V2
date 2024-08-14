@@ -13,7 +13,8 @@ class BoardResult(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val boardResultId: Long? = null,
-    val boardId: Long,
     val boardContentId: Long,
     val userId: Long,
+    val boardId: Long,
+    val boardContentItemId: Long,
 ) : BaseEntity()
