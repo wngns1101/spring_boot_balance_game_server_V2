@@ -10,6 +10,7 @@ import balance_game_v2.api.v1.board.http.req.toCommand
 import domain.board.BoardService
 import domain.board.dto.BoardContentDTO
 import domain.board.dto.BoardDetailDTO
+import domain.board.dto.BoardListDTO
 import domain.board.dto.BoardResultDTO
 import domain.board.dto.PageBoardDTO
 import domain.board.model.BoardSortCondition
@@ -81,7 +82,7 @@ class BoardFacade(
         return boardService.getMyBoardCount(userId)
     }
 
-    fun getMyBoards(userId: Long): List<SimpleBoardDTO> {
+    fun getMyBoards(userId: Long): List<BoardListDTO> {
         return boardService.getMyBoards(userId)
     }
 

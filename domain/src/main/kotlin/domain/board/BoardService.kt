@@ -3,6 +3,7 @@ package domain.board
 import domain.auth.exception.NotFoundUserException
 import domain.board.dto.BoardContentDTO
 import domain.board.dto.BoardDetailDTO
+import domain.board.dto.BoardListDTO
 import domain.board.dto.BoardResultDTO
 import domain.board.dto.CreateBoardCommand
 import domain.board.dto.CreateBoardReviewCommand
@@ -350,9 +351,16 @@ class BoardService(
         return boardRepository.countBoardByUserId(userId)
     }
 
-    fun getMyBoards(userId: Long): List<SimpleBoardDTO> {
-        return boardRepository.findAllByUserId(userId).map {
-            it.toSimpleBoard()
+    fun getMyBoards(userId: Long): List<BoardListDTO> {
+        val boards = boardRepository.findAllByUserId(userId)
+        val boardKeywordMap = boardKeywordRepository.findAllByBoardIdIn(boards.mapNotNull { it.boardId })
+            .groupBy { it.boardId }
+            .mapValues { it.value.map { it.toDTO() } }
+
+        return boards.map {
+            it.toPageBoardDTO(
+                boardKeywordMap[it.boardId] ?: emptyList()
+            )
         }
     }
 

@@ -1,7 +1,7 @@
 package balance_game_v2.api.v1.board.http.res
 
-import domain.domain.board.dto.SimpleBoardDTO
+import domain.board.dto.BoardListDTO
 
 class GetMyBoardsResponseDTO(
-    val boards: List<SimpleBoardDTO>
+    val boards: List<BoardListDTO>
 )
