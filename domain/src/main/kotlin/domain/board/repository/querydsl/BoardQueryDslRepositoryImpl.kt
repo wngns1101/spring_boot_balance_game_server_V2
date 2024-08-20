@@ -20,10 +20,10 @@ class BoardQueryDslRepositoryImpl :
         query: String?,
         pageable: Pageable,
         sortCondition: BoardSortCondition?,
-        themeId: Long
+        themeId: Long?
     ): Page<Board> {
         val result = from(board)
-            .where(searchCondition(query), board.themeId.eq(themeId))
+            .where(searchCondition(query), searchForThemeId(themeId))
             .orderBy(*sortCondition(sortCondition))
             .offset(pageable.offset)
             .limit((pageable.pageSize).toLong())
@@ -58,6 +58,11 @@ class BoardQueryDslRepositoryImpl :
 private fun searchCondition(query: String?): BooleanExpression? {
     if (query.isNullOrBlank()) return null
     return board.title.contains(query)
+}
+
+private fun searchForThemeId(themeId: Long?): BooleanExpression? {
+    if (themeId == null) return null
+    return board.themeId.eq(themeId)
 }
 
 private fun sortCondition(sortCondition: BoardSortCondition?): Array<OrderSpecifier<*>> {

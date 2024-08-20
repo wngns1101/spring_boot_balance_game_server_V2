@@ -57,7 +57,7 @@ class BoardApiController(
         @RequestParam("page", defaultValue = "0") page: Int,
         @RequestParam("size", defaultValue = "10") size: Int,
         @RequestParam("sortCondition") sortCondition: BoardSortCondition?,
-        @RequestParam("themeId") themeId: Long,
+        @RequestParam("themeId") themeId: Long?,
     ): PageBoardResponseDTO {
         return PageBoardResponseDTO(boardFacade.getBoards(query, page, size, sortCondition, themeId))
     }
@@ -71,7 +71,7 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-004] 게임 좋아요")
-    @PostMapping("/boards/{boardId}/heart")
+    @PostMapping("/boards/{boardId}/evaluation")
     fun createBoardHeart(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,

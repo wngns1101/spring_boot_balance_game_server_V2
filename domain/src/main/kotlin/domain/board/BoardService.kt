@@ -103,7 +103,7 @@ class BoardService(
         }
     }
 
-    fun getBoards(query: String?, page: Int, size: Int, sortCondition: BoardSortCondition?, themeId: Long): PageBoardDTO {
+    fun getBoards(query: String?, page: Int, size: Int, sortCondition: BoardSortCondition?, themeId: Long?): PageBoardDTO {
         val pageable = PageRequest.of(page, size)
         val boards = boardRepository.search(query, pageable, sortCondition, themeId)
         val boardIds = boards.content.mapNotNull { it.boardId }
