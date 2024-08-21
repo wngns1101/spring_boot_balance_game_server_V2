@@ -2,6 +2,8 @@ package balance_game_v2.api.v1.board
 
 import balance_game_v2.api.v1.board.application.BoardFacade
 import balance_game_v2.api.v1.board.http.req.BoardModifyRequestDTO
+import balance_game_v2.api.v1.board.http.req.BoardReportRequestDTO
+import balance_game_v2.api.v1.board.http.req.BoardReviewReportRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardResultRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardReviewRequestDTO
@@ -130,7 +132,7 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-009] 게시글 리뷰 작성")
-    @PostMapping("/comments/{boardId}/comment")
+    @PostMapping("/comments/{boardId}/review")
     fun createBoardComment(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
@@ -142,7 +144,7 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-010] 게시글 댓글 수정")
-    @PutMapping("/comments/{boardId}/comment")
+    @PutMapping("/comments/{boardId}/review")
     fun modifyBoardReview(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
@@ -154,7 +156,7 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-011] 게시글 리뷰 삭제")
-    @DeleteMapping("/boards/{boardId}/comment")
+    @DeleteMapping("/boards/{boardId}/review")
     fun deleteBoardReview(
         @RequestAttribute("accountName") accountName: String,
         @RequestBody request: DeleteBoardReviewRequestDTO,
@@ -169,21 +171,23 @@ class BoardApiController(
     fun createBoardReport(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
+        @RequestBody request: BoardReportRequestDTO,
     ) {
         val user = userFacade.getUserByAccountName(accountName)
 
-        boardFacade.createBoardReport(boardId, user.userId)
+        boardFacade.createBoardReport(boardId, user.userId, request.content)
     }
 
-    @Operation(summary = "[게임-013] 댓글 신고")
-    @PostMapping("/comments/{boardCommentId}/report")
-    fun createBoardCommentReport(
+    @Operation(summary = "[게임-013] 리뷰 신고")
+    @PostMapping("/comments/{boardReviewId}/report")
+    fun createBoardReviewReport(
         @RequestAttribute("accountName") accountName: String,
-        @PathVariable("boardCommentId") boardCommentId: Long,
+        @PathVariable("boardReviewId") boardReviewId: Long,
+        @RequestBody request: BoardReviewReportRequestDTO,
     ) {
         val user = userFacade.getUserByAccountName(accountName)
 
-        boardFacade.createBoardCommentReport(boardCommentId, user.userId)
+        boardFacade.createBoardReviewReport(boardReviewId, user.userId, request.content)
     }
 
     @Operation(summary = "[게임-014] 오늘의 추천 밸런스 게임 조회")

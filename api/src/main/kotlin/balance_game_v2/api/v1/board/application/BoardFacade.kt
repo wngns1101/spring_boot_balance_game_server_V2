@@ -68,12 +68,12 @@ class BoardFacade(
         return boardService.deleteBoardReview(userId, request.toCommand())
     }
 
-    fun createBoardReport(boardId: Long, userId: Long) {
-        boardService.createBoardReport(boardId, userId)
+    fun createBoardReport(boardId: Long, userId: Long, content: String) {
+        boardService.createBoardReport(boardId, userId, content)
     }
 
-    fun createBoardCommentReport(boardCommentId: Long, userId: Long) {
-        boardService.createBoardCommentReport(boardCommentId, userId)
+    fun createBoardReviewReport(boardReviewId: Long, userId: Long, content: String) {
+        boardService.createBoardReviewReport(boardReviewId, userId, content)
     }
 
     fun todayRecommendGame(): SimpleBoardDTO {

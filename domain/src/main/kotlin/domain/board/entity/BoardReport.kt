@@ -15,4 +15,5 @@ class BoardReport(
     val boardReportId: Long? = null,
     val boardId: Long,
     val userId: Long,
+    val content: String,
 ) : BaseEntity()

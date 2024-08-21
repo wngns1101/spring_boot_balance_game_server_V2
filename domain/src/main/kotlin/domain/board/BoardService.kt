@@ -16,7 +16,6 @@ import domain.board.dto.toBoardDetail
 import domain.board.dto.toDTO
 import domain.board.dto.toPageBoardDTO
 import domain.board.entity.Board
-import domain.board.entity.BoardCommentReport
 import domain.board.entity.BoardContent
 import domain.board.entity.BoardContentItem
 import domain.board.entity.BoardEvaluationHistory
@@ -25,9 +24,9 @@ import domain.board.entity.BoardReport
 import domain.board.entity.BoardResult
 import domain.board.entity.BoardReview
 import domain.board.entity.BoardReviewKeyword
+import domain.board.entity.BoardReviewReport
 import domain.board.exception.NotFoundException
 import domain.board.model.BoardSortCondition
-import domain.board.repository.BoardCommentReportRepository
 import domain.board.repository.BoardContentItemRepository
 import domain.board.repository.BoardContentRepository
 import domain.board.repository.BoardEvaluationHistoryRepository
@@ -36,6 +35,7 @@ import domain.board.repository.BoardReportRepository
 import domain.board.repository.BoardRepository
 import domain.board.repository.BoardResultRepository
 import domain.board.repository.BoardReviewKeywordRepository
+import domain.board.repository.BoardReviewReportRepository
 import domain.board.repository.BoardReviewRepository
 import domain.domain.board.dto.BoardEvaluationDTO
 import domain.domain.board.dto.CreateBoardResultRequestCommand
@@ -57,7 +57,7 @@ class BoardService(
     private val boardResultRepository: BoardResultRepository,
     private val boardReviewRepository: BoardReviewRepository,
     private val boardReportRepository: BoardReportRepository,
-    private val boardCommentReportRepository: BoardCommentReportRepository,
+    private val boardReviewReportRepository: BoardReviewReportRepository,
     private val boardContentItemRepository: BoardContentItemRepository,
     private val boardKeywordRepository: BoardKeywordRepository,
     private val boardContentRepository: BoardContentRepository,
@@ -110,6 +110,7 @@ class BoardService(
         themeId: Long?
     ): PageBoardDTO {
         val pageable = PageRequest.of(page, size)
+
         val boards = boardRepository.search(query, pageable, sortCondition, themeId)
         val boardIds = boards.content.mapNotNull { it.boardId }
 
@@ -366,23 +367,25 @@ class BoardService(
     }
 
     @Transactional
-    fun createBoardReport(boardId: Long, userId: Long) {
+    fun createBoardReport(boardId: Long, userId: Long, content: String) {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
 
         BoardReport(
             boardId = board.boardId!!,
             userId = userId,
+            content = content,
         ).let { boardReportRepository.save(it) }
     }
 
     @Transactional
-    fun createBoardCommentReport(boardCommentId: Long, userId: Long) {
-        val boardComment = boardReviewRepository.findById(boardCommentId).orElseThrow { NotFoundException() }
+    fun createBoardReviewReport(boardReviewId: Long, userId: Long, content: String) {
+        val boardReview = boardReviewRepository.findById(boardReviewId).orElseThrow { NotFoundException() }
 
-        BoardCommentReport(
-            boardCommentId = boardComment.boardId,
+        BoardReviewReport(
+            boardReviewId = boardReview.boardReviewId!!,
             userId = userId,
-        ).let { boardCommentReportRepository.save(it) }
+            content = content,
+        ).let { boardReviewReportRepository.save(it) }
     }
 
 //    fun getBoardReports(userId: Long): List<BoardReportDTO> {
