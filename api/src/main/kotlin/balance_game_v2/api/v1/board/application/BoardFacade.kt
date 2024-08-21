@@ -5,6 +5,7 @@ import balance_game_v2.api.v1.board.http.req.CreateBoardRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardResultRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.DeleteBoardReviewRequestDTO
+import balance_game_v2.api.v1.board.http.req.EvaluationBoardRequest
 import balance_game_v2.api.v1.board.http.req.ModifyBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.toCommand
 import domain.board.BoardService
@@ -14,6 +15,7 @@ import domain.board.dto.BoardListDTO
 import domain.board.dto.BoardResultDTO
 import domain.board.dto.PageBoardDTO
 import domain.board.model.BoardSortCondition
+import domain.domain.board.dto.BoardEvaluationDTO
 import domain.domain.board.dto.SimpleBoardDTO
 import org.springframework.stereotype.Component
 
@@ -34,8 +36,8 @@ class BoardFacade(
         return boardService.getBoardDetail(boardId)
     }
 
-    fun boardHeart(boardId: Long, userId: Long): Boolean {
-        return boardService.boardHeart(boardId, userId)
+    fun boardEvaluation(boardId: Long, userId: Long, request: EvaluationBoardRequest): BoardEvaluationDTO {
+        return boardService.boardEvaluation(boardId, userId, request.toCommand())
     }
 
     fun getBoardContents(boardId: Long): List<BoardContentDTO> {

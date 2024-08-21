@@ -6,10 +6,11 @@ import balance_game_v2.api.v1.board.http.req.CreateBoardRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardResultRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.DeleteBoardReviewRequestDTO
+import balance_game_v2.api.v1.board.http.req.EvaluationBoardRequest
 import balance_game_v2.api.v1.board.http.req.ModifyBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.res.BoardContentResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardDetailResponseDTO
-import balance_game_v2.api.v1.board.http.res.BoardHeartResponseDTO
+import balance_game_v2.api.v1.board.http.res.BoardEvaluationResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardResultResponseDTO
 import balance_game_v2.api.v1.board.http.res.GetMyBoardsResponseDTO
 import balance_game_v2.api.v1.board.http.res.PageBoardResponseDTO
@@ -70,15 +71,16 @@ class BoardApiController(
         return BoardDetailResponseDTO(boardFacade.getBoardDetail(boardId))
     }
 
-    @Operation(summary = "[게임-004] 게임 좋아요")
+    @Operation(summary = "[게임-004] 게임 평가(좋아요, 싫어요)")
     @PostMapping("/boards/{boardId}/evaluation")
-    fun createBoardHeart(
+    fun boardEvaluation(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
-    ): BoardHeartResponseDTO {
+        @RequestBody request: EvaluationBoardRequest,
+    ): BoardEvaluationResponseDTO {
         val user = userFacade.getUserByAccountName(accountName)
 
-        return BoardHeartResponseDTO(boardFacade.boardHeart(boardId, user.userId))
+        return BoardEvaluationResponseDTO(boardFacade.boardEvaluation(boardId, user.userId, request))
     }
 
     @Operation(summary = "[게임-005] 게시글 게임 전체 조회")

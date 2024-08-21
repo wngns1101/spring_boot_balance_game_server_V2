@@ -20,7 +20,6 @@ import domain.board.entity.BoardCommentReport
 import domain.board.entity.BoardContent
 import domain.board.entity.BoardContentItem
 import domain.board.entity.BoardEvaluationHistory
-import domain.board.entity.BoardHeart
 import domain.board.entity.BoardKeyword
 import domain.board.entity.BoardReport
 import domain.board.entity.BoardResult
@@ -32,14 +31,15 @@ import domain.board.repository.BoardCommentReportRepository
 import domain.board.repository.BoardContentItemRepository
 import domain.board.repository.BoardContentRepository
 import domain.board.repository.BoardEvaluationHistoryRepository
-import domain.board.repository.BoardHeartRepository
 import domain.board.repository.BoardKeywordRepository
 import domain.board.repository.BoardReportRepository
 import domain.board.repository.BoardRepository
 import domain.board.repository.BoardResultRepository
 import domain.board.repository.BoardReviewKeywordRepository
 import domain.board.repository.BoardReviewRepository
+import domain.domain.board.dto.BoardEvaluationDTO
 import domain.domain.board.dto.CreateBoardResultRequestCommand
+import domain.domain.board.dto.EvaluationBoardCommand
 import domain.domain.board.dto.SimpleBoardDTO
 import domain.domain.board.dto.toDTO
 import domain.domain.board.dto.toSimpleBoard
@@ -54,7 +54,6 @@ class BoardService(
     private val userRepository: UserRepository,
     private val boardRepository: BoardRepository,
     private val boardReviewKeywordRepository: BoardReviewKeywordRepository,
-    private val boardHeartRepository: BoardHeartRepository,
     private val boardResultRepository: BoardResultRepository,
     private val boardReviewRepository: BoardReviewRepository,
     private val boardReportRepository: BoardReportRepository,
@@ -103,7 +102,13 @@ class BoardService(
         }
     }
 
-    fun getBoards(query: String?, page: Int, size: Int, sortCondition: BoardSortCondition?, themeId: Long?): PageBoardDTO {
+    fun getBoards(
+        query: String?,
+        page: Int,
+        size: Int,
+        sortCondition: BoardSortCondition?,
+        themeId: Long?
+    ): PageBoardDTO {
         val pageable = PageRequest.of(page, size)
         val boards = boardRepository.search(query, pageable, sortCondition, themeId)
         val boardIds = boards.content.mapNotNull { it.boardId }
@@ -150,24 +155,67 @@ class BoardService(
     }
 
     @Transactional
-    fun boardHeart(boardId: Long, userId: Long): Boolean {
+    fun boardEvaluation(boardId: Long, userId: Long, command: EvaluationBoardCommand): BoardEvaluationDTO {
         val board = boardRepository.findById(boardId).orElseThrow { NotFoundException() }
-        val exist = boardHeartRepository.existsByBoardIdAndUserId(boardId, userId)
 
-        if (exist) {
-            val boardHeart = boardHeartRepository.findByBoardIdAndUserId(boardId, userId)
-            boardHeartRepository.delete(boardHeart)
+        if (command.isLike) {
+            val boardLikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsLikeTrue(board.boardId!!, userId)
+            val isLike = if (boardLikeEvaluation == null) {
+                boardEvaluationHistoryRepository.save(
+                    BoardEvaluationHistory(
+                        boardId = board.boardId,
+                        userId = userId,
+                        isLike = true,
+                        isDislike = false,
+                    )
+                )
+                board.likeCount += 1
+                true
+            } else {
+                boardEvaluationHistoryRepository.delete(boardLikeEvaluation)
+                board.likeCount -= 1
+                false
+            }
 
-            board.likeCount -= 1
-            return false
+            val boardDislikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsDislikeTrue(board.boardId, userId)
+            if (boardDislikeEvaluation != null) {
+                boardEvaluationHistoryRepository.delete(boardDislikeEvaluation)
+                board.dislikeCount -= 1
+            }
+
+            return BoardEvaluationDTO(
+                isLike = isLike,
+                isDislike = false,
+            )
         } else {
-            BoardHeart(
-                boardId = boardId,
-                userId = userId,
-            ).let { boardHeartRepository.save(it) }
+            val boardDislikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsDislikeTrue(board.boardId!!, userId)
+            val isDislike = if (boardDislikeEvaluation == null) {
+                boardEvaluationHistoryRepository.save(
+                    BoardEvaluationHistory(
+                        boardId = board.boardId,
+                        userId = userId,
+                        isLike = false,
+                        isDislike = true,
+                    )
+                )
+                board.dislikeCount += 1
+                true
+            } else {
+                boardEvaluationHistoryRepository.delete(boardDislikeEvaluation)
+                board.dislikeCount -= 1
+                false
+            }
 
-            board.likeCount += 1
-            return true
+            val boardLikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsLikeTrue(board.boardId, userId)
+            if (boardLikeEvaluation != null) {
+                boardEvaluationHistoryRepository.delete(boardLikeEvaluation)
+                board.likeCount -= 1
+            }
+
+            return BoardEvaluationDTO(
+                isLike = false,
+                isDislike = isDislike,
+            )
         }
     }
 
@@ -178,10 +226,11 @@ class BoardService(
 
         val boardContentItems = boardContentItemRepository.findAllByBoardContentIdIn(boardContentIds)
 
-        val boardContentResults = boardResultRepository.findAllByBoardContentItemIdIn(boardContentItems.mapNotNull { it.boardContentItemId })
-            .groupingBy {
-                it.boardContentItemId
-            }.eachCount()
+        val boardContentResults =
+            boardResultRepository.findAllByBoardContentItemIdIn(boardContentItems.mapNotNull { it.boardContentItemId })
+                .groupingBy {
+                    it.boardContentItemId
+                }.eachCount()
 
         val boardContentMap = boardContentItems.map {
             it.toDTO(boardContentResults[it.boardContentItemId] ?: 0)
@@ -218,10 +267,11 @@ class BoardService(
 
         val boardContentItems = boardContentItemRepository.findAllByBoardContentIdIn(boardContentIds)
 
-        val boardContentResults = boardResultRepository.findAllByBoardContentItemIdIn(boardContentItems.mapNotNull { it.boardContentItemId })
-            .groupingBy {
-                it.boardContentItemId
-            }.eachCount()
+        val boardContentResults =
+            boardResultRepository.findAllByBoardContentItemIdIn(boardContentItems.mapNotNull { it.boardContentItemId })
+                .groupingBy {
+                    it.boardContentItemId
+                }.eachCount()
 
         val boardContentMap = boardContentItems.map {
             it.toDTO(boardContentResults[it.boardContentItemId] ?: 0)
