@@ -10,5 +10,5 @@ interface AuthRepository : JpaRepository<Auth, Long> {
 
     fun findByAccountNameAndDeletedAtIsNull(id: String): Auth?
 
-    fun findByAccountName(id: String): Auth?
+    fun findByAccountName(accountName: String): Auth?
 }

@@ -10,6 +10,8 @@ import balance_game_v2.api.v1.user.http.exception.NotEqualsTokenException
 import balance_game_v2.api.v1.user.http.exception.NotExistTokenException
 import domain.auth.exception.NotSignUpUserException
 import domain.auth.exception.PasswordMismatchException
+import domain.domain.auth.exception.BlockUserException
+import domain.domain.auth.exception.WithDrawUserException
 import domain.error.AlreadyExistEmailException
 import domain.error.AlreadySignUpException
 import domain.error.BusinessException
@@ -40,6 +42,8 @@ class RestControllerAdvise(
             is InvalidTokenTypeException -> createResponse(ErrorCodes.INVALID_TOKEN_TYPE_ERROR)
             is NotEqualsTokenException -> createResponse(ErrorCodes.NOT_EQUALS_TOKEN_ERROR)
             is NotExistTokenException -> createResponse(ErrorCodes.NOT_EXIST_TOKEN_ERROR)
+            is WithDrawUserException -> createResponse(ErrorCodes.WITH_DRAW_USER_ERROR)
+            is BlockUserException -> createResponse(ErrorCodes.BLOCK_USER_ERROR)
             else -> createResponse(ErrorCodes.UNKNOWN_ERROR)
         }
     }
@@ -53,9 +57,9 @@ class RestControllerAdvise(
             val userEmail = tokenManager.getUserEmailFromToken(accessToken)
             val userId = userService.getUserByEmail(userEmail).userId
 
-//            slackInternalErrorSender.execute(cachingRequest, ex, userId)
+            slackInternalErrorSender.execute(cachingRequest, ex, userId)
         } catch (e: Exception) {
-//            slackInternalErrorSender.execute(cachingRequest, ex, null)
+            slackInternalErrorSender.execute(cachingRequest, ex, null)
         }
 
         createResponse(ErrorCodes.UNKNOWN_ERROR)

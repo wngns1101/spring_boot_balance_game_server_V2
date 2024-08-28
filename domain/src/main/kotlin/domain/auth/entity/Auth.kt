@@ -2,6 +2,7 @@ package domain.auth.entity
 
 import domain.BaseEntity
 import domain.auth.model.AuthGroup
+import domain.auth.model.AuthStatus
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -21,4 +22,6 @@ class Auth(
     val accountName: String,
     var password: String,
     var refreshToken: String? = null,
+    @Enumerated(value = EnumType.STRING)
+    var status: AuthStatus,
 ) : BaseEntity()

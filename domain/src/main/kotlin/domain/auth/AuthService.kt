@@ -1,18 +1,27 @@
 package domain.auth
 
+import domain.admin.repository.AdminRepository
 import domain.auth.entity.Auth
+import domain.auth.exception.NotFoundUserException
 import domain.auth.exception.NotSignUpUserException
 import domain.auth.exception.PasswordMismatchException
 import domain.auth.model.AuthGroup
+import domain.auth.model.AuthStatus
 import domain.auth.repository.AuthRepository
+import domain.board.exception.NotFoundException
+import domain.domain.auth.exception.BlockUserException
+import domain.domain.auth.exception.WithDrawUserException
 import domain.error.AlreadyExistEmailException
+import domain.user.repository.BlockUserHistoryRepository
 import jakarta.transaction.Transactional
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 class AuthService(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val blockUserHistoryRepository: BlockUserHistoryRepository,
+    private val adminRepository: AdminRepository,
 ) {
     final val encoder = BCryptPasswordEncoder(10)
 
@@ -24,6 +33,7 @@ class AuthService(
             accountName = accountName,
             password = convertPassword(password),
             authGroup = AuthGroup.USER,
+            status = AuthStatus.ACTIVITY,
         )
 
         authRepository.save(auth)
@@ -69,5 +79,18 @@ class AuthService(
 
     fun checkDuplicateEmail(accountName: String): Boolean {
         return authRepository.existsByAccountName(accountName)
+    }
+
+    fun checkTokenValidation(accountName: String) {
+        val auth = authRepository.findByAccountName(accountName) ?: throw NotSignUpUserException()
+        if (auth.deletedAt != null) throw WithDrawUserException()
+        if (auth.status == AuthStatus.BLOCK) throw BlockUserException()
+    }
+
+    fun checkBlockReason(userId: Long): BlockReasonDTO {
+        val blockHistory = blockUserHistoryRepository.findByUserId(userId) ?: throw NotFoundUserException()
+        val admin = adminRepository.findById(blockHistory.adminId).orElseThrow { NotFoundException() }
+
+        return blockHistory.toDTO(admin.realName)
     }
 }

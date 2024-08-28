@@ -6,6 +6,7 @@ import balance_game_v2.api.v1.user.http.exception.NotEqualsTokenException
 import balance_game_v2.api.v1.user.http.exception.UnknownException
 import balance_game_v2.api.v1.user.http.req.SignUpCommand
 import domain.auth.AuthService
+import domain.auth.BlockReasonDTO
 import domain.board.BoardService
 import domain.board.exception.NotFoundException
 import domain.user.UserService
@@ -171,5 +172,13 @@ class UserFacade(
         val existCertificate = certificateRepository.findById(email).orElseThrow { NotFoundException() }
 
         return existCertificate.code == code
+    }
+
+    fun checkTokenValidation(accountName: String) {
+        authService.checkTokenValidation(accountName)
+    }
+
+    fun checkBlockReason(userId: Long): BlockReasonDTO {
+        return authService.checkBlockReason(userId)
     }
 }

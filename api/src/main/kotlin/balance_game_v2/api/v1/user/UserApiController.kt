@@ -12,6 +12,7 @@ import balance_game_v2.api.v1.user.http.req.EmailCertificateRequestDTO
 import balance_game_v2.api.v1.user.http.req.ModifyUserInfoRequestDTO
 import balance_game_v2.api.v1.user.http.req.SignInRequestDTO
 import balance_game_v2.api.v1.user.http.req.SignUpRequestDTO
+import balance_game_v2.api.v1.user.http.res.CheckBlockReasonResponseDTO
 import balance_game_v2.api.v1.user.http.res.CheckEmailCertificateResponseDTO
 import balance_game_v2.api.v1.user.http.res.CheckEmailResponseDTO
 import balance_game_v2.api.v1.user.http.res.ListUserNotificationResponseDTO
@@ -298,5 +299,22 @@ class UserApiController(
             nickName = user.nickname,
             myBoardCount = myBoardCount
         )
+    }
+
+    @Operation(summary = "[회원-025] 토큰 유효성 확인")
+    @GetMapping("/check-token-validation")
+    fun checkTokenValidation(
+        @RequestAttribute("accountName") accountName: String,
+    ) {
+        userFacade.checkTokenValidation(accountName)
+    }
+
+    @Operation(summary = "[회원-026] 차단 사유 확인")
+    @GetMapping("/check-block-reason")
+    fun checkBlockReason(
+        @RequestAttribute("accountName") accountName: String,
+    ): CheckBlockReasonResponseDTO {
+        val user = userFacade.getUserByAccountName(accountName)
+        return CheckBlockReasonResponseDTO(userFacade.checkBlockReason(user.userId))
     }
 }
