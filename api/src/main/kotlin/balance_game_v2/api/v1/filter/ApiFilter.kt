@@ -34,32 +34,50 @@ class ApiFilter(
             req.requestURI == "$USER_V2_PREFIX/profile" ||
             req.requestURI == "$USER_V2_PREFIX/email-certificate" ||
             req.requestURI == "$USER_V2_PREFIX/check-email-certificate" ||
-            req.requestURI == "$BOARD_V2_PREFIX/boards" ||
             req.requestURI == "$BOARD_V2_PREFIX/boards/today-recommend-game" ||
-            req.requestURI == "$BOARD_V2_PREFIX/public/**" ||
             req.requestURI.startsWith("$BOARD_V2_PREFIX/public/")
         ) {
             chain.doFilter(req, res)
             return
         }
 
-        token = try {
-            token.split(" ")[1]
-        } catch (e: Exception) {
-            sendError(res, ErrorCodes.NOT_EXIST_TOKEN_ERROR)
-            return
-        }
-
-        try {
-            if (tokenManager.validationAccessToken(token)) {
-                if (tokenManager.isTokenExpired(token)) {
-                    sendError(res, ErrorCodes.EXPIRED_TOKEN_ERROR)
+        if (req.requestURI == "$BOARD_V2_PREFIX/boards" ||
+            req.requestURI == "$BOARD_V2_PREFIX/boards/today-recommend-game" ||
+            req.requestURI.endsWith("/related-boards")
+        ) {
+            if (token != null) {
+                val splitToken = splitToken(token)
+                if (splitToken == null) {
+                    sendError(res, ErrorCodes.INVALID_TOKEN_TYPE_ERROR)
                     return
                 }
-                val email = tokenManager.getUserEmailFromToken(token)
+                val email = tokenManager.getUserEmailFromToken(splitToken)
                 req.setAttribute("accountName", email)
 
                 chain.doFilter(req, res)
+                return
+            } else {
+                req.setAttribute("accountName", null)
+
+                chain.doFilter(req, res)
+                return
+            }
+        }
+        val splitToken = splitToken(token)
+        if (splitToken == null) {
+            sendError(res, ErrorCodes.INVALID_TOKEN_TYPE_ERROR)
+        }
+        try {
+            if (tokenManager.validationAccessToken(splitToken!!)) {
+                if (tokenManager.isTokenExpired(splitToken)) {
+                    sendError(res, ErrorCodes.EXPIRED_TOKEN_ERROR)
+                    return
+                }
+                val email = tokenManager.getUserEmailFromToken(splitToken)
+                req.setAttribute("accountName", email)
+
+                chain.doFilter(req, res)
+                return
             } else {
                 sendError(res, ErrorCodes.INVALID_TOKEN_TYPE_ERROR)
             }
@@ -67,6 +85,14 @@ class ApiFilter(
             sendError(res, ErrorCodes.UNKNOWN_ERROR)
             return
         }
+    }
+}
+
+private fun splitToken(token: String): String? {
+    return try {
+        token.split(" ")[1]
+    } catch (e: Exception) {
+        null
     }
 }
 

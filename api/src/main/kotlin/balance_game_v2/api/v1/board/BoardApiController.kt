@@ -8,13 +8,12 @@ import balance_game_v2.api.v1.board.http.req.CreateBoardRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardResultRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.DeleteBoardReviewRequestDTO
-import balance_game_v2.api.v1.board.http.req.EvaluationBoardRequest
 import balance_game_v2.api.v1.board.http.req.ModifyBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.res.BoardContentResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardDetailResponseDTO
-import balance_game_v2.api.v1.board.http.res.BoardEvaluationResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardResultResponseDTO
 import balance_game_v2.api.v1.board.http.res.GetMyBoardsResponseDTO
+import balance_game_v2.api.v1.board.http.res.GetReviewsResponseDTO
 import balance_game_v2.api.v1.board.http.res.PageBoardResponseDTO
 import balance_game_v2.api.v1.board.http.res.RelatedBoardsResponseDTO
 import balance_game_v2.api.v1.board.http.res.TodayRecommendGameResponseDTO
@@ -61,8 +60,15 @@ class BoardApiController(
         @RequestParam("size", defaultValue = "10") size: Int,
         @RequestParam("sortCondition") sortCondition: BoardSortCondition?,
         @RequestParam("themeId") themeId: Long?,
+        @RequestAttribute("accountName") accountName: String?,
     ): PageBoardResponseDTO {
-        return PageBoardResponseDTO(boardFacade.getBoards(query, page, size, sortCondition, themeId))
+        val userId = if (accountName != null) {
+            userFacade.getUserByAccountName(accountName).userId
+        } else {
+            null
+        }
+
+        return PageBoardResponseDTO(boardFacade.getBoards(query, page, size, sortCondition, themeId, userId))
     }
 
     @Operation(summary = "[게임-003] 게임 상세 조회")
@@ -73,17 +79,17 @@ class BoardApiController(
         return BoardDetailResponseDTO(boardFacade.getBoardDetail(boardId))
     }
 
-    @Operation(summary = "[게임-004] 게임 평가(좋아요, 싫어요)")
-    @PostMapping("/boards/{boardId}/evaluation")
-    fun boardEvaluation(
-        @RequestAttribute("accountName") accountName: String,
-        @PathVariable("boardId") boardId: Long,
-        @RequestBody request: EvaluationBoardRequest,
-    ): BoardEvaluationResponseDTO {
-        val user = userFacade.getUserByAccountName(accountName)
-
-        return BoardEvaluationResponseDTO(boardFacade.boardEvaluation(boardId, user.userId, request))
-    }
+//    @Operation(summary = "[게임-004] 게임 평가(좋아요, 싫어요)")
+//    @PostMapping("/boards/{boardId}/evaluation")
+//    fun boardEvaluation(
+//        @RequestAttribute("accountName") accountName: String,
+//        @PathVariable("boardId") boardId: Long,
+//        @RequestBody request: EvaluationBoardRequest,
+//    ): BoardEvaluationResponseDTO {
+//        val user = userFacade.getUserByAccountName(accountName)
+//
+//        return BoardEvaluationResponseDTO(boardFacade.boardEvaluation(boardId, user.userId, request))
+//    }
 
     @Operation(summary = "[게임-005] 게시글 게임 전체 조회")
     @GetMapping("/boards/{boardId}/contents")
@@ -132,19 +138,18 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-009] 게시글 리뷰 작성")
-    @PostMapping("/comments/{boardId}/review")
+    @PostMapping("/boards/{boardId}/review")
     fun createBoardComment(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
         @RequestBody request: CreateBoardReviewRequestDTO,
     ) {
         val user = userFacade.getUserByAccountName(accountName)
-
         boardFacade.createBoardReview(boardId, user.userId, request)
     }
 
     @Operation(summary = "[게임-010] 게시글 댓글 수정")
-    @PutMapping("/comments/{boardId}/review")
+    @PutMapping("/boards/{boardId}/review")
     fun modifyBoardReview(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
@@ -179,7 +184,7 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-013] 리뷰 신고")
-    @PostMapping("/comments/{boardReviewId}/report")
+    @PostMapping("/boards/{boardReviewId}/report")
     fun createBoardReviewReport(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardReviewId") boardReviewId: Long,
@@ -207,10 +212,25 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-016] 관련있는 게임 API")
-    @GetMapping("/public/boards/{boardId}/related-boards")
+    @GetMapping("/boards/{boardId}/related-boards")
     fun relatedBoards(
         @PathVariable("boardId") boardId: Long,
+        @RequestAttribute("accountName") accountName: String?,
     ): RelatedBoardsResponseDTO {
-        return RelatedBoardsResponseDTO(boardFacade.relatedBoards(boardId))
+        val userId = if (accountName != null) {
+            userFacade.getUserByAccountName(accountName).userId
+        } else {
+            null
+        }
+
+        return RelatedBoardsResponseDTO(boardFacade.relatedBoards(boardId, userId))
+    }
+
+    @Operation(summary = "[게임-017] 리뷰 조회 API")
+    @GetMapping("/public/boards/{boardId}/reviews")
+    fun getReviews(
+        @PathVariable("boardId") boardId: Long,
+    ): GetReviewsResponseDTO {
+        return GetReviewsResponseDTO(boardFacade.getReviews(boardId))
     }
 }

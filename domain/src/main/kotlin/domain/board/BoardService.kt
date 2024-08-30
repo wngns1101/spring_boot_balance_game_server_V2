@@ -5,6 +5,7 @@ import domain.board.dto.BoardContentDTO
 import domain.board.dto.BoardDetailDTO
 import domain.board.dto.BoardListDTO
 import domain.board.dto.BoardResultDTO
+import domain.board.dto.BoardReviewDTO
 import domain.board.dto.CreateBoardCommand
 import domain.board.dto.CreateBoardReviewCommand
 import domain.board.dto.DeleteBoardReviewCommand
@@ -18,7 +19,6 @@ import domain.board.dto.toPageBoardDTO
 import domain.board.entity.Board
 import domain.board.entity.BoardContent
 import domain.board.entity.BoardContentItem
-import domain.board.entity.BoardEvaluationHistory
 import domain.board.entity.BoardKeyword
 import domain.board.entity.BoardReport
 import domain.board.entity.BoardResult
@@ -29,7 +29,6 @@ import domain.board.exception.NotFoundException
 import domain.board.model.BoardSortCondition
 import domain.board.repository.BoardContentItemRepository
 import domain.board.repository.BoardContentRepository
-import domain.board.repository.BoardEvaluationHistoryRepository
 import domain.board.repository.BoardKeywordRepository
 import domain.board.repository.BoardReportRepository
 import domain.board.repository.BoardRepository
@@ -37,12 +36,11 @@ import domain.board.repository.BoardResultRepository
 import domain.board.repository.BoardReviewKeywordRepository
 import domain.board.repository.BoardReviewReportRepository
 import domain.board.repository.BoardReviewRepository
-import domain.domain.board.dto.BoardEvaluationDTO
 import domain.domain.board.dto.CreateBoardResultRequestCommand
-import domain.domain.board.dto.EvaluationBoardCommand
 import domain.domain.board.dto.SimpleBoardDTO
 import domain.domain.board.dto.toDTO
 import domain.domain.board.dto.toSimpleBoard
+import domain.domain.board.exception.AlreadyExistReviewException
 import domain.domain.board.exception.NotJoinedGameException
 import domain.error.InvalidUserException
 import domain.user.repository.UserRepository
@@ -62,7 +60,6 @@ class BoardService(
     private val boardContentItemRepository: BoardContentItemRepository,
     private val boardKeywordRepository: BoardKeywordRepository,
     private val boardContentRepository: BoardContentRepository,
-    private val boardEvaluationHistoryRepository: BoardEvaluationHistoryRepository,
 ) {
     @Transactional
     fun createBoard(userId: Long, command: CreateBoardCommand) {
@@ -108,11 +105,18 @@ class BoardService(
         page: Int,
         size: Int,
         sortCondition: BoardSortCondition?,
-        themeId: Long?
+        themeId: Long?,
+        userId: Long?,
     ): PageBoardDTO {
         val pageable = PageRequest.of(page, size)
 
-        val boards = boardRepository.search(query, pageable, sortCondition, themeId)
+        val boardReportIds = if (userId != null) {
+            boardReportRepository.findAllByUserId(userId).map { it.boardId }
+        } else {
+            null
+        }
+
+        val boards = boardRepository.search(query, pageable, sortCondition, themeId, boardReportIds)
         val boardIds = boards.content.mapNotNull { it.boardId }
 
         val boardKeywords = boardKeywordRepository.findAllByBoardIdIn(boardIds)
@@ -155,71 +159,70 @@ class BoardService(
             previewBoardReviewKeywords
         )
     }
-
-    @Transactional
-    fun boardEvaluation(boardId: Long, userId: Long, command: EvaluationBoardCommand): BoardEvaluationDTO {
-        val board = boardRepository.findById(boardId).orElseThrow { NotFoundException() }
-
-        if (command.isLike) {
-            val boardLikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsLikeTrue(board.boardId!!, userId)
-            val isLike = if (boardLikeEvaluation == null) {
-                boardEvaluationHistoryRepository.save(
-                    BoardEvaluationHistory(
-                        boardId = board.boardId,
-                        userId = userId,
-                        isLike = true,
-                        isDislike = false,
-                    )
-                )
-                board.likeCount += 1
-                true
-            } else {
-                boardEvaluationHistoryRepository.delete(boardLikeEvaluation)
-                board.likeCount -= 1
-                false
-            }
-
-            val boardDislikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsDislikeTrue(board.boardId, userId)
-            if (boardDislikeEvaluation != null) {
-                boardEvaluationHistoryRepository.delete(boardDislikeEvaluation)
-                board.dislikeCount -= 1
-            }
-
-            return BoardEvaluationDTO(
-                isLike = isLike,
-                isDislike = false,
-            )
-        } else {
-            val boardDislikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsDislikeTrue(board.boardId!!, userId)
-            val isDislike = if (boardDislikeEvaluation == null) {
-                boardEvaluationHistoryRepository.save(
-                    BoardEvaluationHistory(
-                        boardId = board.boardId,
-                        userId = userId,
-                        isLike = false,
-                        isDislike = true,
-                    )
-                )
-                board.dislikeCount += 1
-                true
-            } else {
-                boardEvaluationHistoryRepository.delete(boardDislikeEvaluation)
-                board.dislikeCount -= 1
-                false
-            }
-
-            val boardLikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsLikeTrue(board.boardId, userId)
-            if (boardLikeEvaluation != null) {
-                boardEvaluationHistoryRepository.delete(boardLikeEvaluation)
-                board.likeCount -= 1
-            }
-
-            return BoardEvaluationDTO(
-                isLike = false,
-                isDislike = isDislike,
-            )
-        }
-    }
+//    @Transactional
+//    fun boardEvaluation(boardId: Long, userId: Long, command: EvaluationBoardCommand): BoardEvaluationDTO {
+//        val board = boardRepository.findById(boardId).orElseThrow { NotFoundException() }
+//
+//        if (command.isLike) {
+//            val boardLikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsLikeTrue(board.boardId!!, userId)
+//            val isLike = if (boardLikeEvaluation == null) {
+//                boardEvaluationHistoryRepository.save(
+//                    BoardEvaluationHistory(
+//                        boardId = board.boardId,
+//                        userId = userId,
+//                        isLike = true,
+//                        isDislike = false,
+//                    )
+//                )
+//                board.likeCount += 1
+//                true
+//            } else {
+//                boardEvaluationHistoryRepository.delete(boardLikeEvaluation)
+//                board.likeCount -= 1
+//                false
+//            }
+//
+//            val boardDislikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsDislikeTrue(board.boardId, userId)
+//            if (boardDislikeEvaluation != null) {
+//                boardEvaluationHistoryRepository.delete(boardDislikeEvaluation)
+//                board.dislikeCount -= 1
+//            }
+//
+//            return BoardEvaluationDTO(
+//                isLike = isLike,
+//                isDislike = false,
+//            )
+//        } else {
+//            val boardDislikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsDislikeTrue(board.boardId!!, userId)
+//            val isDislike = if (boardDislikeEvaluation == null) {
+//                boardEvaluationHistoryRepository.save(
+//                    BoardEvaluationHistory(
+//                        boardId = board.boardId,
+//                        userId = userId,
+//                        isLike = false,
+//                        isDislike = true,
+//                    )
+//                )
+//                board.dislikeCount += 1
+//                true
+//            } else {
+//                boardEvaluationHistoryRepository.delete(boardDislikeEvaluation)
+//                board.dislikeCount -= 1
+//                false
+//            }
+//
+//            val boardLikeEvaluation = boardEvaluationHistoryRepository.findByBoardIdAndUserIdAndIsLikeTrue(board.boardId, userId)
+//            if (boardLikeEvaluation != null) {
+//                boardEvaluationHistoryRepository.delete(boardLikeEvaluation)
+//                board.likeCount -= 1
+//            }
+//
+//            return BoardEvaluationDTO(
+//                isLike = false,
+//                isDislike = isDislike,
+//            )
+//        }
+//    }
 
     fun getBoardContents(boardId: Long): List<BoardContentDTO> {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
@@ -315,18 +318,17 @@ class BoardService(
             throw NotJoinedGameException()
         }
 
-        BoardEvaluationHistory(
-            boardId = board.boardId!!,
-            userId = userId,
-            isLike = command.isLike,
-            isDislike = command.isDislike,
-        ).let { boardEvaluationHistoryRepository.save(it) }
+        if (boardReviewRepository.findByBoardIdAndUserId(boardId, userId) != null) {
+            throw AlreadyExistReviewException()
+        }
 
         val boardReview = BoardReview(
-            boardId = board.boardId,
+            boardId = board.boardId!!,
             userId = userId,
             title = command.title,
-            comment = command.comment
+            comment = command.comment,
+            isLike = command.isLike,
+            isDislike = command.isDislike,
         ).let { boardReviewRepository.save(it) }
 
         command.keywords.map {
@@ -425,11 +427,34 @@ class BoardService(
         }
     }
 
-    fun relatedBoards(boardId: Long): List<SimpleBoardDTO> {
+    fun relatedBoards(boardId: Long, userId: Long?): List<SimpleBoardDTO> {
         val board = boardRepository.findById(boardId).orElseThrow { NotFoundException() }
 
-        return boardRepository.relatedBoards(boardId, board.themeId).map {
+        val boardReportIds = if (userId != null) {
+            boardReportRepository.findAllByUserId(userId).map { it.boardId }
+        } else {
+            null
+        }
+
+        return boardRepository.relatedBoards(boardId, board.themeId, boardReportIds).map {
             it.toSimpleBoard()
+        }
+    }
+
+    fun getReviews(boardId: Long): List<BoardReviewDTO> {
+        val board = boardRepository.findById(boardId).orElseThrow { NotFoundException() }
+
+        val boardReviews = boardReviewRepository.findAllByBoardId(board.boardId!!)
+
+        val boardReviewIds = boardReviews!!.map { it.boardReviewId!! }
+        val boardKeywordMap = boardReviewKeywordRepository.findAllByBoardReviewIdIn(boardReviewIds)
+            .groupBy { it.boardReviewId }
+            .mapValues { it.value.map { it.keyword } }
+
+        return boardReviews.map {
+            it.toDTO(
+                boardKeywordMap[it.boardReviewId]!!
+            )
         }
     }
 }

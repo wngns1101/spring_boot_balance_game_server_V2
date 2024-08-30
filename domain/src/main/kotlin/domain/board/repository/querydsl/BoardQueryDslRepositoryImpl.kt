@@ -20,10 +20,11 @@ class BoardQueryDslRepositoryImpl :
         query: String?,
         pageable: Pageable,
         sortCondition: BoardSortCondition?,
-        themeId: Long?
+        themeId: Long?,
+        boardReportsIds: List<Long>?
     ): Page<Board> {
         val result = from(board)
-            .where(searchCondition(query), searchForThemeId(themeId))
+            .where(searchCondition(query), searchForThemeId(themeId), filteringBoards(boardReportsIds))
             .orderBy(*sortCondition(sortCondition))
             .offset(pageable.offset)
             .limit((pageable.pageSize).toLong())
@@ -43,11 +44,12 @@ class BoardQueryDslRepositoryImpl :
             .fetch()
     }
 
-    override fun relatedBoards(boardId: Long, themeId: Long): List<Board> {
+    override fun relatedBoards(boardId: Long, themeId: Long, boardReportsIds: List<Long>?): List<Board> {
         return from(board)
             .where(
                 board.boardId.ne(boardId),
                 board.themeId.eq(themeId),
+                filteringBoards(boardReportsIds)
             )
             .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
             .limit(10)
@@ -63,6 +65,11 @@ private fun searchCondition(query: String?): BooleanExpression? {
 private fun searchForThemeId(themeId: Long?): BooleanExpression? {
     if (themeId == null) return null
     return board.themeId.eq(themeId)
+}
+
+private fun filteringBoards(boardReportsIds: List<Long>?): BooleanExpression? {
+    if (boardReportsIds == null) return null
+    return board.boardId.notIn(boardReportsIds)
 }
 
 private fun sortCondition(sortCondition: BoardSortCondition?): Array<OrderSpecifier<*>> {

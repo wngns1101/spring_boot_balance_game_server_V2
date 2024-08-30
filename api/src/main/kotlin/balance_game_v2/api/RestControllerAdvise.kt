@@ -12,6 +12,7 @@ import domain.auth.exception.NotSignUpUserException
 import domain.auth.exception.PasswordMismatchException
 import domain.domain.auth.exception.BlockUserException
 import domain.domain.auth.exception.WithDrawUserException
+import domain.domain.board.exception.AlreadyExistReviewException
 import domain.domain.board.exception.NotJoinedGameException
 import domain.error.AlreadyExistEmailException
 import domain.error.AlreadySignUpException
@@ -46,6 +47,7 @@ class RestControllerAdvise(
             is WithDrawUserException -> createResponse(ErrorCodes.WITH_DRAW_USER_ERROR)
             is BlockUserException -> createResponse(ErrorCodes.BLOCK_USER_ERROR)
             is NotJoinedGameException -> createResponse(ErrorCodes.NOT_SIGNED_GAME_ERROR)
+            is AlreadyExistReviewException -> createResponse(ErrorCodes.ALREADY_EXIST_REVIEW_ERROR)
             else -> createResponse(ErrorCodes.UNKNOWN_ERROR)
         }
     }
@@ -59,9 +61,9 @@ class RestControllerAdvise(
             val userEmail = tokenManager.getUserEmailFromToken(accessToken)
             val userId = userService.getUserByEmail(userEmail).userId
 
-            slackInternalErrorSender.execute(cachingRequest, ex, userId)
+//            slackInternalErrorSender.execute(cachingRequest, ex, userId)
         } catch (e: Exception) {
-            slackInternalErrorSender.execute(cachingRequest, ex, null)
+//            slackInternalErrorSender.execute(cachingRequest, ex, null)
         }
 
         createResponse(ErrorCodes.UNKNOWN_ERROR)

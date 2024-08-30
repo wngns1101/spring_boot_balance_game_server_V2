@@ -17,4 +17,6 @@ class BoardReview(
     val userId: Long,
     var title: String,
     var comment: String,
+    var isLike: Boolean,
+    var isDislike: Boolean,
 ) : BaseEntity()
