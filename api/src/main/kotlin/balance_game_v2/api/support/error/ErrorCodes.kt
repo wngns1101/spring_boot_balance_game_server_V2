@@ -13,5 +13,6 @@ enum class ErrorCodes(val httpStatus: HttpStatus, val message: String) {
     NOT_EQUALS_TOKEN_ERROR(HttpStatus.BAD_REQUEST, "토큰이 일치하지 않습니다"),
     NOT_EXIST_TOKEN_ERROR(HttpStatus.BAD_REQUEST, "토큰이 존재하지 않습니다"),
     WITH_DRAW_USER_ERROR(HttpStatus.BAD_REQUEST, "탈퇴한 유저입니다."),
-    BLOCK_USER_ERROR(HttpStatus.BAD_REQUEST, "차단된 유저입니다.")
+    BLOCK_USER_ERROR(HttpStatus.BAD_REQUEST, "차단된 유저입니다."),
+    NOT_SIGNED_GAME_ERROR(HttpStatus.BAD_REQUEST, "아직 게임에 참여하지 않았습니다")
 }

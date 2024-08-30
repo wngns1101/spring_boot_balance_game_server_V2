@@ -43,6 +43,7 @@ import domain.domain.board.dto.EvaluationBoardCommand
 import domain.domain.board.dto.SimpleBoardDTO
 import domain.domain.board.dto.toDTO
 import domain.domain.board.dto.toSimpleBoard
+import domain.domain.board.exception.NotJoinedGameException
 import domain.error.InvalidUserException
 import domain.user.repository.UserRepository
 import org.springframework.data.domain.PageRequest
@@ -307,6 +308,12 @@ class BoardService(
     @Transactional
     fun createBoardReview(boardId: Long, userId: Long, command: CreateBoardReviewCommand) {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+
+        val boardResults = boardResultRepository.findAllByBoardIdAndUserId(boardId, userId)
+
+        if (boardResults.isEmpty()) {
+            throw NotJoinedGameException()
+        }
 
         BoardEvaluationHistory(
             boardId = board.boardId!!,

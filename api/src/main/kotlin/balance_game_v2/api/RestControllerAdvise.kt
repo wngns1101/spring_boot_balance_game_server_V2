@@ -12,6 +12,7 @@ import domain.auth.exception.NotSignUpUserException
 import domain.auth.exception.PasswordMismatchException
 import domain.domain.auth.exception.BlockUserException
 import domain.domain.auth.exception.WithDrawUserException
+import domain.domain.board.exception.NotJoinedGameException
 import domain.error.AlreadyExistEmailException
 import domain.error.AlreadySignUpException
 import domain.error.BusinessException
@@ -44,6 +45,7 @@ class RestControllerAdvise(
             is NotExistTokenException -> createResponse(ErrorCodes.NOT_EXIST_TOKEN_ERROR)
             is WithDrawUserException -> createResponse(ErrorCodes.WITH_DRAW_USER_ERROR)
             is BlockUserException -> createResponse(ErrorCodes.BLOCK_USER_ERROR)
+            is NotJoinedGameException -> createResponse(ErrorCodes.NOT_SIGNED_GAME_ERROR)
             else -> createResponse(ErrorCodes.UNKNOWN_ERROR)
         }
     }
