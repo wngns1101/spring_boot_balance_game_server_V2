@@ -15,5 +15,6 @@ class BoardReview(
     val boardReviewId: Long? = null,
     val boardId: Long,
     val userId: Long,
+    var title: String,
     var comment: String,
 ) : BaseEntity()

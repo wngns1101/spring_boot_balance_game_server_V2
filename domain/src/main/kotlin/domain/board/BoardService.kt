@@ -318,6 +318,7 @@ class BoardService(
         val boardReview = BoardReview(
             boardId = board.boardId,
             userId = userId,
+            title = command.title,
             comment = command.comment
         ).let { boardReviewRepository.save(it) }
 
