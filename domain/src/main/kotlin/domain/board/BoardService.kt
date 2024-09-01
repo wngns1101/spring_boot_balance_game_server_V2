@@ -322,6 +322,12 @@ class BoardService(
             throw AlreadyExistReviewException()
         }
 
+        if (command.isLike) {
+            board.likeCount += 1
+        } else if (command.isDislike) {
+            board.dislikeCount += 1
+        }
+
         val boardReview = BoardReview(
             boardId = board.boardId!!,
             userId = userId,
@@ -369,8 +375,14 @@ class BoardService(
         val boardReview = boardReviewRepository.findById(command.boardReviewId).orElseThrow { NotFoundException() }
 
         if (boardReview.userId != userId) throw InvalidUserException()
-
         boardReviewRepository.delete(boardReview)
+
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardReview.boardId) ?: throw NotFoundException()
+        if (boardReview.isLike) {
+            board.likeCount -= 1
+        } else if (boardReview.isDislike) {
+            board.dislikeCount -= 1
+        }
 
         boardReviewKeywordRepository.findAllByBoardReviewId(boardReview.boardReviewId!!)
             .let { boardReviewKeywordRepository.deleteAll(it) }
