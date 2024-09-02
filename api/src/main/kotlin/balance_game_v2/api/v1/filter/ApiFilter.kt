@@ -46,8 +46,9 @@ class ApiFilter(
             req.requestURI.endsWith("/related-boards")
         ) {
             if (token != null) {
-                val splitToken = splitToken(token)
-                if (splitToken == null) {
+                val splitToken = try {
+                    token.split(" ")[1]
+                } catch (e: Exception) {
                     sendError(res, ErrorCodes.INVALID_TOKEN_TYPE_ERROR)
                     return
                 }
@@ -63,12 +64,16 @@ class ApiFilter(
                 return
             }
         }
-        val splitToken = splitToken(token)
-        if (splitToken == null) {
+
+        val splitToken = try {
+            token.split(" ")[1]
+        } catch (e: Exception) {
             sendError(res, ErrorCodes.INVALID_TOKEN_TYPE_ERROR)
+            return
         }
+
         try {
-            if (tokenManager.validationAccessToken(splitToken!!)) {
+            if (tokenManager.validationAccessToken(splitToken)) {
                 if (tokenManager.isTokenExpired(splitToken)) {
                     sendError(res, ErrorCodes.EXPIRED_TOKEN_ERROR)
                     return
@@ -85,14 +90,6 @@ class ApiFilter(
             sendError(res, ErrorCodes.UNKNOWN_ERROR)
             return
         }
-    }
-}
-
-private fun splitToken(token: String): String? {
-    return try {
-        token.split(" ")[1]
-    } catch (e: Exception) {
-        null
     }
 }
 

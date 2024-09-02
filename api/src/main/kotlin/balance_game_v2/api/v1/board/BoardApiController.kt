@@ -99,7 +99,7 @@ class BoardApiController(
     ): BoardContentResponseDTO {
         val user = userFacade.getUserByAccountName(accountName)
 
-        return BoardContentResponseDTO(boardFacade.getBoardContents(boardId))
+        return BoardContentResponseDTO(boardFacade.getBoardContents(boardId, user.userId))
     }
 
     @Operation(summary = "[게임-006] 게시글 게임 결과 등록")

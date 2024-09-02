@@ -1,7 +1,6 @@
 package domain.board
 
 import domain.auth.exception.NotFoundUserException
-import domain.board.dto.BoardContentDTO
 import domain.board.dto.BoardDetailDTO
 import domain.board.dto.BoardListDTO
 import domain.board.dto.BoardResultDTO
@@ -36,12 +35,11 @@ import domain.board.repository.BoardResultRepository
 import domain.board.repository.BoardReviewKeywordRepository
 import domain.board.repository.BoardReviewReportRepository
 import domain.board.repository.BoardReviewRepository
+import domain.domain.board.dto.BoardContentList
 import domain.domain.board.dto.CreateBoardResultRequestCommand
 import domain.domain.board.dto.SimpleBoardDTO
 import domain.domain.board.dto.toDTO
 import domain.domain.board.dto.toSimpleBoard
-import domain.domain.board.exception.AlreadyExistReviewException
-import domain.domain.board.exception.NotJoinedGameException
 import domain.error.InvalidUserException
 import domain.user.repository.UserRepository
 import org.springframework.data.domain.PageRequest
@@ -224,9 +222,9 @@ class BoardService(
 //        }
 //    }
 
-    fun getBoardContents(boardId: Long): List<BoardContentDTO> {
+    fun getBoardContents(boardId: Long, userId: Long): BoardContentList {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
-        val boardContents = boardContentRepository.findAllByBoardId(boardId)
+        val boardContents = boardContentRepository.findAllByBoardId(board.boardId!!)
         val boardContentIds = boardContents.mapNotNull { it.boardContentId }
 
         val boardContentItems = boardContentItemRepository.findAllByBoardContentIdIn(boardContentIds)
@@ -241,11 +239,17 @@ class BoardService(
             it.toDTO(boardContentResults[it.boardContentItemId] ?: 0)
         }.groupBy { it.boardContentId }
 
-        return boardContents.map {
+        val isReviewExist = boardReviewRepository.existsByBoardIdAndUserId(board.boardId, userId)
+
+        val boardContentsDTO = boardContents.map {
             it.toDTO(
-                boardContentMap[it.boardContentId]!!
+                boardContentMap[it.boardContentId]!!,
             )
         }
+        return BoardContentList(
+            boardContentsDTO,
+            isReviewExist
+        )
     }
 
     @Transactional
@@ -314,13 +318,13 @@ class BoardService(
 
         val boardResults = boardResultRepository.findAllByBoardIdAndUserId(boardId, userId)
 
-        if (boardResults.isEmpty()) {
-            throw NotJoinedGameException()
-        }
-
-        if (boardReviewRepository.findByBoardIdAndUserId(boardId, userId) != null) {
-            throw AlreadyExistReviewException()
-        }
+//        if (boardResults.isEmpty()) {
+//            throw NotJoinedGameException()
+//        }
+//
+//        if (boardReviewRepository.findByBoardIdAndUserId(boardId, userId) != null) {
+//            throw AlreadyExistReviewException()
+//        }
 
         if (command.isLike) {
             board.likeCount += 1

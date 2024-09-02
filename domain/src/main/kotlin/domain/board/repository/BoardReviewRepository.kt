@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface BoardReviewRepository : JpaRepository<BoardReview, Long> {
     fun findAllByBoardId(boardId: Long): List<BoardReview>?
     fun findByBoardIdAndUserId(boardId: Long, userId: Long): BoardReview?
+    fun existsByBoardIdAndUserId(boardId: Long, userId: Long): Boolean
 }

@@ -8,13 +8,13 @@ import balance_game_v2.api.v1.board.http.req.DeleteBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.ModifyBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.toCommand
 import domain.board.BoardService
-import domain.board.dto.BoardContentDTO
 import domain.board.dto.BoardDetailDTO
 import domain.board.dto.BoardListDTO
 import domain.board.dto.BoardResultDTO
 import domain.board.dto.BoardReviewDTO
 import domain.board.dto.PageBoardDTO
 import domain.board.model.BoardSortCondition
+import domain.domain.board.dto.BoardContentList
 import domain.domain.board.dto.SimpleBoardDTO
 import org.springframework.stereotype.Component
 
@@ -39,8 +39,8 @@ class BoardFacade(
 //        return boardService.boardEvaluation(boardId, userId, request.toCommand())
 //    }
 
-    fun getBoardContents(boardId: Long): List<BoardContentDTO> {
-        return boardService.getBoardContents(boardId)
+    fun getBoardContents(boardId: Long, userId: Long): BoardContentList {
+        return boardService.getBoardContents(boardId, userId)
     }
 
     fun createBoardResult(boardId: Long, request: List<CreateBoardResultRequestDTO>, userId: Long) {

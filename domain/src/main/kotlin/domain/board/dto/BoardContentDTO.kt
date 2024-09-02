@@ -13,6 +13,6 @@ fun BoardContent.toDTO(boardContentItems: List<BoardContentItemDTO>): BoardConte
     return BoardContentDTO(
         boardContentId = boardContentId!!,
         title = title,
-        boardContentItems = boardContentItems,
+        boardContentItems = boardContentItems
     )
 }
