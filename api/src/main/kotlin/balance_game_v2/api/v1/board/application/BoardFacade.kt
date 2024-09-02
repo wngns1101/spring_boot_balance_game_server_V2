@@ -15,6 +15,7 @@ import domain.board.dto.BoardReviewDTO
 import domain.board.dto.PageBoardDTO
 import domain.board.model.BoardSortCondition
 import domain.domain.board.dto.BoardContentList
+import domain.domain.board.dto.ParticipatedBoardDTO
 import domain.domain.board.dto.SimpleBoardDTO
 import org.springframework.stereotype.Component
 
@@ -93,5 +94,9 @@ class BoardFacade(
 
     fun getReviews(boardId: Long): List<BoardReviewDTO> {
         return boardService.getReviews(boardId)
+    }
+
+    fun getParticipatedGames(userId: Long): List<ParticipatedBoardDTO> {
+        return boardService.getParticipatedGames(userId)
     }
 }

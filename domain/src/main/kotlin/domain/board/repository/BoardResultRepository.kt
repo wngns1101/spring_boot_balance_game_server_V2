@@ -8,4 +8,5 @@ interface BoardResultRepository : JpaRepository<BoardResult, Long> {
     fun countByBoardContentId(boardContentId: Long): Long
     fun findAllByBoardContentItemIdIn(boardContentItemIds: List<Long>): List<BoardResult>
     fun findAllByBoardIdAndUserId(boardId: Long, userId: Long): List<BoardResult>
+    fun findByUserId(userId: Long): List<BoardResult>
 }

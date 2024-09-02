@@ -13,6 +13,7 @@ import balance_game_v2.api.v1.board.http.res.BoardContentResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardDetailResponseDTO
 import balance_game_v2.api.v1.board.http.res.BoardResultResponseDTO
 import balance_game_v2.api.v1.board.http.res.GetMyBoardsResponseDTO
+import balance_game_v2.api.v1.board.http.res.GetParticipatedGamesResponseDTO
 import balance_game_v2.api.v1.board.http.res.GetReviewsResponseDTO
 import balance_game_v2.api.v1.board.http.res.PageBoardResponseDTO
 import balance_game_v2.api.v1.board.http.res.RelatedBoardsResponseDTO
@@ -232,5 +233,14 @@ class BoardApiController(
         @PathVariable("boardId") boardId: Long,
     ): GetReviewsResponseDTO {
         return GetReviewsResponseDTO(boardFacade.getReviews(boardId))
+    }
+
+    @Operation(summary = "[게임-018] 내가 참여한 게임 조회")
+    @GetMapping("/boards/me/participated-games")
+    fun getParticipatedGames(
+        @RequestAttribute("accountName") accountName: String,
+    ): GetParticipatedGamesResponseDTO {
+        val user = userFacade.getUserByAccountName(accountName)
+        return GetParticipatedGamesResponseDTO(boardFacade.getParticipatedGames(user.userId))
     }
 }

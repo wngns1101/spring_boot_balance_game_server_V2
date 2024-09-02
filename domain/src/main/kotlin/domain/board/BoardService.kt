@@ -37,8 +37,10 @@ import domain.board.repository.BoardReviewReportRepository
 import domain.board.repository.BoardReviewRepository
 import domain.domain.board.dto.BoardContentList
 import domain.domain.board.dto.CreateBoardResultRequestCommand
+import domain.domain.board.dto.ParticipatedBoardDTO
 import domain.domain.board.dto.SimpleBoardDTO
 import domain.domain.board.dto.toDTO
+import domain.domain.board.dto.toParticipatedBoardDTO
 import domain.domain.board.dto.toSimpleBoard
 import domain.error.InvalidUserException
 import domain.user.repository.UserRepository
@@ -472,5 +474,19 @@ class BoardService(
                 boardKeywordMap[it.boardReviewId]!!
             )
         }
+    }
+
+    fun getParticipatedGames(userId: Long): List<ParticipatedBoardDTO> {
+        val participatedBoardIds = boardResultRepository.findByUserId(userId).map { it.boardId }
+
+        val boardKeywords = boardKeywordRepository.findAllByBoardIdIn(participatedBoardIds)
+        val boardKeywordsMap = boardKeywords.groupBy { it.boardId }
+            .mapValues { it.value.map { it.keyword } }
+
+        return boardRepository.findByBoardIdIn(participatedBoardIds)
+            .map {
+                val isReviewExist = boardReviewRepository.existsByBoardIdAndUserId(it.boardId!!, userId)
+                it.toParticipatedBoardDTO(isReviewExist, boardKeywordsMap[it.boardId]!!)
+            }
     }
 }
