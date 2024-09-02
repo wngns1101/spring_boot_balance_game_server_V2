@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
     fun findByAccountNameAndDeletedAtIsNull(id: String): User?
-
     fun existsUserByNickname(nickname: String): Boolean
+    fun findAllByUserIdIn(userIds: List<Long>): List<User>
 }

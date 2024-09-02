@@ -469,9 +469,13 @@ class BoardService(
             .groupBy { it.boardReviewId }
             .mapValues { it.value.map { it.keyword } }
 
+        val userMap = userRepository.findAllByUserIdIn(boardReviews.map { it.userId })
+            .associate { it.userId to it.nickname }
+
         return boardReviews.map {
             it.toDTO(
-                boardKeywordMap[it.boardReviewId]!!
+                boardKeywordMap[it.boardReviewId]!!,
+                userMap[it.userId]!!
             )
         }
     }
