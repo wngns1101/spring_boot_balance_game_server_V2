@@ -255,7 +255,7 @@ class BoardService(
     }
 
     @Transactional
-    fun createBoardResult(boardId: Long, command: List<CreateBoardResultRequestCommand>, userId: Long) {
+    fun createBoardResult(boardId: Long, command: List<CreateBoardResultRequestCommand>, userId: Long): Long {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
 
         boardResultRepository.findAllByBoardIdAndUserId(boardId, userId)
@@ -269,6 +269,8 @@ class BoardService(
                 userId = userId,
             )
         }.let { boardResultRepository.saveAll(it) }
+
+        return board.boardId!!
     }
 
     fun getBoardResult(boardId: Long): List<BoardResultDTO> {

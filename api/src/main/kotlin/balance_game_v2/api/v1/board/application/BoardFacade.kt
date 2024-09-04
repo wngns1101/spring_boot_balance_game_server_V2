@@ -44,13 +44,14 @@ class BoardFacade(
         return boardService.getBoardContents(boardId, userId)
     }
 
-    fun createBoardResult(boardId: Long, request: List<CreateBoardResultRequestDTO>, userId: Long) {
-        boardService.createBoardResult(boardId, request.map { it.toCommand() }, userId)
-    }
-
-    fun getBoardResult(boardId: Long): List<BoardResultDTO> {
+    fun createBoardResult(boardId: Long, request: List<CreateBoardResultRequestDTO>, userId: Long): List<BoardResultDTO> {
+        val boardId = boardService.createBoardResult(boardId, request.map { it.toCommand() }, userId)
         return boardService.getBoardResult(boardId)
     }
+
+//    fun getBoardResult(boardId: Long): List<BoardResultDTO> {
+//        return boardService.getBoardResult(boardId)
+//    }
 
     fun modifyBoard(boardId: Long, request: BoardModifyRequestDTO) {
         return boardService.modifyBoard(boardId, request.toCommand())

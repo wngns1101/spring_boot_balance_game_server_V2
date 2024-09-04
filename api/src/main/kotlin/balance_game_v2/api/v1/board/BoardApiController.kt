@@ -109,22 +109,22 @@ class BoardApiController(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
         @RequestBody request: List<CreateBoardResultRequestDTO>,
-    ) {
-        val user = userFacade.getUserByAccountName(accountName)
-
-        return boardFacade.createBoardResult(boardId, request, user.userId)
-    }
-
-    @Operation(summary = "[게임-007] 게시글 게임 결과 조회")
-    @GetMapping("/boards/{boardId}/results")
-    fun getBoardResult(
-        @RequestAttribute("accountName") accountName: String,
-        @PathVariable("boardId") boardId: Long,
     ): BoardResultResponseDTO {
         val user = userFacade.getUserByAccountName(accountName)
 
-        return BoardResultResponseDTO(boardFacade.getBoardResult(boardId))
+        return BoardResultResponseDTO(boardFacade.createBoardResult(boardId, request, user.userId))
     }
+
+//    @Operation(summary = "[게임-007] 게시글 게임 결과 조회")
+//    @GetMapping("/boards/{boardId}/results")
+//    fun getBoardResult(
+//        @RequestAttribute("accountName") accountName: String,
+//        @PathVariable("boardId") boardId: Long,
+//    ): BoardResultResponseDTO {
+//        val user = userFacade.getUserByAccountName(accountName)
+//
+//        return BoardResultResponseDTO(boardFacade.getBoardResult(boardId))
+//    }
 
     @Operation(summary = "[게임-008] 게시글 게임 수정")
     @PutMapping("/boards/{boardId}")
