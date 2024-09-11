@@ -483,7 +483,7 @@ class BoardService(
     }
 
     fun getParticipatedGames(userId: Long): List<ParticipatedBoardDTO> {
-        val participatedBoardIds = boardResultRepository.findByUserId(userId).map { it.boardId }
+        val participatedBoardIds = boardResultRepository.findAllByUserId(userId).map { it.boardId }
 
         val boardKeywords = boardKeywordRepository.findAllByBoardIdIn(participatedBoardIds)
         val boardKeywordsMap = boardKeywords.groupBy { it.boardId }
@@ -494,5 +494,24 @@ class BoardService(
                 val isReviewExist = boardReviewRepository.existsByBoardIdAndUserId(it.boardId!!, userId)
                 it.toParticipatedBoardDTO(isReviewExist, boardKeywordsMap[it.boardId]!!)
             }
+    }
+
+    fun getWroteReviews(userId: Long): List<BoardReviewDTO> {
+        val WroteReviews = boardReviewRepository.findAllByUserId(userId)
+
+        val boardReviewIds = WroteReviews.map { it.boardReviewId!! }
+        val boardKeywordMap = boardReviewKeywordRepository.findAllByBoardReviewIdIn(boardReviewIds)
+            .groupBy { it.boardReviewId }
+            .mapValues { it.value.map { it.keyword } }
+
+        val userMap = userRepository.findAllByUserIdIn(WroteReviews.map { it.userId })
+            .associate { it.userId to it.nickname }
+
+        return WroteReviews.map {
+            it.toDTO(
+                boardKeywordMap[it.boardReviewId]!!,
+                userMap[it.userId]!!
+            )
+        }
     }
 }

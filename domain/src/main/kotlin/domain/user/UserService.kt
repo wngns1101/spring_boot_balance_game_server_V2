@@ -3,7 +3,17 @@ package domain.user
 import domain.auth.AuthService
 import domain.auth.exception.NotFoundUserException
 import domain.auth.model.AuthGroup
+import domain.auth.repository.AuthRepository
 import domain.board.exception.NotFoundException
+import domain.board.repository.BoardContentItemRepository
+import domain.board.repository.BoardContentRepository
+import domain.board.repository.BoardKeywordRepository
+import domain.board.repository.BoardReportRepository
+import domain.board.repository.BoardRepository
+import domain.board.repository.BoardResultRepository
+import domain.board.repository.BoardReviewKeywordRepository
+import domain.board.repository.BoardReviewReportRepository
+import domain.board.repository.BoardReviewRepository
 import domain.error.AlreadySignUpException
 import domain.notification.repository.NotificationRepository
 import domain.user.dto.JoinUserCommand
@@ -20,6 +30,7 @@ import domain.user.model.TermsAgreementHistoryType
 import domain.user.model.UserNotificationType
 import domain.user.repository.AdjectiveNameRepository
 import domain.user.repository.AnimalNameRepository
+import domain.user.repository.BlockUserHistoryRepository
 import domain.user.repository.TermsAgreementHistoryRepository
 import domain.user.repository.UserNotificationRepository
 import domain.user.repository.UserReportRepository
@@ -39,6 +50,17 @@ class UserService(
     private val userReportRepository: UserReportRepository,
     private val adjectiveNameRepository: AdjectiveNameRepository,
     private val animalNameRepository: AnimalNameRepository,
+    private val authRepository: AuthRepository,
+    private val boardRepository: BoardRepository,
+    private val blockUserHistoryRepository: BlockUserHistoryRepository,
+    private val boardContentRepository: BoardContentRepository,
+    private val boardContentItemRepository: BoardContentItemRepository,
+    private val boardKeywordRepository: BoardKeywordRepository,
+    private val boardReviewRepository: BoardReviewRepository,
+    private val boardReviewKeywordRepository: BoardReviewKeywordRepository,
+    private val boardReviewReportRepository: BoardReviewReportRepository,
+    private val boardResultRepository: BoardResultRepository,
+    private val boardReportRepository: BoardReportRepository,
 ) {
     @Transactional
     fun signUp(accountName: String, password: String, joinUserCommand: JoinUserCommand): Pair<String, AuthGroup> {
@@ -110,8 +132,6 @@ class UserService(
     fun withdraw(userId: Long) {
         val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
         user.deletedAt = LocalDateTime.now()
-
-//        TODO: 삭제 스케쥴러 추가
     }
 
     fun getUserById(userId: Long): UserDTO {
@@ -221,5 +241,38 @@ class UserService(
         }
 
         return nickname
+    }
+
+    @Transactional
+    fun withdraw(accountNames: List<String>) {
+        authRepository.findAllByAccountNameIn(accountNames).let { authRepository.deleteAllInBatch(it) }
+        val users = userRepository.findAllByAccountNameIn(accountNames).mapNotNull { it.userId }
+        users.forEach {
+            blockUserHistoryRepository.deleteByUserId(it)
+
+            val boards = boardRepository.findAllByUserId(it)
+            val boardIds = boards.map { it.boardId!! }
+
+            boardKeywordRepository.findAllByBoardIdIn(boardIds)
+                .let { boardKeywordRepository.deleteAllInBatch(it) }
+
+            val boardContents = boardContentRepository.findAllByBoardIdIn(boardIds)
+            val boardContentIds = boardContents.map { it.boardContentId!! }
+            boardContentItemRepository.findAllByBoardContentIdIn(boardContentIds)
+                .let { boardContentItemRepository.deleteAllInBatch(it) }
+
+            boardResultRepository.deleteByUserId(it)
+            boardReportRepository.deleteByUserId(it)
+            boardReviewRepository.deleteByUserId(it)
+            boardReviewKeywordRepository.deleteByUserId(it)
+            boardReviewReportRepository.deleteByUserId(it)
+
+            termsAgreementHistoryRepository.deleteByUserId(it)
+            userNotificationRepository.deleteByUserId(it)
+
+            userRepository.deleteByUserId(it)
+            boardRepository.deleteAllInBatch(boards)
+            boardContentRepository.deleteAllInBatch(boardContents)
+        }
     }
 }

@@ -16,6 +16,7 @@ import domain.user.repository.BlockUserHistoryRepository
 import jakarta.transaction.Transactional
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class AuthService(
@@ -92,5 +93,12 @@ class AuthService(
         val admin = adminRepository.findById(blockHistory.adminId).orElseThrow { NotFoundException() }
 
         return blockHistory.toDTO(admin.realName)
+    }
+
+    @Transactional
+    fun withdraw(accountName: String) {
+        val auth = authRepository.findByAccountNameAndDeletedAtIsNull(accountName) ?: throw NotSignUpUserException()
+        auth.deletedAt = LocalDateTime.now()
+        auth.status = AuthStatus.DELETE
     }
 }

@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface TermsAgreementHistoryRepository : JpaRepository<TermsAgreementHistory, Long> {
     fun findByUserIdAndType(userId: Long, type: TermsAgreementHistoryType): TermsAgreementHistory?
+    fun deleteByUserId(userId: Long)
 }

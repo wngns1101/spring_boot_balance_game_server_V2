@@ -23,6 +23,12 @@ class JobScheduler(
             desc = "알림 예약 스케쥴링 테스트",
             exp = "1 1 10 * * ?"
         )
+
+        runJob(
+            job = WithDrawJob::class.java,
+            desc = "회원 탈퇴 배치 스케쥴러",
+            exp = "0 11 13 * * ?"
+        )
     }
 
     fun runJob(job: Class<out Job>, desc: String, params: Map<String, Any>? = null, exp: String) {

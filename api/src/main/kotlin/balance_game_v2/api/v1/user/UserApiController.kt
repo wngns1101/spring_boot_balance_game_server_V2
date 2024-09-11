@@ -129,7 +129,7 @@ class UserApiController(
         @RequestAttribute("accountName") accountName: String,
     ) {
         val user = userFacade.getUserByAccountName(accountName)
-        userFacade.withdraw(user.userId)
+        userFacade.withdraw(user.userId, user.accountName)
     }
 
     @Operation(summary = "[회원-009] 유저 알림 내역 리스트 조회")

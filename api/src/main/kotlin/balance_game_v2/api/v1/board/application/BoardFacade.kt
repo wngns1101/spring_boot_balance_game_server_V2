@@ -100,4 +100,8 @@ class BoardFacade(
     fun getParticipatedGames(userId: Long): List<ParticipatedBoardDTO> {
         return boardService.getParticipatedGames(userId)
     }
+
+    fun getWroteReviews(userId: Long): List<BoardReviewDTO> {
+        return boardService.getWroteReviews(userId)
+    }
 }

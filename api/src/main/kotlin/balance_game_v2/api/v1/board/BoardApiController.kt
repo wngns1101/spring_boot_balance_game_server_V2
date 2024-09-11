@@ -15,6 +15,7 @@ import balance_game_v2.api.v1.board.http.res.BoardResultResponseDTO
 import balance_game_v2.api.v1.board.http.res.GetMyBoardsResponseDTO
 import balance_game_v2.api.v1.board.http.res.GetParticipatedGamesResponseDTO
 import balance_game_v2.api.v1.board.http.res.GetReviewsResponseDTO
+import balance_game_v2.api.v1.board.http.res.GetWroteReviewsResponseDTO
 import balance_game_v2.api.v1.board.http.res.PageBoardResponseDTO
 import balance_game_v2.api.v1.board.http.res.RelatedBoardsResponseDTO
 import balance_game_v2.api.v1.board.http.res.TodayRecommendGameResponseDTO
@@ -242,5 +243,14 @@ class BoardApiController(
     ): GetParticipatedGamesResponseDTO {
         val user = userFacade.getUserByAccountName(accountName)
         return GetParticipatedGamesResponseDTO(boardFacade.getParticipatedGames(user.userId))
+    }
+
+    @Operation(summary = "[게임-019] 내가 작성한 리뷰 리스트")
+    @GetMapping("/boards/me/wrote-reviews")
+    fun getWroteReviews(
+        @RequestAttribute("accountName") accountName: String,
+    ): GetWroteReviewsResponseDTO {
+        val user = userFacade.getUserByAccountName(accountName)
+        return GetWroteReviewsResponseDTO(boardFacade.getWroteReviews(user.userId))
     }
 }

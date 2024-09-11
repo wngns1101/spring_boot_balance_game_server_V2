@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface BoardContentItemRepository : JpaRepository<BoardContentItem, Long> {
     fun findAllByBoardContentIdIn(boardContentIds: List<Long>): List<BoardContentItem>
+    fun deleteByBoardContentId(boardContentId: Long)
 }

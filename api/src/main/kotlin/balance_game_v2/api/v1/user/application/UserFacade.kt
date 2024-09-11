@@ -71,7 +71,8 @@ class UserFacade(
         userService.modifyUserInfo(userId, nickname, profileUrl)
     }
 
-    fun withdraw(userId: Long) {
+    fun withdraw(userId: Long, accountName: String) {
+        authService.withdraw(accountName)
         userService.withdraw(userId)
     }
 

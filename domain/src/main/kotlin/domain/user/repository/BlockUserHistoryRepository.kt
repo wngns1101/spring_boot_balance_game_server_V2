@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface BlockUserHistoryRepository : JpaRepository<BlockUserHistory, Long> {
     fun findByUserId(userId: Long): BlockUserHistory?
+    fun deleteByUserId(userId: Long)
 }

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface BoardReviewReportRepository : JpaRepository<BoardReviewReport, Long> {
     fun findAllByUserId(userId: Long): List<BoardReviewReport>
+    fun deleteByUserId(userId: Long)
 }

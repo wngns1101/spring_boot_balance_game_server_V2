@@ -11,4 +11,5 @@ interface BoardRepository : JpaRepository<Board, Long>, BoardQueryDslRepository 
     fun countBoardByUserId(userId: Long): Int
     fun findAllByUserId(userId: Long): List<Board>
     fun findByBoardIdIn(boardIds: List<Long>): List<Board>
+    fun deleteByUserId(userId: Long): Board
 }
