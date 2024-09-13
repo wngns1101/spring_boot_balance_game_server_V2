@@ -229,11 +229,18 @@ class BoardApiController(
     }
 
     @Operation(summary = "[게임-017] 리뷰 조회 API")
-    @GetMapping("/public/boards/{boardId}/reviews")
+    @GetMapping("/boards/{boardId}/reviews")
     fun getReviews(
         @PathVariable("boardId") boardId: Long,
+        @RequestAttribute("accountName") accountName: String?,
     ): GetReviewsResponseDTO {
-        return GetReviewsResponseDTO(boardFacade.getReviews(boardId))
+        val userId = if (accountName != null) {
+            userFacade.getUserByAccountName(accountName).userId
+        } else {
+            null
+        }
+
+        return GetReviewsResponseDTO(boardFacade.getReviews(boardId, userId))
     }
 
     @Operation(summary = "[게임-018] 내가 참여한 게임 조회")

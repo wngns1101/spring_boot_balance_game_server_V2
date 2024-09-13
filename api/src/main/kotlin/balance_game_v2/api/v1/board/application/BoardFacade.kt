@@ -92,8 +92,8 @@ class BoardFacade(
         return boardService.relatedBoards(boardId, userId)
     }
 
-    fun getReviews(boardId: Long): List<BoardReviewDTO> {
-        return boardService.getReviews(boardId)
+    fun getReviews(boardId: Long, userId: Long?): List<BoardReviewDTO> {
+        return boardService.getReviews(boardId, userId)
     }
 
     fun getParticipatedGames(userId: Long): List<ParticipatedBoardDTO> {

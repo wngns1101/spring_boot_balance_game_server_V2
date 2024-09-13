@@ -462,12 +462,18 @@ class BoardService(
         }
     }
 
-    fun getReviews(boardId: Long): List<BoardReviewDTO> {
+    fun getReviews(boardId: Long, userId: Long?): List<BoardReviewDTO> {
         val board = boardRepository.findById(boardId).orElseThrow { NotFoundException() }
 
-        val boardReviews = boardReviewRepository.findAllByBoardId(board.boardId!!)
+        val boardReviewReportIds = if (userId != null) {
+            boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
+        } else {
+            null
+        }
 
-        val boardReviewIds = boardReviews!!.map { it.boardReviewId!! }
+        val boardReviews = boardReviewRepository.search(board.boardId!!, boardReviewReportIds)
+
+        val boardReviewIds = boardReviews.map { it.boardReviewId!! }
         val boardKeywordMap = boardReviewKeywordRepository.findAllByBoardReviewIdIn(boardReviewIds)
             .groupBy { it.boardReviewId }
             .mapValues { it.value.map { it.keyword } }
