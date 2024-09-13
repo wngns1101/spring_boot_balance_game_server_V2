@@ -7,7 +7,6 @@ import domain.board.dto.BoardResultDTO
 import domain.board.dto.BoardReviewDTO
 import domain.board.dto.CreateBoardCommand
 import domain.board.dto.CreateBoardReviewCommand
-import domain.board.dto.DeleteBoardReviewCommand
 import domain.board.dto.ModifyBoardCommand
 import domain.board.dto.ModifyBoardReviewCommand
 import domain.board.dto.PageBoardDTO
@@ -379,13 +378,14 @@ class BoardService(
     }
 
     @Transactional
-    fun deleteBoardReview(userId: Long, command: DeleteBoardReviewCommand) {
-        val boardReview = boardReviewRepository.findById(command.boardReviewId).orElseThrow { NotFoundException() }
+    fun deleteBoardReview(userId: Long, boardId: Long, boardReviewId: Long) {
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+
+        val boardReview = boardReviewRepository.findById(boardReviewId).orElseThrow { NotFoundException() }
 
         if (boardReview.userId != userId) throw InvalidUserException()
         boardReviewRepository.delete(boardReview)
 
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardReview.boardId) ?: throw NotFoundException()
         if (boardReview.isLike) {
             board.likeCount -= 1
         } else if (boardReview.isDislike) {
@@ -408,7 +408,8 @@ class BoardService(
     }
 
     @Transactional
-    fun createBoardReviewReport(boardReviewId: Long, userId: Long, content: String) {
+    fun createBoardReviewReport(boardId: Long, boardReviewId: Long, userId: Long, content: String) {
+        boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
         val boardReview = boardReviewRepository.findById(boardReviewId).orElseThrow { NotFoundException() }
 
         BoardReviewReport(

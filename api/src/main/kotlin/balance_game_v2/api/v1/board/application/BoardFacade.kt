@@ -4,7 +4,6 @@ import balance_game_v2.api.v1.board.http.req.BoardModifyRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardResultRequestDTO
 import balance_game_v2.api.v1.board.http.req.CreateBoardReviewRequestDTO
-import balance_game_v2.api.v1.board.http.req.DeleteBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.ModifyBoardReviewRequestDTO
 import balance_game_v2.api.v1.board.http.req.toCommand
 import domain.board.BoardService
@@ -65,16 +64,16 @@ class BoardFacade(
         return boardService.modifyBoardReview(boardId, userId, request.toCommand())
     }
 
-    fun deleteBoardReview(userId: Long, request: DeleteBoardReviewRequestDTO) {
-        return boardService.deleteBoardReview(userId, request.toCommand())
+    fun deleteBoardReview(userId: Long, boardId: Long, boardReviewId: Long) {
+        return boardService.deleteBoardReview(userId, boardId, boardReviewId)
     }
 
     fun createBoardReport(boardId: Long, userId: Long, content: String) {
         boardService.createBoardReport(boardId, userId, content)
     }
 
-    fun createBoardReviewReport(boardReviewId: Long, userId: Long, content: String) {
-        boardService.createBoardReviewReport(boardReviewId, userId, content)
+    fun createBoardReviewReport(boardId: Long, boardReviewId: Long, userId: Long, content: String) {
+        boardService.createBoardReviewReport(boardId, boardReviewId, userId, content)
     }
 
     fun todayRecommendGame(): SimpleBoardDTO {
