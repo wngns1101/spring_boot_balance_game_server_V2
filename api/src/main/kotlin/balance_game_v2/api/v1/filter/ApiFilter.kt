@@ -46,7 +46,6 @@ class ApiFilter(
             req.requestURI.endsWith("/related-boards") ||
             req.requestURI.endsWith("/reviews")
         ) {
-            println("여기오니?")
             if (token != null) {
                 val splitToken = try {
                     token.split(" ")[1]
