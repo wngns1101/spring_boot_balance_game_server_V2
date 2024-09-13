@@ -12,9 +12,10 @@ data class BoardReviewDTO(
     val keywords: List<String>,
     val isLike: Boolean,
     val isDislike: Boolean,
+    val profile: String?,
 )
 
-fun BoardReview.toDTO(keywords: List<String>, nickname: String): BoardReviewDTO {
+fun BoardReview.toDTO(keywords: List<String>, nickname: String, profile: String?): BoardReviewDTO {
     return BoardReviewDTO(
         boardReviewId = boardReviewId!!,
         boardId = boardId,
@@ -25,5 +26,6 @@ fun BoardReview.toDTO(keywords: List<String>, nickname: String): BoardReviewDTO 
         keywords = keywords,
         isLike = isLike,
         isDislike = isDislike,
+        profile = profile,
     )
 }

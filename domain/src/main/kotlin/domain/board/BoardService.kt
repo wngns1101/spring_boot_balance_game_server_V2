@@ -472,13 +472,15 @@ class BoardService(
             .groupBy { it.boardReviewId }
             .mapValues { it.value.map { it.keyword } }
 
-        val userMap = userRepository.findAllByUserIdIn(boardReviews.map { it.userId })
-            .associate { it.userId to it.nickname }
+        val users = userRepository.findAllByUserIdIn(boardReviews.map { it.userId })
+        val userNicknameMap = users.associate { it.userId to it.nickname }
+        val userProfileMap = users.associate { it.userId to it.profileUrl }
 
         return boardReviews.map {
             it.toDTO(
                 boardKeywordMap[it.boardReviewId]!!,
-                userMap[it.userId]!!
+                userNicknameMap[it.userId]!!,
+                userProfileMap[it.userId],
             )
         }
     }
@@ -498,20 +500,22 @@ class BoardService(
     }
 
     fun getWroteReviews(userId: Long): List<BoardReviewDTO> {
-        val WroteReviews = boardReviewRepository.findAllByUserId(userId)
+        val wroteReviews = boardReviewRepository.findAllByUserId(userId)
 
-        val boardReviewIds = WroteReviews.map { it.boardReviewId!! }
+        val boardReviewIds = wroteReviews.map { it.boardReviewId!! }
         val boardKeywordMap = boardReviewKeywordRepository.findAllByBoardReviewIdIn(boardReviewIds)
             .groupBy { it.boardReviewId }
             .mapValues { it.value.map { it.keyword } }
 
-        val userMap = userRepository.findAllByUserIdIn(WroteReviews.map { it.userId })
-            .associate { it.userId to it.nickname }
+        val users = userRepository.findAllByUserIdIn(wroteReviews.map { it.userId })
+        val userNicknameMap = users.associate { it.userId to it.nickname }
+        val userProfileMap = users.associate { it.userId to it.profileUrl }
 
-        return WroteReviews.map {
+        return wroteReviews.map {
             it.toDTO(
                 boardKeywordMap[it.boardReviewId]!!,
-                userMap[it.userId]!!
+                userNicknameMap[it.userId]!!,
+                userProfileMap[it.userId],
             )
         }
     }
