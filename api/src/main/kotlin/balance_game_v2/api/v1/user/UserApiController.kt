@@ -12,6 +12,7 @@ import balance_game_v2.api.v1.user.http.req.EmailCertificateRequestDTO
 import balance_game_v2.api.v1.user.http.req.ModifyUserInfoRequestDTO
 import balance_game_v2.api.v1.user.http.req.SignInRequestDTO
 import balance_game_v2.api.v1.user.http.req.SignUpRequestDTO
+import balance_game_v2.api.v1.user.http.req.WithDrawRequestDTO
 import balance_game_v2.api.v1.user.http.res.CheckBlockReasonResponseDTO
 import balance_game_v2.api.v1.user.http.res.CheckEmailCertificateResponseDTO
 import balance_game_v2.api.v1.user.http.res.CheckEmailResponseDTO
@@ -127,9 +128,10 @@ class UserApiController(
     @PostMapping("/users/me/withdraw")
     fun withdraw(
         @RequestAttribute("accountName") accountName: String,
+        @RequestBody request: WithDrawRequestDTO,
     ) {
         val user = userFacade.getUserByAccountName(accountName)
-        userFacade.withdraw(user.userId, user.accountName)
+        userFacade.withdraw(user.userId, user.accountName, request.toCommand())
     }
 
     @Operation(summary = "[회원-009] 유저 알림 내역 리스트 조회")

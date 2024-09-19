@@ -14,6 +14,7 @@ import domain.board.repository.BoardResultRepository
 import domain.board.repository.BoardReviewKeywordRepository
 import domain.board.repository.BoardReviewReportRepository
 import domain.board.repository.BoardReviewRepository
+import domain.domain.user.dto.WithDrawCommandDTO
 import domain.error.AlreadySignUpException
 import domain.notification.repository.NotificationRepository
 import domain.user.dto.JoinUserCommand
@@ -129,9 +130,10 @@ class UserService(
     }
 
     @Transactional
-    fun withdraw(userId: Long) {
+    fun withdraw(userId: Long, command: WithDrawCommandDTO) {
         val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
         user.deletedAt = LocalDateTime.now()
+        user.deletedReason = command.reason
     }
 
     fun getUserById(userId: Long): UserDTO {

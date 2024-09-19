@@ -9,6 +9,7 @@ import domain.auth.AuthService
 import domain.auth.BlockReasonDTO
 import domain.board.BoardService
 import domain.board.exception.NotFoundException
+import domain.domain.user.dto.WithDrawCommandDTO
 import domain.user.UserService
 import domain.user.dto.PageUserNotificationDTO
 import domain.user.dto.UserDTO
@@ -71,9 +72,9 @@ class UserFacade(
         userService.modifyUserInfo(userId, nickname, profileUrl)
     }
 
-    fun withdraw(userId: Long, accountName: String) {
+    fun withdraw(userId: Long, accountName: String, command: WithDrawCommandDTO) {
         authService.withdraw(accountName)
-        userService.withdraw(userId)
+        userService.withdraw(userId, command)
     }
 
     fun getUserNotificationHistories(userId: Long, page: Int, size: Int): PageUserNotificationDTO {
