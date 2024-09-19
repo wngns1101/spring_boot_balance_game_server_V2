@@ -1,9 +1,9 @@
 package balance_game_v2.config
 
-import balance_game_v2.api.v1.filter.ApiFilter
-import balance_game_v2.api.v1.filter.HostFilter
-import balance_game_v2.api.v1.user.application.TokenManager
-import balance_game_v2.api.v1.user.http.common.CookieUtils
+import balance_game_v2.api.v2.filter.ApiFilter
+import balance_game_v2.api.v2.filter.HostFilter
+import balance_game_v2.api.v2.user.application.TokenManager
+import balance_game_v2.api.v2.user.http.common.CookieUtils
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean

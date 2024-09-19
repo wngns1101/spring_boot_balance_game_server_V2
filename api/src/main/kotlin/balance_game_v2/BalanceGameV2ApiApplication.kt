@@ -5,7 +5,7 @@ import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableAsync
 
 @SpringBootApplication(
-    scanBasePackages = ["balance_game_v2", "domain", "redis"]
+    scanBasePackages = ["balance_game_v2"]
 )
 @EnableAsync
 class BalanceGameV2ApiApplication
