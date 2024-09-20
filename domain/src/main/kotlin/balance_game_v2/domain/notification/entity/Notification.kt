@@ -16,7 +16,7 @@ import jakarta.persistence.Table
 class Notification(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val userNotificationId: Long? = null,
+    val notificationId: Long? = null,
     val userId: Long,
     val title: String,
     val body: String,
