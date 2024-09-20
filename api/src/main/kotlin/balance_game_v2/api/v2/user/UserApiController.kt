@@ -17,7 +17,6 @@ import balance_game_v2.api.v2.user.http.res.CheckBlockReasonResponseDTO
 import balance_game_v2.api.v2.user.http.res.CheckEmailCertificateResponseDTO
 import balance_game_v2.api.v2.user.http.res.CheckEmailResponseDTO
 import balance_game_v2.api.v2.user.http.res.ListUserNotificationResponseDTO
-import balance_game_v2.api.v2.user.http.res.ListUserReportResponseDTO
 import balance_game_v2.api.v2.user.http.res.MainUserInfoResponseDTO
 import balance_game_v2.api.v2.user.http.res.ModifyUserNotificationResponseDTO
 import balance_game_v2.api.v2.user.http.res.PageUserNotificationResponseDTO
@@ -182,43 +181,6 @@ class UserApiController(
         val user = userFacade.getUserByAccountName(accountName)
 //       TODO: 초대 이력 가져오는 로직 추가
     }
-
-    @Operation(summary = "[회원-015] 유저 신고")
-    @PostMapping("/users/{userId}/report")
-    fun createUserReport(
-        @RequestAttribute("accountName") accountName: String,
-        @PathVariable("userId") targetUserId: Long,
-    ) {
-        val user = userFacade.getUserByAccountName(accountName)
-        userFacade.createUserReport(user.userId, targetUserId)
-    }
-
-    @Operation(summary = "[회원-016] 신고한 유저 내역 조회")
-    @GetMapping("/users/me/userReports")
-    fun getUserReports(
-        @RequestAttribute("accountName") accountName: String,
-    ): ListUserReportResponseDTO {
-        val user = userFacade.getUserByAccountName(accountName)
-        return ListUserReportResponseDTO(userFacade.getUserReports(user.userId))
-    }
-
-//    @Operation(summary = "[회원-017] 신고한 게시글 내역 조회")
-//    @GetMapping("/users/me/boardReports")
-//    fun getBoardReports(
-//        @RequestAttribute("accountName") accountName: String,
-//    ): ListBoardReportResponseDTO {
-//        val user = userFacade.getUserByAccountName(accountName)
-//        return ListBoardReportResponseDTO(userFacade.getBoardReports(user.userId))
-//    }
-//
-//    @Operation(summary = "[회원-018] 신고한 댓글 내역 조회")
-//    @GetMapping("/users/me/boardCommentReports")
-//    fun getBoardCommentReports(
-//        @RequestAttribute("accountName") accountName: String,
-//    ): ListBoardCommentReportResponseDTO {
-//        val user = userFacade.getUserByAccountName(accountName)
-//        return ListBoardCommentReportResponseDTO(userFacade.getBoardCommentReports(user.userId))
-//    }
 
     @Operation(summary = "[회원-019] 토큰 재발급")
     @PostMapping("/users/me/re-issue")

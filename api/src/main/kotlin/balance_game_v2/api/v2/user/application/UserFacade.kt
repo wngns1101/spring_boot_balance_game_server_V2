@@ -12,7 +12,6 @@ import balance_game_v2.domain.board.exception.NotFoundException
 import balance_game_v2.domain.user.UserService
 import balance_game_v2.domain.user.dto.PageUserNotificationDTO
 import balance_game_v2.domain.user.dto.UserDTO
-import balance_game_v2.domain.user.dto.UserReportDTO
 import balance_game_v2.domain.user.dto.WithDrawCommandDTO
 import balance_game_v2.redis.certificate.entity.Certificate
 import balance_game_v2.redis.certificate.repository.CertificateRepository
@@ -95,26 +94,6 @@ class UserFacade(
     fun modifyUserNotification(userId: Long, userNotificationId: Long): Boolean {
         return userService.modifyUserNotifications(userId, userNotificationId)
     }
-
-    fun getUserInvitation(userId: Long): Any {
-        return userService.getUserInvitation(userId)
-    }
-
-    fun createUserReport(userId: Long, targetUserId: Long) {
-        return userService.createUserReport(userId, targetUserId)
-    }
-
-    fun getUserReports(userId: Long): List<UserReportDTO> {
-        return userService.getUserReports(userId)
-    }
-
-//    fun getBoardReports(userId: Long): List<BoardReportDTO> {
-//        return boardService.getBoardReports(userId)
-//    }
-//
-//    fun getBoardCommentReports(userId: Long): List<BoardCommentReportDTO> {
-//        return boardService.getBoardCommentReports(userId)
-//    }
 
     fun reIssue(token: String): TokenDTO {
         try {

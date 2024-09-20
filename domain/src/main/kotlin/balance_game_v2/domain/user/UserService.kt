@@ -19,14 +19,11 @@ import balance_game_v2.domain.notification.repository.NotificationRepository
 import balance_game_v2.domain.user.dto.JoinUserCommand
 import balance_game_v2.domain.user.dto.PageUserNotificationDTO
 import balance_game_v2.domain.user.dto.UserDTO
-import balance_game_v2.domain.user.dto.UserNotificationDTO
-import balance_game_v2.domain.user.dto.UserReportDTO
 import balance_game_v2.domain.user.dto.WithDrawCommandDTO
 import balance_game_v2.domain.user.dto.toDTO
 import balance_game_v2.domain.user.entity.TermsAgreementHistory
 import balance_game_v2.domain.user.entity.User
 import balance_game_v2.domain.user.entity.UserNotification
-import balance_game_v2.domain.user.entity.UserReport
 import balance_game_v2.domain.user.model.TermsAgreementHistoryType
 import balance_game_v2.domain.user.model.UserNotificationType
 import balance_game_v2.domain.user.repository.AdjectiveNameRepository
@@ -34,7 +31,6 @@ import balance_game_v2.domain.user.repository.AnimalNameRepository
 import balance_game_v2.domain.user.repository.BlockUserHistoryRepository
 import balance_game_v2.domain.user.repository.TermsAgreementHistoryRepository
 import balance_game_v2.domain.user.repository.UserNotificationRepository
-import balance_game_v2.domain.user.repository.UserReportRepository
 import balance_game_v2.domain.user.repository.UserRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -48,7 +44,6 @@ class UserService(
     private val notificationRepository: NotificationRepository,
     private val termsAgreementHistoryRepository: TermsAgreementHistoryRepository,
     private val userNotificationRepository: UserNotificationRepository,
-    private val userReportRepository: UserReportRepository,
     private val adjectiveNameRepository: AdjectiveNameRepository,
     private val animalNameRepository: AnimalNameRepository,
     private val authRepository: AuthRepository,
@@ -200,28 +195,6 @@ class UserService(
         userNotification.status = !userNotification.status
 
         return userNotification.status
-    }
-
-    fun getUserInvitation(userId: Long) {
-        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
-
-//      TODO: 초대코드 생성
-    }
-
-    @Transactional
-    fun createUserReport(userId: Long, targetUserId: Long) {
-        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
-
-        UserReport(
-            userId = userId,
-            targetUserId = targetUserId,
-        ).let { userReportRepository.save(it) }
-    }
-
-    fun getUserReports(userId: Long): List<UserReportDTO> {
-        val user = userRepository.findById(userId).orElseThrow { NotFoundUserException() }
-
-        return userReportRepository.findAllByUserId(userId).map { it.toDTO() }
     }
 
     private fun nicknameMaker(): String {
