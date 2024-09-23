@@ -1,7 +1,6 @@
 package balance_game_v2.domain.board.repository.querydsl
 
 import balance_game_v2.domain.board.entity.BoardReview
-import balance_game_v2.domain.board.entity.QBoard.board
 import balance_game_v2.domain.board.entity.QBoardReview.boardReview
 import com.querydsl.core.types.dsl.BooleanExpression
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
@@ -18,5 +17,5 @@ class BoardReviewQueryDslRepositoryImpl : BoardReviewQueryDslRepository, Queryds
 
 private fun filteringBoards(boardReportsIds: List<Long>?): BooleanExpression? {
     if (boardReportsIds == null) return null
-    return board.boardId.notIn(boardReportsIds)
+    return boardReview.boardId.notIn(boardReportsIds)
 }
