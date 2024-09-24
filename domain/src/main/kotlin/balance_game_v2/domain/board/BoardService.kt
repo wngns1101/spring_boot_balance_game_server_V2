@@ -29,7 +29,6 @@ import balance_game_v2.domain.board.entity.BoardResult
 import balance_game_v2.domain.board.entity.BoardReview
 import balance_game_v2.domain.board.entity.BoardReviewKeyword
 import balance_game_v2.domain.board.entity.BoardReviewReport
-import balance_game_v2.domain.board.exception.NotFoundException
 import balance_game_v2.domain.board.model.BoardSortCondition
 import balance_game_v2.domain.board.repository.BoardContentItemRepository
 import balance_game_v2.domain.board.repository.BoardContentRepository
@@ -41,6 +40,8 @@ import balance_game_v2.domain.board.repository.BoardReviewKeywordRepository
 import balance_game_v2.domain.board.repository.BoardReviewReportRepository
 import balance_game_v2.domain.board.repository.BoardReviewRepository
 import balance_game_v2.domain.error.InvalidUserException
+import balance_game_v2.domain.error.NotFoundBoardException
+import balance_game_v2.domain.error.NotFoundReviewException
 import balance_game_v2.domain.user.repository.UserRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -133,7 +134,7 @@ class BoardService(
 
     @Transactional
     fun getBoardDetail(boardId: Long): BoardDetailDTO {
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
         board.viewCount += 1
 
         val writer = userRepository.findById(board.userId).orElseThrow { NotFoundUserException() }
@@ -223,7 +224,7 @@ class BoardService(
 //    }
 
     fun getBoardContents(boardId: Long, userId: Long): BoardContentList {
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
         val boardContents = boardContentRepository.findAllByBoardId(board.boardId!!)
         val boardContentIds = boardContents.mapNotNull { it.boardContentId }
 
@@ -254,7 +255,7 @@ class BoardService(
 
     @Transactional
     fun createBoardResult(boardId: Long, command: List<CreateBoardResultRequestCommand>, userId: Long): Long {
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
 
         boardResultRepository.findAllByBoardIdAndUserId(boardId, userId)
             .let { boardResultRepository.deleteAll(it) }
@@ -272,7 +273,7 @@ class BoardService(
     }
 
     fun getBoardResult(boardId: Long): List<BoardResultDTO> {
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
         val boardContents = boardContentRepository.findAllByBoardId(boardId)
         val boardContentIds = boardContents.mapNotNull { it.boardContentId }
 
@@ -299,7 +300,7 @@ class BoardService(
 
     @Transactional
     fun modifyBoard(boardId: Long, command: ModifyBoardCommand) {
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
         board.title = command.title
         board.introduce = command.content
 
@@ -316,7 +317,7 @@ class BoardService(
 
     @Transactional
     fun createBoardReview(boardId: Long, userId: Long, command: CreateBoardReviewCommand) {
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
 
         val boardResults = boardResultRepository.findAllByBoardIdAndUserId(boardId, userId)
 
@@ -354,8 +355,8 @@ class BoardService(
 
     @Transactional
     fun modifyBoardReview(boardId: Long, userId: Long, command: ModifyBoardReviewCommand) {
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
-        val boardReview = boardReviewRepository.findById(command.boardReviewId).orElseThrow { NotFoundException() }
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
+        val boardReview = boardReviewRepository.findById(command.boardReviewId).orElseThrow { NotFoundReviewException() }
 
         if (boardReview.userId != userId) throw InvalidUserException()
         boardReview.comment = command.comment
@@ -378,9 +379,9 @@ class BoardService(
 
     @Transactional
     fun deleteBoardReview(userId: Long, boardId: Long, boardReviewId: Long) {
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
 
-        val boardReview = boardReviewRepository.findById(boardReviewId).orElseThrow { NotFoundException() }
+        val boardReview = boardReviewRepository.findById(boardReviewId).orElseThrow { NotFoundReviewException() }
 
         if (boardReview.userId != userId) throw InvalidUserException()
         boardReviewRepository.delete(boardReview)
@@ -397,7 +398,7 @@ class BoardService(
 
     @Transactional
     fun createBoardReport(boardId: Long, userId: Long, content: String) {
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
 
         BoardReport(
             boardId = board.boardId!!,
@@ -408,8 +409,8 @@ class BoardService(
 
     @Transactional
     fun createBoardReviewReport(boardId: Long, boardReviewId: Long, userId: Long, content: String) {
-        boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundException()
-        val boardReview = boardReviewRepository.findById(boardReviewId).orElseThrow { NotFoundException() }
+        boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
+        val boardReview = boardReviewRepository.findById(boardReviewId).orElseThrow { NotFoundReviewException() }
 
         BoardReviewReport(
             boardReviewId = boardReview.boardReviewId!!,
@@ -448,7 +449,7 @@ class BoardService(
     }
 
     fun relatedBoards(boardId: Long, userId: Long?): List<SimpleBoardDTO> {
-        val board = boardRepository.findById(boardId).orElseThrow { NotFoundException() }
+        val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
 
         val boardReportIds = if (userId != null) {
             boardReportRepository.findAllByUserId(userId).map { it.boardId }
@@ -462,7 +463,7 @@ class BoardService(
     }
 
     fun getReviews(boardId: Long, userId: Long?): List<BoardReviewDTO> {
-        val board = boardRepository.findById(boardId).orElseThrow { NotFoundException() }
+        val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
 
         val boardReviewReportIds = if (userId != null) {
             boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
@@ -519,6 +520,37 @@ class BoardService(
         return wroteReviews.map {
             it.toDTO(
                 boardKeywordMap[it.boardReviewId]!!,
+                userNicknameMap[it.userId]!!,
+                userProfileMap[it.userId],
+            )
+        }
+    }
+
+    fun getRecommendReview(userId: Long?): List<BoardReviewDTO> {
+        val boardReviewReportIds = if (userId != null) {
+            boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
+        } else {
+            null
+        }
+
+        val boardReportIds = if (userId != null) {
+            boardReportRepository.findAllByUserId(userId).map { it.boardId }
+        } else {
+            null
+        }
+
+        val recommendBoardReviews = boardReviewRepository.searchRecommendReview(boardReviewReportIds, boardReportIds)
+        val recommendBoardKeywordMap = boardReviewKeywordRepository.findAllByBoardReviewIdIn(recommendBoardReviews.map { it.boardReviewId!! })
+            .groupBy { it.boardReviewId }
+            .mapValues { it.value.map { it.keyword } }
+
+        val users = userRepository.findAllByUserIdIn(recommendBoardReviews.map { it.userId })
+        val userNicknameMap = users.associate { it.userId to it.nickname }
+        val userProfileMap = users.associate { it.userId to it.profileUrl }
+
+        return recommendBoardReviews.map {
+            it.toDTO(
+                recommendBoardKeywordMap[it.boardReviewId]!!,
                 userNicknameMap[it.userId]!!,
                 userProfileMap[it.userId],
             )

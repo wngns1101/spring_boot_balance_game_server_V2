@@ -1,3 +1,5 @@
 package balance_game_v2.domain.board.exception
 
-class NotFoundException : RuntimeException()
+import balance_game_v2.domain.error.BusinessException
+
+class NotFoundException : BusinessException()

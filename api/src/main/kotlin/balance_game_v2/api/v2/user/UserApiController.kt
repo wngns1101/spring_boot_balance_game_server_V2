@@ -290,6 +290,7 @@ class UserApiController(
         @RequestBody request: FindAccountNameRequestDTO,
     ) {
         val user = userFacade.getUserByEmail(request.email)
+        println(user.toString())
         userFacade.sendAccountNameForEmail(user.email, user.accountName)
     }
 

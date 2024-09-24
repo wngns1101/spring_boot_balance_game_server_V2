@@ -15,6 +15,7 @@ import balance_game_v2.api.v2.board.http.res.GetParticipatedGamesResponseDTO
 import balance_game_v2.api.v2.board.http.res.GetReviewsResponseDTO
 import balance_game_v2.api.v2.board.http.res.GetWroteReviewsResponseDTO
 import balance_game_v2.api.v2.board.http.res.PageBoardResponseDTO
+import balance_game_v2.api.v2.board.http.res.RecommendReviewResponseDTO
 import balance_game_v2.api.v2.board.http.res.RelatedBoardsResponseDTO
 import balance_game_v2.api.v2.board.http.res.TodayRecommendGameResponseDTO
 import balance_game_v2.api.v2.user.application.UserFacade
@@ -259,5 +260,19 @@ class BoardApiController(
     ): GetWroteReviewsResponseDTO {
         val user = userFacade.getUserByAccountName(accountName)
         return GetWroteReviewsResponseDTO(boardFacade.getWroteReviews(user.userId))
+    }
+
+    @Operation(summary = "[게임-020] 추천 리뷰 조회")
+    @GetMapping("/recommend-review")
+    fun recommendReview(
+        @RequestAttribute("accountName") accountName: String?,
+    ): RecommendReviewResponseDTO {
+        val userId = if (accountName != null) {
+            userFacade.getUserByAccountName(accountName).userId
+        } else {
+            null
+        }
+
+        return RecommendReviewResponseDTO(boardFacade.getRecommendReview(userId))
     }
 }

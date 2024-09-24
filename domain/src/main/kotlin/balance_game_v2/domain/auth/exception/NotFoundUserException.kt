@@ -1,3 +1,5 @@
 package balance_game_v2.domain.auth.exception
 
-class NotFoundUserException : RuntimeException()
+import balance_game_v2.domain.error.BusinessException
+
+class NotFoundUserException : BusinessException()

@@ -9,6 +9,7 @@ import balance_game_v2.api.v2.user.http.exception.InvalidTokenTypeException
 import balance_game_v2.api.v2.user.http.exception.NotEqualsTokenException
 import balance_game_v2.api.v2.user.http.exception.NotExistTokenException
 import balance_game_v2.domain.auth.exception.BlockUserException
+import balance_game_v2.domain.auth.exception.NotFoundUserException
 import balance_game_v2.domain.auth.exception.NotSignUpUserException
 import balance_game_v2.domain.auth.exception.PasswordMismatchException
 import balance_game_v2.domain.auth.exception.WithDrawUserException
@@ -18,6 +19,9 @@ import balance_game_v2.domain.error.AlreadyExistAccountNameException
 import balance_game_v2.domain.error.AlreadyExistEmailException
 import balance_game_v2.domain.error.AlreadySignUpException
 import balance_game_v2.domain.error.BusinessException
+import balance_game_v2.domain.error.NotFoundBoardException
+import balance_game_v2.domain.error.NotFoundEmailException
+import balance_game_v2.domain.error.NotFoundReviewException
 import balance_game_v2.domain.user.UserService
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.Logger
@@ -50,6 +54,10 @@ class RestControllerAdvise(
             is BlockUserException -> createResponse(ErrorCodes.BLOCK_USER_ERROR)
             is NotJoinedGameException -> createResponse(ErrorCodes.NOT_SIGNED_GAME_ERROR)
             is AlreadyExistReviewException -> createResponse(ErrorCodes.ALREADY_EXIST_REVIEW_ERROR)
+            is NotFoundEmailException -> createResponse(ErrorCodes.NOT_FOUND_EMAIL_ERROR)
+            is NotFoundUserException -> createResponse(ErrorCodes.NOT_FOUND_USER_ERROR)
+            is NotFoundBoardException -> createResponse(ErrorCodes.NOT_FOUND_BOARD_ERROR)
+            is NotFoundReviewException -> createResponse(ErrorCodes.NOT_FOUND_REVIEW_ERROR)
             else -> createResponse(ErrorCodes.UNKNOWN_ERROR)
         }
     }

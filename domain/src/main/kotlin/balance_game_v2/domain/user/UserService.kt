@@ -15,6 +15,7 @@ import balance_game_v2.domain.board.repository.BoardReviewKeywordRepository
 import balance_game_v2.domain.board.repository.BoardReviewReportRepository
 import balance_game_v2.domain.board.repository.BoardReviewRepository
 import balance_game_v2.domain.error.AlreadyExistEmailException
+import balance_game_v2.domain.error.NotFoundEmailException
 import balance_game_v2.domain.notification.repository.NotificationRepository
 import balance_game_v2.domain.user.dto.JoinUserCommand
 import balance_game_v2.domain.user.dto.PageUserNotificationDTO
@@ -251,7 +252,8 @@ class UserService(
     }
 
     fun getUserByEmail(email: String): UserDTO {
-        val user = userRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotFoundUserException()
+        val user = userRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotFoundEmailException()
+        println(user.toString())
         return user.toDTO()
     }
 }

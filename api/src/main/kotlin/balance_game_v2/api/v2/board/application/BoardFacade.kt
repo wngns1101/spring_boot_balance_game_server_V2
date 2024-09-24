@@ -103,4 +103,8 @@ class BoardFacade(
     fun getWroteReviews(userId: Long): List<BoardReviewDTO> {
         return boardService.getWroteReviews(userId)
     }
+
+    fun getRecommendReview(userId: Long?): List<BoardReviewDTO> {
+        return boardService.getRecommendReview(userId)
+    }
 }

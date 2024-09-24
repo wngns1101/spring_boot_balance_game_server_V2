@@ -16,5 +16,9 @@ enum class ErrorCodes(val httpStatus: HttpStatus, val message: String) {
     WITH_DRAW_USER_ERROR(HttpStatus.BAD_REQUEST, "탈퇴한 유저입니다."),
     BLOCK_USER_ERROR(HttpStatus.BAD_REQUEST, "차단된 유저입니다."),
     NOT_SIGNED_GAME_ERROR(HttpStatus.BAD_REQUEST, "아직 게임에 참여하지 않았습니다"),
-    ALREADY_EXIST_REVIEW_ERROR(HttpStatus.BAD_REQUEST, "이미 작성된 리뷰가 있습니다")
+    ALREADY_EXIST_REVIEW_ERROR(HttpStatus.BAD_REQUEST, "이미 작성된 리뷰가 있습니다"),
+    NOT_FOUND_EMAIL_ERROR(HttpStatus.BAD_REQUEST, "이메일이 존재하지 않습니다"),
+    NOT_FOUND_USER_ERROR(HttpStatus.BAD_REQUEST, "유저가 존재하지 않습니다"),
+    NOT_FOUND_BOARD_ERROR(HttpStatus.BAD_REQUEST, "게시글이 존재하지 않습니다"),
+    NOT_FOUND_REVIEW_ERROR(HttpStatus.BAD_REQUEST, "리뷰가 존재하지 않습니다")
 }
