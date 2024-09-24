@@ -35,6 +35,7 @@ class ApiFilter(
             req.requestURI == "$USER_V2_PREFIX/email-certificate" ||
             req.requestURI == "$USER_V2_PREFIX/check-email-certificate" ||
             req.requestURI == "$USER_V2_PREFIX/find-account-name" ||
+            req.requestURI == "$USER_V2_PREFIX/temporary-password" ||
             req.requestURI == "$BOARD_V2_PREFIX/boards/today-recommend-game" ||
             req.requestURI.startsWith("$BOARD_V2_PREFIX/public/")
         ) {

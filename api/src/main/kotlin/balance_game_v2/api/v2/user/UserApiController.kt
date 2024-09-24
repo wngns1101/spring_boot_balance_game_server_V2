@@ -299,6 +299,6 @@ class UserApiController(
         @RequestBody request: TemporaryPasswordRequestDTO,
     ) {
         val user = userFacade.getUserByAccountName(request.accountName)
-//        userFacade.sendTemporaryPasswordForAccountName()
+        userFacade.sendTemporaryPasswordForAccountName(user.accountName, user.email)
     }
 }

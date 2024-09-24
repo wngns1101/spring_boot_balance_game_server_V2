@@ -101,4 +101,10 @@ class AuthService(
         auth.deletedAt = LocalDateTime.now()
         auth.status = AuthStatus.DELETE
     }
+
+    @Transactional
+    fun updatePassword(email: String, encodePw: String) {
+        val auth = authRepository.findByAccountNameAndDeletedAtIsNull(email) ?: throw NotFoundUserException()
+        auth.password = encodePw
+    }
 }
