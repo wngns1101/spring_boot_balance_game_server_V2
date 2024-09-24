@@ -9,9 +9,11 @@ import balance_game_v2.api.v2.user.http.req.ChangePasswordRequestDTO
 import balance_game_v2.api.v2.user.http.req.CheckEmailCertificateRequestDTO
 import balance_game_v2.api.v2.user.http.req.CheckEmailRequestDTO
 import balance_game_v2.api.v2.user.http.req.EmailCertificateRequestDTO
+import balance_game_v2.api.v2.user.http.req.FindAccountNameRequestDTO
 import balance_game_v2.api.v2.user.http.req.ModifyUserInfoRequestDTO
 import balance_game_v2.api.v2.user.http.req.SignInRequestDTO
 import balance_game_v2.api.v2.user.http.req.SignUpRequestDTO
+import balance_game_v2.api.v2.user.http.req.TemporaryPasswordRequestDTO
 import balance_game_v2.api.v2.user.http.req.WithDrawRequestDTO
 import balance_game_v2.api.v2.user.http.res.CheckBlockReasonResponseDTO
 import balance_game_v2.api.v2.user.http.res.CheckEmailCertificateResponseDTO
@@ -280,5 +282,23 @@ class UserApiController(
     ): CheckBlockReasonResponseDTO {
         val user = userFacade.getUserByAccountName(accountName)
         return CheckBlockReasonResponseDTO(userFacade.checkBlockReason(user.userId))
+    }
+
+    @Operation(summary = "[회원-027] 아이디 찾기 발송")
+    @PostMapping("/find-account-name")
+    fun findAccountName(
+        @RequestBody request: FindAccountNameRequestDTO,
+    ) {
+        val user = userFacade.getUserByEmail(request.email)
+        userFacade.sendAccountNameForEmail(user.email, user.accountName)
+    }
+
+    @Operation(summary = "[회원-028] 임시 비밀번호 발송")
+    @PostMapping("/temporary-password")
+    fun temporaryPassword(
+        @RequestBody request: TemporaryPasswordRequestDTO,
+    ) {
+        val user = userFacade.getUserByAccountName(request.accountName)
+//        userFacade.sendTemporaryPasswordForAccountName()
     }
 }

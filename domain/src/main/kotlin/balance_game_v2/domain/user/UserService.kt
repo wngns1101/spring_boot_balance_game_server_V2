@@ -14,7 +14,7 @@ import balance_game_v2.domain.board.repository.BoardResultRepository
 import balance_game_v2.domain.board.repository.BoardReviewKeywordRepository
 import balance_game_v2.domain.board.repository.BoardReviewReportRepository
 import balance_game_v2.domain.board.repository.BoardReviewRepository
-import balance_game_v2.domain.error.AlreadySignUpException
+import balance_game_v2.domain.error.AlreadyExistEmailException
 import balance_game_v2.domain.notification.repository.NotificationRepository
 import balance_game_v2.domain.user.dto.JoinUserCommand
 import balance_game_v2.domain.user.dto.PageUserNotificationDTO
@@ -61,9 +61,8 @@ class UserService(
     @Transactional
     fun signUp(accountName: String, password: String, joinUserCommand: JoinUserCommand): Pair<String, AuthGroup> {
         val authResult = authService.signUp(accountName, password)
-        val userResult = userRepository.findByAccountNameAndDeletedAtIsNull(authResult.first)
 
-        if (userResult != null) throw AlreadySignUpException()
+        if (userRepository.existsUserByEmail(joinUserCommand.email)) throw AlreadyExistEmailException()
 
         val user = User(
             accountName = joinUserCommand.accountName,
@@ -111,7 +110,7 @@ class UserService(
         return authResult
     }
 
-    fun getUserByEmail(accountName: String): UserDTO {
+    fun getUserByAccountName(accountName: String): UserDTO {
         val user = userRepository.findByAccountNameAndDeletedAtIsNull(accountName)
         user.let { return user!!.toDTO() }
     }
@@ -249,5 +248,10 @@ class UserService(
             boardRepository.deleteAllInBatch(boards)
             boardContentRepository.deleteAllInBatch(boardContents)
         }
+    }
+
+    fun getUserByEmail(email: String): UserDTO {
+        val user = userRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotFoundUserException()
+        return user.toDTO()
     }
 }

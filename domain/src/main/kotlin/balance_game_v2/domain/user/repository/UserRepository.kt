@@ -11,4 +11,6 @@ interface UserRepository : JpaRepository<User, Long> {
     fun findAllByUserIdIn(userIds: List<Long>): List<User>
     fun findAllByAccountNameIn(accountNames: List<String>): List<User>
     fun deleteByUserId(userId: Long)
+    fun findByEmailAndDeletedAtIsNull(email: String): User?
+    fun existsUserByEmail(email: String): Boolean
 }

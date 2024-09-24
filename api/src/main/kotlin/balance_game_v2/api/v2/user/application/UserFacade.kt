@@ -48,7 +48,7 @@ class UserFacade(
         val auth = authService.signIn(email, password)
 
         if (pushToken != null) {
-            val user = userService.getUserByEmail(email)
+            val user = userService.getUserByAccountName(email)
             userService.updateUserPushToken(user.userId, pushToken)
         }
 
@@ -58,8 +58,8 @@ class UserFacade(
         return tokens
     }
 
-    fun getUserByAccountName(email: String): UserDTO {
-        return userService.getUserByEmail(email)
+    fun getUserByAccountName(accountName: String): UserDTO {
+        return userService.getUserByAccountName(accountName)
     }
 
     fun changeUserPassword(email: String, currentPassword: String, newPassword: String) {
@@ -129,7 +129,7 @@ class UserFacade(
         val context = Context()
         context.setVariable("authCode", code)
 
-        val mailBody = templateEngine.process(EmailMetaData.TEMPLATE, context)
+        val mailBody = templateEngine.process(EmailMetaData.AUTH_CODE_TEMPLATE, context)
 
         val message = mailSender.createMimeMessage()
 
@@ -160,5 +160,25 @@ class UserFacade(
 
     fun checkBlockReason(userId: Long): BlockReasonDTO {
         return authService.checkBlockReason(userId)
+    }
+
+    fun getUserByEmail(email: String): UserDTO {
+        return userService.getUserByEmail(email)
+    }
+
+    fun sendAccountNameForEmail(email: String, accountName: String) {
+        val context = Context()
+        context.setVariable("accountName", accountName)
+
+        val mailBody = templateEngine.process(EmailMetaData.ACCOUNT_NAME_TEMPLATE, context)
+
+        val message = mailSender.createMimeMessage()
+
+        val helper = MimeMessageHelper(message)
+        helper.setTo(email) // 수신자 email
+        helper.setSubject(EmailMetaData.ACCOUNT_NAME_AUTH_CODE_TITLE)
+        helper.setText(mailBody, true)
+        helper.setFrom(targetEmail)
+        mailSender.send(message)
     }
 }

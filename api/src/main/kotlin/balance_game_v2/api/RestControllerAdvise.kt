@@ -14,6 +14,7 @@ import balance_game_v2.domain.auth.exception.PasswordMismatchException
 import balance_game_v2.domain.auth.exception.WithDrawUserException
 import balance_game_v2.domain.board.exception.AlreadyExistReviewException
 import balance_game_v2.domain.board.exception.NotJoinedGameException
+import balance_game_v2.domain.error.AlreadyExistAccountNameException
 import balance_game_v2.domain.error.AlreadyExistEmailException
 import balance_game_v2.domain.error.AlreadySignUpException
 import balance_game_v2.domain.error.BusinessException
@@ -37,6 +38,7 @@ class RestControllerAdvise(
     fun handleBusinessException(ex: BusinessException): ResponseEntity<ErrorModel> {
         return when (ex) {
             is AlreadyExistEmailException -> createResponse(ErrorCodes.ALREADY_EXIST_EMAIL_ERROR)
+            is AlreadyExistAccountNameException -> createResponse(ErrorCodes.ALREADY_EXIST_ACCOUNT_NAME_ERROR)
             is AlreadySignUpException -> createResponse(ErrorCodes.ALREADY_SIGN_UP_ERROR)
             is NotSignUpUserException -> createResponse(ErrorCodes.NOT_SIGN_UP_USER_ERROR)
             is PasswordMismatchException -> createResponse(ErrorCodes.PASSWORD_MISMATCH_ERROR)
@@ -59,7 +61,7 @@ class RestControllerAdvise(
         try {
             val accessToken = request.getHeader("Authorization").split(" ")[1]
             val userEmail = tokenManager.getUserEmailFromToken(accessToken)
-            val userId = userService.getUserByEmail(userEmail).userId
+            val userId = userService.getUserByAccountName(userEmail).userId
 
 //            slackInternalErrorSender.execute(cachingRequest, ex, userId)
         } catch (e: Exception) {
