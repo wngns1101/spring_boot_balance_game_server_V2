@@ -50,14 +50,10 @@ subprojects {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+        runtimeOnly("com.mysql:mysql-connector-j")
+        implementation("org.springframework.boot:spring-boot-starter-jdbc")
+        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+        implementation("org.springframework.security:spring-security-crypto:5.5.0")
         implementation("org.springframework.boot:spring-boot-starter-data-redis")
     }
 }
-
-//tasks.bootJar {
-//    enabled = false
-//}
-//
-//tasks.jar {
-//    enabled = true
-//}

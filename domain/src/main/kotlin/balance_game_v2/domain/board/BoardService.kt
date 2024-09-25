@@ -428,6 +428,7 @@ class BoardService(
 //    }
 
     fun todayRecommendGame(): SimpleBoardDTO {
+//      신고 내역 필터링 로직 추가
         return boardRepository.todayRecommendGame().random().toSimpleBoard()
     }
 

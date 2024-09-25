@@ -1,21 +1,9 @@
-plugins {
-    kotlin("jvm")
-}
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-group = "org.example"
-version = "0.0.1-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
+val bootJar: BootJar by tasks
+bootJar.enabled = true
 
 dependencies {
+    implementation(project(":domain"))
     testImplementation(kotlin("test"))
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(17)
 }

@@ -44,6 +44,7 @@ class AuthService(
 
     fun signIn(accountName: String, password: String): Pair<String, AuthGroup> {
         val auth = authRepository.findByAccountNameAndDeletedAtIsNull(accountName) ?: throw NotSignUpUserException()
+        if (auth.status == AuthStatus.BLOCK) throw BlockUserException()
 
         if (!verificationPassword(password, auth.password)) throw PasswordMismatchException()
 
