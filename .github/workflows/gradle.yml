@@ -3,8 +3,10 @@ name: Java CI with Gradle
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    paths:
+      - 'api/**'
+      - 'backoffice/**'
+      - 'domain/**'
 
 permissions:
   contents: read
@@ -14,89 +16,59 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      GOOGLE_SERVICES_JSON:  ${{ secrets.FCM }}
+      GOOGLE_SERVICES_JSON: ${{ secrets.FCM }}
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: make application.yml
-        run: |
-          mkdir -p ./api/src/main/resources && cd ./api/src/main/resources
-          touch ./jwt.yml
-          echo "${{secrets.JWT}}" > ./jwt.yml
-
-      - name: make application.yml
-        run: |
-          cd ./api/src/main/resources
-          touch ./application.yml
-          echo "${{secrets.APPLICATION}}" > ./application.yml
-
-      - name: make fcm.json
-        run: |
-          mkdir -p ./domain/src/main/resources/firebase && cd ./domain/src/main/resources/firebase
-          echo "$GOOGLE_SERVICES_JSON" > ./fcm.json
-
-      - name: make slack.yml
-        run: |
-          cd ./api/src/main/resources
-          touch ./slack.yml
-          echo "${{secrets.SLACK}}" > ./slack.yml
-
-      - name: make aws.yml
-        run: |
-          cd ./api/src/main/resources
-          touch ./aws.yml
-          echo "${{secrets.AWS}}" > ./aws.yml
-
-      # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
-      # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5
         with:
           arguments: clean bootJar
 
-      - name: Build API and Domain Modules
-        run: ./gradlew :api:build :domain:build
-      # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
-      # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
-      #
-      # - name: Setup Gradle
-      #   uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
-      #   with:
-      #     gradle-version: '8.5'
-      #
-      # - name: Build with Gradle 8.5
-      #   run: gradle build
-      #
-      # 3. Docker 이미지 빌드
-      - name: docker image build
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/balance-game-server:latest .
+      - name: Build And Push Docker Image for API
+        run: |
+          if echo "${{ github.event.head_commit.message }}" | grep -q 'feat\[api\]:'; then
+            echo "Entered the API build block"
+            mkdir -p ./api/src/main/resources
+            touch ./api/src/main/resources/jwt.yml
+            echo "${{secrets.JWT}}" > ./api/src/main/resources/jwt.yml
 
-      # 4. DockerHub 로그인
-      - name: docker login
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+            touch ./api/src/main/resources/application.yml
+            echo "${{secrets.APPLICATION}}" > ./api/src/main/resources/application.yml
 
-      # 5. Docker Hub 이미지 푸시
-      - name: docker Hub push
-        run: docker push ${{secrets.DOCKER_USERNAME}}/balance-game-server:latest
+            touch ./api/src/main/resources/slack.yml
+            echo "${{secrets.SLACK}}" > ./api/src/main/resources/slack.yml
+
+            touch ./api/src/main/resources/aws.yml
+            echo "${{secrets.AWS}}" > ./api/src/main/resources/aws.yml
+
+            mkdir -p ./domain/src/main/resources/firebase
+            echo "$GOOGLE_SERVICES_JSON" > ./domain/src/main/resources/firebase/fcm.json
+
+            ./gradlew :api:build :domain:build
+            docker build -t ${{ secrets.DOCKER_USERNAME }}/balance-game-api-server:latest .
+
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            docker push ${{ secrets.DOCKER_USERNAME }}/balance-game-api-server:latest
+          fi
 
       - name: AWS Credential
+        if: contains(github.event.head_commit.message, 'feat[api]:')
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.AWS_SSH_HOST }}
           username: ${{ secrets.AWS_SSH_USERNAME }}
           key: ${{ secrets.AWS_KEY }}
-          port: ${{ secrets.AWS_PORT}}
+          port: ${{ secrets.AWS_PORT }}
           script: |
-            sudo docker rm -f balance-game-server
-            sudo docker pull ${{secrets.DOCKER_USERNAME}}/balance-game-server:latest
-            sudo docker run -d --name balance-game-server -e TZ=Asia/Seoul -p 80:80 ${{secrets.DOCKER_USERNAME}}/balance-game-server
+            sudo docker rm -f balance-game-api-server
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/balance-game-api-server:latest
+            sudo docker run -d --name balance-game-api-server -e TZ=Asia/Seoul -p 80:80 ${{ secrets.DOCKER_USERNAME }}/balance-game-api-server
             sudo docker rmi $(docker images -f "dangling=true" -q)
