@@ -1,6 +1,7 @@
 package balance_game_v2.domain.auth
 
 import balance_game_v2.domain.admin.repository.AdminRepository
+import balance_game_v2.domain.auth.dto.AuthDTO
 import balance_game_v2.domain.auth.entity.Auth
 import balance_game_v2.domain.auth.exception.BlockUserException
 import balance_game_v2.domain.auth.exception.NotFoundUserException
@@ -42,13 +43,16 @@ class AuthService(
         return Pair(accountName, auth.authGroup)
     }
 
-    fun signIn(accountName: String, password: String): Pair<String, AuthGroup> {
+    fun signIn(accountName: String, password: String): AuthDTO {
         val auth = authRepository.findByAccountNameAndDeletedAtIsNull(accountName) ?: throw NotSignUpUserException()
-        if (auth.status == AuthStatus.BLOCK) throw BlockUserException()
 
         if (!verificationPassword(password, auth.password)) throw PasswordMismatchException()
 
-        return Pair(auth.accountName, auth.authGroup)
+        return AuthDTO(
+            accountName = auth.accountName,
+            authGroup = auth.authGroup,
+            status = auth.status,
+        )
     }
 
     fun convertPassword(password: String): String {

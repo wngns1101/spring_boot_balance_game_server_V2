@@ -44,7 +44,7 @@ class UserFacade(
         return tokens
     }
 
-    fun signIn(email: String, password: String, pushToken: String?): TokenDTO {
+    fun signIn(email: String, password: String, pushToken: String?): SignInDTO {
         val auth = authService.signIn(email, password)
 
         if (pushToken != null) {
@@ -52,10 +52,14 @@ class UserFacade(
             userService.updateUserPushToken(user.userId, pushToken)
         }
 
-        val tokens = tokenManager.makeJwtToken(auth.first, auth.second)
-        authService.updateToken(auth.first, tokens.refreshToken)
+        val tokens = tokenManager.makeJwtToken(auth.accountName, auth.authGroup)
+        authService.updateToken(auth.accountName, tokens.refreshToken)
 
-        return tokens
+        return SignInDTO(
+            accessToken = tokens.accessToken,
+            refreshToken = tokens.refreshToken,
+            status = auth.status
+        )
     }
 
     fun getUserByAccountName(accountName: String): UserDTO {

@@ -62,7 +62,6 @@ class UserApiController(
     fun signUp(
         @RequestBody signUpRequestDTO: SignUpRequestDTO
     ): SignUpResponseDTO {
-//       test
         return SignUpResponseDTO(userFacade.signUp(signUpRequestDTO.toCommand(signUpRequestDTO)))
     }
 

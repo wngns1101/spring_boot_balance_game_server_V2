@@ -93,9 +93,9 @@ class TokenManager(
         return claims["tokenType"] == "refreshToken"
     }
 
-    fun makeJwtToken(email: String, authGroup: AuthGroup): TokenDTO {
-        val accessToken = createAccessToken(email, authGroup)
-        val refreshToken = createRefreshToken(email, authGroup)
+    fun makeJwtToken(accountName: String, authGroup: AuthGroup): TokenDTO {
+        val accessToken = createAccessToken(accountName, authGroup)
+        val refreshToken = createRefreshToken(accountName, authGroup)
         return TokenDTO(accessToken, refreshToken)
     }
 
