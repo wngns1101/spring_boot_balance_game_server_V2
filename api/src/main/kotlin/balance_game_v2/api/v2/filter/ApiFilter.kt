@@ -45,6 +45,7 @@ class ApiFilter(
 
         if (req.requestURI == "$BOARD_V2_PREFIX/boards" ||
             req.requestURI == "$BOARD_V2_PREFIX/boards/today-recommend-game" ||
+            req.requestURI == "$BOARD_V2_PREFIX/recommend-review" ||
             req.requestURI.endsWith("/related-boards") ||
             req.requestURI.endsWith("/reviews")
         ) {
