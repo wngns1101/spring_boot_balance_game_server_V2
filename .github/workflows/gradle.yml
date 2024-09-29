@@ -34,7 +34,7 @@ jobs:
 
       - name: Build And Push Docker Image for API
         run: |
-          if echo "${{ github.event.head_commit.message }}" | grep -q 'feat\[api\]:'; then
+          if echo "${{ github.event.head_commit.message }}" | grep -qE '.*\[api\]:'; then
             echo "Entered the API build block"
             mkdir -p ./api/src/main/resources
             touch ./api/src/main/resources/jwt.yml
@@ -60,7 +60,7 @@ jobs:
           fi
 
       - name: AWS Credential
-        if: contains(github.event.head_commit.message, 'feat[api]:')
+        if: contains(github.event.head_commit.message, '[api]:')  # 이 조건이 참일 경우에만 실행됩니다.
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.AWS_SSH_HOST }}

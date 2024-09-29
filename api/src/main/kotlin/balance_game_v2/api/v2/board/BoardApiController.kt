@@ -200,8 +200,16 @@ class BoardApiController(
 
     @Operation(summary = "[게임-014] 오늘의 추천 밸런스 게임 조회")
     @GetMapping("/boards/today-recommend-game")
-    fun todayRecommendGame(): TodayRecommendGameResponseDTO {
-        return TodayRecommendGameResponseDTO(boardFacade.todayRecommendGame())
+    fun todayRecommendGame(
+        @RequestAttribute("accountName") accountName: String?,
+    ): TodayRecommendGameResponseDTO {
+        val userId = if (accountName != null) {
+            userFacade.getUserByAccountName(accountName).userId
+        } else {
+            null
+        }
+
+        return TodayRecommendGameResponseDTO(boardFacade.todayRecommendGame(userId))
     }
 
     @Operation(summary = "[게임-015] 내 게임 조회")

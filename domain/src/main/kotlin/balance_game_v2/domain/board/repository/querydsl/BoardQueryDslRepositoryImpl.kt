@@ -55,6 +55,14 @@ class BoardQueryDslRepositoryImpl :
             .limit(10)
             .fetch()
     }
+
+    override fun todayRecommendGameByUserId(myBoardIds: List<Long>?, boardReportIds: List<Long>?): Board {
+        return from(board)
+            .where(filteringBoards(myBoardIds), filteringBoards(boardReportIds))
+            .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
+            .limit(1)
+            .fetchOne()
+    }
 }
 
 private fun searchCondition(query: String?): BooleanExpression? {

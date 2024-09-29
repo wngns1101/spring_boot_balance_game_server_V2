@@ -427,9 +427,16 @@ class BoardService(
 //        return boardCommentReportRepository.findAllByUserId(userId).map { it.toDTO() }
 //    }
 
-    fun todayRecommendGame(): SimpleBoardDTO {
-//      신고 내역 필터링 로직 추가
-        return boardRepository.todayRecommendGame().random().toSimpleBoard()
+    fun todayRecommendGame(userId: Long?): SimpleBoardDTO {
+        return userId?.let {
+            val myBoardIds = boardRepository.findAllByUserId(it).map { it.boardId!! }
+            val boardReportIds = boardReportRepository.findAllByUserId(it).map { it.boardId }
+            println(myBoardIds)
+            println(boardReportIds)
+            boardRepository.todayRecommendGameByUserId(myBoardIds, boardReportIds).toSimpleBoard()
+        } ?: run {
+            boardRepository.todayRecommendGame().random().toSimpleBoard()
+        }
     }
 
     fun getMyBoardCount(userId: Long): Int {
@@ -528,19 +535,16 @@ class BoardService(
     }
 
     fun getRecommendReview(userId: Long?): List<BoardReviewDTO> {
-        val boardReviewReportIds = if (userId != null) {
-            boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
-        } else {
-            null
+        val recommendBoardReviews = userId?.let {
+            val myBoardIds = boardRepository.findAllByUserId(userId).map { it.boardId!! }
+            val myBoardReviewIds = boardReviewRepository.findAllByUserId(userId).map { it.boardReviewId!! }
+            val boardReviewReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
+            val boardReportIds = boardReportRepository.findAllByUserId(userId).map { it.boardId }
+            boardReviewRepository.searchRecommendReviewByUserId(myBoardIds, myBoardReviewIds, boardReviewReportIds, boardReportIds)
+        } ?: run {
+            boardReviewRepository.searchRecommendReview()
         }
 
-        val boardReportIds = if (userId != null) {
-            boardReportRepository.findAllByUserId(userId).map { it.boardId }
-        } else {
-            null
-        }
-
-        val recommendBoardReviews = boardReviewRepository.searchRecommendReview(boardReviewReportIds, boardReportIds)
         val recommendBoardKeywordMap = boardReviewKeywordRepository.findAllByBoardReviewIdIn(recommendBoardReviews.map { it.boardReviewId!! })
             .groupBy { it.boardReviewId }
             .mapValues { it.value.map { it.keyword } }

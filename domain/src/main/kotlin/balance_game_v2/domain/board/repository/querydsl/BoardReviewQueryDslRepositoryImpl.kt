@@ -15,9 +15,21 @@ class BoardReviewQueryDslRepositoryImpl : BoardReviewQueryDslRepository, Queryds
             .fetch()
     }
 
-    override fun searchRecommendReview(boardReviewReportIds: List<Long>?, boardReportIds: List<Long>?): List<BoardReview> {
+    override fun searchRecommendReview(): List<BoardReview> {
         return from(boardReview)
-            .where(filteringBoards(boardReportIds), filteringBoardReviews(boardReviewReportIds))
+            .limit(5)
+            .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
+            .fetch()
+    }
+
+    override fun searchRecommendReviewByUserId(
+        myBoardIds: List<Long>,
+        myBoardReviewIds: List<Long>,
+        boardReviewReportIds: List<Long>,
+        boardReportIds: List<Long>
+    ): List<BoardReview> {
+        return from(boardReview)
+            .where(filteringBoards(myBoardIds), filteringBoards(boardReportIds), filteringBoardReviews(myBoardReviewIds), filteringBoardReviews(boardReviewReportIds))
             .limit(5)
             .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
             .fetch()

@@ -76,8 +76,8 @@ class BoardFacade(
         boardService.createBoardReviewReport(boardId, boardReviewId, userId, content)
     }
 
-    fun todayRecommendGame(): SimpleBoardDTO {
-        return boardService.todayRecommendGame()
+    fun todayRecommendGame(userId: Long?): SimpleBoardDTO {
+        return boardService.todayRecommendGame(userId)
     }
 
     fun getMyBoardCount(userId: Long): Int {
