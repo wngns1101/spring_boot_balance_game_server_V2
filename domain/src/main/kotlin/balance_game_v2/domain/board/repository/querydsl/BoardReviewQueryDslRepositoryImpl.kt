@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 class BoardReviewQueryDslRepositoryImpl : BoardReviewQueryDslRepository, QuerydslRepositorySupport(BoardReview::class.java) {
     override fun search(boardId: Long, boardReviewIds: List<Long>?): List<BoardReview> {
         return from(boardReview)
-            .where(boardReview.boardId.eq(boardId), filteringBoards(boardReviewIds))
+            .where(boardReview.boardId.eq(boardId), filteringBoardReviews(boardReviewIds))
             .fetch()
     }
 
