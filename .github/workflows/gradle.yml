@@ -37,6 +37,10 @@ jobs:
           if echo "${{ github.event.head_commit.message }}" | grep -qE '.*\[api\]:'; then
             echo "Entered the API build block"
             mkdir -p ./api/src/main/resources
+          
+            touch ./api/src/main/resources/kisa.yml
+            echo "${{secrets.KISA}}" > ./api/src/main/resources/kisa.yml
+          
             touch ./api/src/main/resources/jwt.yml
             echo "${{secrets.JWT}}" > ./api/src/main/resources/jwt.yml
 

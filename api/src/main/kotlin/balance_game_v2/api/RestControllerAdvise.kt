@@ -73,9 +73,9 @@ class RestControllerAdvise(
             val userEmail = tokenManager.getUserEmailFromToken(accessToken)
             val userId = userService.getUserByAccountName(userEmail).userId
 
-//            slackInternalErrorSender.execute(cachingRequest, ex, userId)
+            slackInternalErrorSender.execute(cachingRequest, ex, userId)
         } catch (e: Exception) {
-//            slackInternalErrorSender.execute(cachingRequest, ex, null)
+            slackInternalErrorSender.execute(cachingRequest, ex, null)
         }
 
         createResponse(ErrorCodes.UNKNOWN_ERROR)

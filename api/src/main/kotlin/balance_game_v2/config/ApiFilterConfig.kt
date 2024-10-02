@@ -1,5 +1,6 @@
 package balance_game_v2.config
 
+import balance_game_v2.api.client.FeignClient
 import balance_game_v2.api.v2.filter.ApiFilter
 import balance_game_v2.api.v2.filter.HostFilter
 import balance_game_v2.api.v2.user.application.TokenManager
@@ -12,8 +13,9 @@ import org.springframework.core.Ordered
 
 @Configuration
 class ApiFilterConfig(
-    @Value("\${dns}")
-    private var dns: String
+    @Value("\${kisa.access-token}")
+    private val accessToken: String,
+    private val feignClient: FeignClient,
 ) {
     private val includeTokenFilterPaths = arrayOf(
         "$USER_V2_PREFIX/*",
@@ -30,7 +32,7 @@ class ApiFilterConfig(
 
     @Bean
     fun hostFilter(): FilterRegistrationBean<HostFilter> {
-        val registrationBean = FilterRegistrationBean(HostFilter(dns))
+        val registrationBean = FilterRegistrationBean(HostFilter(accessToken, feignClient))
         registrationBean.addUrlPatterns("/*")
         registrationBean.order = Ordered.LOWEST_PRECEDENCE
         return registrationBean
