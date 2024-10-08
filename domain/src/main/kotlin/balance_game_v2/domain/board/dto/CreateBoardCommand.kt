@@ -9,6 +9,6 @@ data class CreateBoardCommand(
 )
 
 data class BoardContentCommand(
-    val title: String,
+    val title: String?,
     val items: List<String>,
 )

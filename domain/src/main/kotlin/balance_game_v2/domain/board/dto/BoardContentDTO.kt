@@ -4,7 +4,7 @@ import balance_game_v2.domain.board.entity.BoardContent
 
 data class BoardContentDTO(
     val boardContentId: Long,
-    val title: String,
+    val title: String?,
     val boardContentItems: List<BoardContentItemDTO>
 )
 

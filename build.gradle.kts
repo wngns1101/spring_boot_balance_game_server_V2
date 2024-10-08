@@ -55,5 +55,6 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-data-jpa")
         implementation("org.springframework.security:spring-security-crypto:5.5.0")
         implementation("org.springframework.boot:spring-boot-starter-data-redis")
+//        implementation("org.apache.poi:poi-ooxml:4.1.2")
     }
 }

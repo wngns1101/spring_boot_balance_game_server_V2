@@ -107,4 +107,8 @@ class BoardFacade(
     fun getRecommendReview(userId: Long?): List<BoardReviewDTO> {
         return boardService.getRecommendReview(userId)
     }
+//
+//    fun excelBoards(dataList: MutableList<ExcelRequestDTO>) {
+//        return boardService.excelBoards(dataList.map { it.toCommand() }.toMutableList())
+//    }
 }

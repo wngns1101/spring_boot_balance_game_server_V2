@@ -292,7 +292,7 @@ class BoardService(
         return boardContents.map {
             BoardResultDTO(
                 boardContentId = it.boardContentId!!,
-                title = it.title,
+                title = it.title!!,
                 boardContentItems = boardContentMap[it.boardContentId]!!,
             )
         }
@@ -561,4 +561,43 @@ class BoardService(
             )
         }
     }
+
+//    @Transactional
+//    fun excelBoards(dataList: MutableList<ExcelBoardCommandDTO>) {
+//        dataList.map { b ->
+//            val board = boardRepository.save(
+//                Board(
+//                    introduce = b.introduce,
+//                    title = b.title,
+//                    userId = b.userId,
+//                    themeId = b.themeId
+//                )
+//            )
+//
+//            var index = 0
+//            println(board.introduce)
+//            b.boardContents.map {
+//                val boardContent = BoardContent(
+//                    boardId = board.boardId!!,
+//                    title = if (it.equals("이주훈")) null else it
+//                )
+//                val savedBoardContent = boardContentRepository.save(boardContent)
+//                println(b.boardContentItems[index])
+//                b.boardContentItems[index].split(",").map {
+//                    BoardContentItem(
+//                        boardContentId = savedBoardContent.boardContentId!!,
+//                        item = it.trim()
+//                    ).let { boardContentItemRepository.save(it) }
+//                }
+//                index += 1
+//            }
+//
+//            b.keywords.map {
+//                BoardKeyword(
+//                    boardId = board.boardId!!,
+//                    keyword = it
+//                ).let { boardKeywordRepository.save(it) }
+//            }
+//        }
+//    }
 }

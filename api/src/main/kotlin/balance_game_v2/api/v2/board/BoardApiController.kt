@@ -283,4 +283,36 @@ class BoardApiController(
 
         return RecommendReviewResponseDTO(boardFacade.getRecommendReview(userId))
     }
+
+//    @PostMapping("/excel/boards", consumes = arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))
+//    fun excelBoards(
+//        @RequestPart("file") file: MultipartFile
+//    ) {
+//        val dataList = mutableListOf<ExcelRequestDTO>()
+//        val extension = FilenameUtils.getExtension(file.originalFilename)
+//        if (!extension.equals("xlsx") && !extension.equals("xls")) {
+//            throw Exception("엑셀파일만 업로드 해주세요.");
+//        }
+//
+//        var workbook: Workbook? = XSSFWorkbook(file.inputStream)
+//
+//        val worksheet = workbook?.getSheetAt(0)
+//
+//        if (worksheet != null) {
+//            for (i in 2..worksheet.lastRowNum){
+//                val row = worksheet.getRow(i)
+//                val data = ExcelRequestDTO(
+//                    introduce = row.getCell(0).stringCellValue.trim(),
+//                    title = row.getCell(1).stringCellValue.trim(),
+//                    userId = row.getCell(2).numericCellValue.toLong(),
+//                    themeId = row.getCell(3).numericCellValue.toLong(),
+//                    boardContents = row.getCell(4).stringCellValue.split(",").toList().map { it.trim() },
+//                    boardContentItems = row.getCell(5).stringCellValue.split("/"),
+//                    keywords = row.getCell(6)?.stringCellValue?.split(",")?.map { it.trim() } ?: emptyList()
+//                )
+//                dataList += data
+//            }
+//        }
+//        boardFacade.excelBoards(dataList)
+//    }
 }
