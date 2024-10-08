@@ -7,12 +7,12 @@ data class CreateBoardRequestDTO(
     val themeId: Long,
     val title: String,
     val introduce: String,
-    val keywords: List<String>,
+    val keywords: List<String>?,
     val boardContents: List<BoardContentRequestDTO>
 )
 
 data class BoardContentRequestDTO(
-    val title: String,
+    val title: String?,
     val items: List<String>,
 )
 
@@ -21,7 +21,7 @@ fun CreateBoardRequestDTO.toCommand(): CreateBoardCommand {
         themeId = themeId,
         title = title,
         introduce = introduce,
-        keywords = keywords,
+        keywords = keywords ?: emptyList(),
         boardContents = boardContents.map {
             BoardContentCommand(
                 title = it.title,
