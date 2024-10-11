@@ -492,7 +492,7 @@ class BoardService(
 
         return boardReviews.map {
             it.toDTO(
-                boardKeywordMap[it.boardReviewId]!!,
+                boardKeywordMap[it.boardReviewId] ?: emptyList(),
                 userNicknameMap[it.userId]!!,
                 userProfileMap[it.userId],
             )
