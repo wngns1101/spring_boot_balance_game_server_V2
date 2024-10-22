@@ -33,7 +33,7 @@ class SwaggerConfig {
         )
 
         return GroupedOpenApi.builder()
-            .group("v1")
+            .group("v2")
             .pathsToMatch(*paths)
             .addOpenApiCustomizer(
                 buildSecurityOpenApi(true)

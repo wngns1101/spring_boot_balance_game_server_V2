@@ -87,7 +87,7 @@ private fun sortCondition(sortCondition: BoardSortCondition?): Array<OrderSpecif
             arrayOf(board.updatedAt.desc())
         }
         BoardSortCondition.LIKE -> {
-            arrayOf(board.likeCount.desc())
+            arrayOf(board.likeCount.desc(), board.updatedAt.desc(), board.boardId.desc())
         }
     }
 }
