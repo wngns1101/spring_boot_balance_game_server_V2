@@ -5,7 +5,7 @@ import balance_game_v2.domain.announcement.dto.AnnouncementDTO
 import balance_game_v2.domain.announcement.dto.AnnouncementSimpleDTO
 import balance_game_v2.domain.announcement.model.SearchCondition
 import balance_game_v2.domain.theme.ThemeService
-import balance_game_v2.domain.theme.model.ThemeDTO
+import balance_game_v2.domain.theme.dto.ThemeDTO
 import balance_game_v2.domain.version.VersionService
 import balance_game_v2.domain.version.dto.VersionDTO
 import org.springframework.stereotype.Component

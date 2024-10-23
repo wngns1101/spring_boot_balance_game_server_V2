@@ -21,6 +21,7 @@ import balance_game_v2.domain.notification.repository.NotificationRepository
 import balance_game_v2.domain.user.dto.JoinUserCommand
 import balance_game_v2.domain.user.dto.PageUserNotificationDTO
 import balance_game_v2.domain.user.dto.UserDTO
+import balance_game_v2.domain.user.dto.UserPageDTO
 import balance_game_v2.domain.user.dto.WithDrawCommandDTO
 import balance_game_v2.domain.user.dto.toDTO
 import balance_game_v2.domain.user.entity.TermsAgreementHistory
@@ -256,5 +257,20 @@ class UserService(
         val user = userRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotFoundEmailException()
         println(user.toString())
         return user.toDTO()
+    }
+
+    fun getUserPage(
+        query: String?,
+        page: Int,
+        size: Int,
+    ): UserPageDTO {
+        val pageable = PageRequest.of(page, size)
+
+        val users = userRepository.search(query, pageable)
+
+        return UserPageDTO(
+            users = users.content.map { it.toDTO() },
+            totalPage = users.totalPages
+        )
     }
 }

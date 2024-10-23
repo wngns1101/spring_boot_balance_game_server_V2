@@ -6,4 +6,5 @@ bootJar.enabled = true
 dependencies {
     implementation(project(":domain"))
     testImplementation(kotlin("test"))
+    implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
 }

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            버전
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">버전ID</th>
+                    <th scope="col">현재버전</th>
+                    <th scope="col">최소버전</th>
+                    <th scope="col">선호버전</th>
+                </tr>
+                </thead>
+                <tbody th:each="version: ${versions}">
+                <tr style="cursor: pointer;"
+                    th:onclick="'location.href=\'' + @{/backoffice/v2/version/versions/{versionId}(versionId=${version.versionId})} + '\''">
+                    <th scope="row" th:text="${version.versionId}"></th>
+                    <td th:text="${version.currentVersion}"></td>
+                    <td th:text="${version.minimumVersion}"></td>
+                    <td th:text="${version.preferVersion}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <!-- 이전 그룹으로 이동 -->
+                    <li class="page-item">
+                        <a class="page-link"
+                           th:href="@{/backoffice/v2/version/versions(page=${(pageGroup > 0 ? (pageGroup - 1) * 5 + 1 : 1)})}">
+                            <
+                        </a>
+                    </li>
+                    <!-- 페이지 번호 표시 -->
+                    <li class="page-item"
+                        th:each="page : ${#numbers.sequence((pageGroup * 5) + 1, (pageGroup + 1) * 5)}"
+                        th:classappend="${page == currentPage} ? 'active'">
+                        <a class="page-link"
+                           th:if="${page <= totalPage}"
+                           th:href="@{/backoffice/v2/version/versions(page=${page})}"
+                           th:text="${page}"
+                           onclick="setPageActive(this)">
+                        </a>
+                    </li>
+                    <!-- 다음 그룹으로 이동 -->
+                    <li class="page-item">
+                        <a class="page-link"
+                           th:href="@{/backoffice/v2/version/versions(page=${(pageGroup + 1) * 5 < totalPage ? (pageGroup + 1) * 5 + 1 : totalPage})}">
+                            >
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+<script>
+    function setPageActive(link) {
+        // 모든 'nav-link'에서 active 클래스 제거
+        var links = document.querySelectorAll('.page-link');
+        links.forEach(function(item) {
+            item.classList.remove('active');
+        });
+
+        // 클릭된 항목에 active 클래스 추가
+        link.classList.add('active');
+    }
+</script>
+</body>
+</html>

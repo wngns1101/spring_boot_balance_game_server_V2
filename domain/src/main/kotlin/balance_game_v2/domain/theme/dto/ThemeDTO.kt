@@ -1,4 +1,4 @@
-package balance_game_v2.domain.theme.model
+package balance_game_v2.domain.theme.dto
 
 import balance_game_v2.domain.theme.entity.Theme
 

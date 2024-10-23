@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/backoffice/v2")
 class IndexController(
     private val adminService: AdminService,
 ) {
-    @GetMapping("/")
+    @GetMapping("/index")
     fun index(): String {
         return "index"
     }

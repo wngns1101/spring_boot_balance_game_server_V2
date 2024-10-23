@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!-- Thymeleaf 선언 / headerFragment 임을 선언-->
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      th:fragment="HeaderFragment">
+<div class="container">
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+        <a href="/backoffice/v2/index" class="d-flex align-items-center me-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+            <span class="fs-4 me-3">양자택일 관리자 페이지</span>
+        </a>
+
+        <ul class="nav nav-pills">
+            <li class="nav-item"><a href="/backoffice/v2/user/users" class="nav-link" onclick="setActive(this)">회원 관리</a></li>
+            <li class="nav-item"><a href="/backoffice/v2/board/boards" class="nav-link" onclick="setActive(this)">게시글 관리</a></li>
+            <li class="nav-item"><a href="/backoffice/v2/theme/themes" class="nav-link" onclick="setActive(this)">테마 관리</a></li>
+            <li class="nav-item"><a href="/backoffice/v2/version/versions" class="nav-link" onclick="setActive(this)">버전 관리</a></li>
+            <li class="nav-item"><a href="/backoffice/v2/announcement/announcements" class="nav-link" onclick="setActive(this)">공지사항 관리</a></li>
+            <li class="nav-item"><a href="/backoffice/v2/notification/notifications" class="nav-link" onclick="setActive(this)">알림 관리</a></li>
+            <li class="nav-item"><a href="#" class="nav-link">로그아웃</a></li>
+        </ul>
+    </header>
+
+    <script>
+        window.onload = function() {
+            var path = window.location.pathname;
+            var links = document.querySelectorAll('.nav-link');
+            links.forEach(function(link) {
+                if (link.getAttribute('href') === path) {
+                    link.classList.add('active');
+                }
+            });
+        };
+
+        function setActive(link) {
+            // 모든 'nav-link'에서 active 클래스 제거
+            var links = document.querySelectorAll('.nav-link');
+            links.forEach(function(item) {
+                item.classList.remove('active');
+            });
+
+            // 클릭된 항목에 active 클래스 추가
+            link.classList.add('active');
+        }
+    </script>
+</div>
+</html>
