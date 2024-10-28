@@ -19,8 +19,8 @@ import balance_game_v2.api.v2.board.http.res.RecommendReviewResponseDTO
 import balance_game_v2.api.v2.board.http.res.RelatedBoardsResponseDTO
 import balance_game_v2.api.v2.board.http.res.TodayRecommendGameResponseDTO
 import balance_game_v2.api.v2.user.application.UserFacade
-import balance_game_v2.config.BOARD_V2
-import balance_game_v2.config.BOARD_V2_PREFIX
+import balance_game_v2.client.BOARD_V2
+import balance_game_v2.client.BOARD_V2_PREFIX
 import balance_game_v2.domain.board.model.BoardSortCondition
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag

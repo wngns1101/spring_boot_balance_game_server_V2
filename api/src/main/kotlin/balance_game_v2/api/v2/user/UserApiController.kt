@@ -1,6 +1,5 @@
 package balance_game_v2.api.v2.user
 
-import balance_game_v2.api.client.S3Config
 import balance_game_v2.api.v2.board.application.BoardFacade
 import balance_game_v2.api.v2.user.application.TokenManager
 import balance_game_v2.api.v2.user.application.UserFacade
@@ -26,10 +25,10 @@ import balance_game_v2.api.v2.user.http.res.ReIssueResponseDTO
 import balance_game_v2.api.v2.user.http.res.SignInResponseDTO
 import balance_game_v2.api.v2.user.http.res.SignUpResponseDTO
 import balance_game_v2.api.v2.user.http.res.UserDetailResponseDTO
-import balance_game_v2.config.USER_V2
-import balance_game_v2.config.USER_V2_PREFIX
-import com.amazonaws.services.s3.model.ObjectMetadata
-import com.amazonaws.services.s3.model.PutObjectRequest
+import balance_game_v2.client.S3Config
+import balance_game_v2.client.USER_V2
+import balance_game_v2.client.USER_V2_PREFIX
+import balance_game_v2.domain.user.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
@@ -56,6 +55,7 @@ class UserApiController(
     private val tokenManager: TokenManager,
     private val s3Config: S3Config,
     private val boardFacade: BoardFacade,
+    private val userService: UserService,
 ) {
     @Operation(summary = "[회원-001] 회원가입")
     @PostMapping("/sign-up")
@@ -215,25 +215,7 @@ class UserApiController(
     fun profile(
         @RequestPart file: MultipartFile,
     ): String {
-        val objectMetadata = ObjectMetadata().apply {
-            this.contentType = file.contentType
-            this.contentLength = file.size
-        }
-
-        val objectKey = "profiles/${UUID.randomUUID()}-${file.originalFilename}"
-
-        val putObjectRequest = PutObjectRequest(
-            "balance-game-bucket",
-            objectKey,
-            file.inputStream,
-            objectMetadata,
-        )
-
-        s3Config.amazonS3Client().putObject(putObjectRequest)
-
-        val publicUrl = "https://balance-game-bucket.s3.amazonaws.com/$objectKey"
-
-        return publicUrl
+        return userService.postProfile(file)
     }
 
     @Operation(summary = "[회원-022] 이메일 인증")

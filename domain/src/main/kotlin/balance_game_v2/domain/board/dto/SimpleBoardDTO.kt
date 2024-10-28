@@ -6,6 +6,7 @@ data class SimpleBoardDTO(
     val boardId: Long,
     val title: String,
     val introduce: String,
+    val likeCount: Int?,
 )
 
 fun Board.toSimpleBoard(): SimpleBoardDTO {
@@ -13,5 +14,6 @@ fun Board.toSimpleBoard(): SimpleBoardDTO {
         boardId = boardId!!,
         title = title,
         introduce = introduce,
+        likeCount = likeCount,
     )
 }

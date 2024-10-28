@@ -1,4 +1,4 @@
-package balance_game_v2.config
+package balance_game_v2.client
 
 import balance_game_v2.api.client.FeignClient
 import balance_game_v2.api.v2.filter.ApiFilter

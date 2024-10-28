@@ -1,4 +1,4 @@
-package balance_game_v2.config
+package balance_game_v2.client
 
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer

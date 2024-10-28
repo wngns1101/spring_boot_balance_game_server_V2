@@ -4,8 +4,8 @@ import balance_game_v2.api.support.error.ErrorCodes
 import balance_game_v2.api.support.error.ErrorModel
 import balance_game_v2.api.v2.user.application.TokenManager
 import balance_game_v2.api.v2.user.http.common.CookieUtils
-import balance_game_v2.config.BOARD_V2_PREFIX
-import balance_game_v2.config.USER_V2_PREFIX
+import balance_game_v2.client.BOARD_V2_PREFIX
+import balance_game_v2.client.USER_V2_PREFIX
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.servlet.Filter
 import jakarta.servlet.FilterChain

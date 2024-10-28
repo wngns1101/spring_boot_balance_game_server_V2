@@ -5,8 +5,8 @@ import balance_game_v2.api.v2.common.http.res.AnnouncementDetailResponseDTO
 import balance_game_v2.api.v2.common.http.res.AnnouncementResponseDTO
 import balance_game_v2.api.v2.common.http.res.ThemeResponseDTO
 import balance_game_v2.api.v2.common.http.res.VersionResponseDTO
-import balance_game_v2.config.COMMON_V2
-import balance_game_v2.config.COMMON_V2_PREFIX
+import balance_game_v2.client.COMMON_V2
+import balance_game_v2.client.COMMON_V2_PREFIX
 import balance_game_v2.domain.announcement.model.SearchCondition
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag

@@ -17,6 +17,7 @@ dependencies {
     kapt ("jakarta.persistence:jakarta.persistence-api")
     implementation("com.google.firebase:firebase-admin:9.2.0")
     implementation("org.springframework.boot:spring-boot-starter-quartz")
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.174")
 }
 
 idea {

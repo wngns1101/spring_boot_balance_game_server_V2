@@ -1,4 +1,4 @@
-package balance_game_v2.config
+package balance_game_v2.client
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.info.Info

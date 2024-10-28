@@ -34,7 +34,8 @@ jobs:
 
       - name: Build And Push Docker Image for API
         run: |
-          if echo "${{ github.event.head_commit.message }}" | grep -qE '.*\[api\]:'; then
+          
+          if echo "${{ github.event.head_commit.message }}" | grep -qE '\[api\]:'; then
             echo "Entered the API build block"
             mkdir -p ./api/src/main/resources
           
@@ -50,8 +51,9 @@ jobs:
             touch ./api/src/main/resources/slack.yml
             echo "${{secrets.SLACK}}" > ./api/src/main/resources/slack.yml
 
-            touch ./api/src/main/resources/aws.yml
-            echo "${{secrets.AWS}}" > ./api/src/main/resources/aws.yml
+            mkdir -p ./domain/src/main/resources
+            touch ./domain/src/main/resources/aws.yml
+            echo "${{secrets.AWS}}" > ./domain/src/main/resources/aws.yml
 
             mkdir -p ./domain/src/main/resources/firebase
             echo "$GOOGLE_SERVICES_JSON" > ./domain/src/main/resources/firebase/fcm.json

@@ -1,4 +1,4 @@
-package balance_game_v2.api.client
+package balance_game_v2.client
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials

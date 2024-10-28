@@ -25,7 +25,7 @@ class AuthService(
     private val blockUserHistoryRepository: BlockUserHistoryRepository,
     private val adminRepository: AdminRepository,
 ) {
-    final val encoder = BCryptPasswordEncoder(10)
+    private final val encoder = BCryptPasswordEncoder(10)
 
     @Transactional
     fun signUp(accountName: String, password: String): Pair<String, AuthGroup> {
@@ -108,8 +108,13 @@ class AuthService(
     }
 
     @Transactional
-    fun updatePassword(email: String, encodePw: String) {
-        val auth = authRepository.findByAccountNameAndDeletedAtIsNull(email) ?: throw NotFoundUserException()
+    fun updatePassword(accountName: String, encodePw: String) {
+        val auth = authRepository.findByAccountNameAndDeletedAtIsNull(accountName) ?: throw NotFoundUserException()
         auth.password = encodePw
+    }
+
+    fun getAuthStatus(accountName: String): String {
+        val auth = authRepository.findByAccountName(accountName) ?: throw NotFoundUserException()
+        return auth.status.name
     }
 }

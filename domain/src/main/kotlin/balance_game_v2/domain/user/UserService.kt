@@ -1,5 +1,6 @@
 package balance_game_v2.domain.user
 
+import balance_game_v2.client.S3Config
 import balance_game_v2.domain.auth.AuthService
 import balance_game_v2.domain.auth.exception.NotFoundUserException
 import balance_game_v2.domain.auth.model.AuthGroup
@@ -35,10 +36,14 @@ import balance_game_v2.domain.user.repository.BlockUserHistoryRepository
 import balance_game_v2.domain.user.repository.TermsAgreementHistoryRepository
 import balance_game_v2.domain.user.repository.UserNotificationRepository
 import balance_game_v2.domain.user.repository.UserRepository
+import com.amazonaws.services.s3.model.ObjectMetadata
+import com.amazonaws.services.s3.model.PutObjectRequest
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Service
 class UserService(
@@ -60,6 +65,7 @@ class UserService(
     private val boardReviewReportRepository: BoardReviewReportRepository,
     private val boardResultRepository: BoardResultRepository,
     private val boardReportRepository: BoardReportRepository,
+    private val s3Config: S3Config,
 ) {
     @Transactional
     fun signUp(accountName: String, password: String, joinUserCommand: JoinUserCommand): Pair<String, AuthGroup> {
@@ -272,5 +278,54 @@ class UserService(
             users = users.content.map { it.toDTO() },
             totalPage = users.totalPages
         )
+    }
+
+    @Transactional
+    fun postProfile(
+        file: MultipartFile,
+    ): String {
+        val objectMetadata = ObjectMetadata().apply {
+            this.contentType = file.contentType
+            this.contentLength = file.size
+        }
+
+        val objectKey = "profiles/${UUID.randomUUID()}-${file.originalFilename}"
+
+        val putObjectRequest = PutObjectRequest(
+            "balance-game-bucket",
+            objectKey,
+            file.inputStream,
+            objectMetadata,
+        )
+
+        s3Config.amazonS3Client().putObject(putObjectRequest)
+
+        val publicUrl = "https://balance-game-bucket.s3.amazonaws.com/$objectKey"
+
+        return publicUrl
+    }
+
+    fun postProfileByAdmin(
+        file: MultipartFile,
+    ): String {
+        val objectMetadata = ObjectMetadata().apply {
+            this.contentType = file.contentType
+            this.contentLength = file.size
+        }
+
+        val objectKey = "admin/${UUID.randomUUID()}-${file.originalFilename}"
+
+        val putObjectRequest = PutObjectRequest(
+            "balance-game-bucket",
+            objectKey,
+            file.inputStream,
+            objectMetadata,
+        )
+
+        s3Config.amazonS3Client().putObject(putObjectRequest)
+
+        val publicUrl = "https://balance-game-bucket.s3.amazonaws.com/$objectKey"
+
+        return publicUrl
     }
 }

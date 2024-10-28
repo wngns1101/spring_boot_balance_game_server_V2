@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableAsync
 
 @EnableRedisRepositories("balance_game_v2.redis.*")
 @SpringBootApplication(
-    scanBasePackages = ["balance_game_v2.api", "balance_game_v2.domain", "balance_game_v2.config"],
+    scanBasePackages = ["balance_game_v2.api", "balance_game_v2.domain", "balance_game_v2.client"],
 )
 @EnableAsync
 @EnableFeignClients

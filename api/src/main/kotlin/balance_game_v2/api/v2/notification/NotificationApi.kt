@@ -3,7 +3,7 @@ package balance_game_v2.api.v2.notification
 import balance_game_v2.api.v2.notification.application.NotificationFacade
 import balance_game_v2.api.v2.notification.http.req.CreateUserNotificationRequestDTO
 import balance_game_v2.api.v2.user.application.UserFacade
-import balance_game_v2.config.NOTIFICATION_V2_PREFIX
+import balance_game_v2.client.NOTIFICATION_V2_PREFIX
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.PostMapping
