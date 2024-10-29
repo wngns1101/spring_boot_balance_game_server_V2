@@ -11,6 +11,7 @@ data class BoardDetailDTO(
     val likeCount: Int,
     val dislikeCount: Int,
     val viewCount: Int,
+    val boardReviewCount: Int,
     val boardReviewsPreview: List<BoardReviewKeywordDTO>?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
@@ -21,7 +22,7 @@ data class WriterDTO(
     val nickName: String,
 )
 
-fun Board.toBoardDetail(writer: WriterDTO, boardReviewsPreview: List<BoardReviewKeywordDTO>): BoardDetailDTO {
+fun Board.toBoardDetail(writer: WriterDTO, boardReviewCount: Int, boardReviewsPreview: List<BoardReviewKeywordDTO>): BoardDetailDTO {
     return BoardDetailDTO(
         boardId = boardId!!,
         writer = writer,
@@ -30,6 +31,7 @@ fun Board.toBoardDetail(writer: WriterDTO, boardReviewsPreview: List<BoardReview
         likeCount = likeCount,
         dislikeCount = dislikeCount,
         viewCount = viewCount,
+        boardReviewCount = boardReviewCount,
         boardReviewsPreview = boardReviewsPreview,
         createdAt = createdAt,
         updatedAt = updatedAt,

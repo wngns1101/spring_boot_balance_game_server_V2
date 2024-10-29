@@ -141,6 +141,8 @@ class BoardService(
 
         val boardReviews = boardReviewRepository.findAllByBoardId(boardId)
 
+        val boardReviewCount = boardReviews?.size ?: 0
+
         val previewBoardReviewKeywords = if (boardReviews == null) {
             emptyList()
         } else {
@@ -155,6 +157,7 @@ class BoardService(
                 writer.userId!!,
                 writer.nickname,
             ),
+            boardReviewCount,
             previewBoardReviewKeywords
         )
     }
