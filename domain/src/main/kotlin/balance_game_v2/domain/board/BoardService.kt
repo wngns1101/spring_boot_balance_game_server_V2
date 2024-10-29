@@ -295,7 +295,7 @@ class BoardService(
         return boardContents.map {
             BoardResultDTO(
                 boardContentId = it.boardContentId!!,
-                title = it.title!!,
+                title = it.title,
                 boardContentItems = boardContentMap[it.boardContentId]!!,
             )
         }

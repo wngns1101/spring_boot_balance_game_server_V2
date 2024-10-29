@@ -14,9 +14,9 @@ class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val userId: Long? = null,
     var nickname: String,
-    val realName: String,
-    val accountName: String,
-    val birth: String,
+    var realName: String,
+    var accountName: String,
+    var birth: String,
     var email: String,
     val invitationCode: String,
     var pushToken: String? = null,

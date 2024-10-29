@@ -19,7 +19,7 @@ class Auth(
     val authId: Long? = null,
     @Enumerated(value = EnumType.STRING)
     val authGroup: AuthGroup,
-    val accountName: String,
+    var accountName: String,
     var password: String,
     var refreshToken: String? = null,
     @Enumerated(value = EnumType.STRING)
