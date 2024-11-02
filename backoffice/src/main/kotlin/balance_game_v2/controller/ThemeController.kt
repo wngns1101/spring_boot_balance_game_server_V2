@@ -4,6 +4,7 @@ import balance_game_v2.domain.theme.ThemeService
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -12,6 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam
 class ThemeController(
     private val themeService: ThemeService,
 ) {
+    @GetMapping("/create-theme")
+    fun createTheme(): String {
+        return "create-theme"
+    }
+
     @GetMapping("/themes")
     fun getThemePage(
         @RequestParam(value = "query") query: String?,
@@ -29,5 +35,17 @@ class ThemeController(
         model.addAttribute("totalPage", themePage.totalPage)
 
         return "themes"
+    }
+
+    @GetMapping("/themes/{themeId}")
+    fun getTheme(
+        @PathVariable themeId: Long,
+        model: Model,
+    ): String {
+        val theme = themeService.getThemeById(themeId)
+
+        model.addAttribute("theme", theme)
+
+        return "theme-detail"
     }
 }

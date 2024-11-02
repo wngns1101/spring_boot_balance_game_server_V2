@@ -12,6 +12,6 @@ class Theme(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val themeId: Long? = null,
-    val theme: String,
-    val iconUrl: String,
+    var theme: String,
+    var iconUrl: String,
 )

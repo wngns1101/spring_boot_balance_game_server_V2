@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<script>
+    const version = {
+        versionId: null,
+        currentVersion: null,
+        minimumVersion: null,
+        preferVersion: null,
+    }
+
+    $(document).ready(function () {
+        version.versionId = `[[${version.versionId}]]`
+        version.currentVersion = `[[${version.currentVersion}]]`
+        version.minimumVersion = `[[${version.minimumVersion}]]`
+        version.preferVersion = `[[${version.preferVersion}]]`
+
+    });
+
+    function addModRow(rowId, inputId, buttonId) {
+        const nicknameRow = document.getElementById(rowId)
+        document.getElementById(buttonId).style.display = "none";
+
+        const newColInput = document.createElement("div");
+        newColInput.setAttribute("class", "col-md-6");
+
+        const newInput = document.createElement("input");
+        newInput.setAttribute("type", "text");
+        newInput.setAttribute("id", "mod-nickname-input");
+        newInput.setAttribute("class", "form-control");
+        newColInput.appendChild(newInput);
+
+        const newColCancelBtn = document.createElement("div");
+        newColCancelBtn.setAttribute("class", "col-md-1");
+
+        const newCancelBtn = document.createElement("input");
+        newCancelBtn.setAttribute("type", "button");
+        newCancelBtn.setAttribute("id", "cancel-mod-btn");
+        newCancelBtn.setAttribute("class", "btn btn-secondary");
+        newCancelBtn.setAttribute("value", "취소");
+        newCancelBtn.onclick = () => {
+            newColInput.remove()
+            newColCancelBtn.remove()
+            newColBtn.remove()
+            document.getElementById(buttonId).style.display = "inline-block";
+        };
+        newColCancelBtn.appendChild(newCancelBtn);
+
+        // 새로운 확인 버튼 (col-md-6)
+        const newColBtn = document.createElement("div");
+        newColBtn.setAttribute("class", "col-md-1");
+
+        const newButton = document.createElement("input");
+        newButton.setAttribute("type", "button");
+        newButton.setAttribute("id", "confirm-mod-btn");
+        newButton.setAttribute("class", "btn btn-primary");
+        newButton.setAttribute("value", "확인");
+        newButton.onclick = () => {
+            if (newInput.value === '') {
+                alert("텍스트를 입력해주세요")
+                return
+            }
+
+            document.getElementById(inputId).value = newInput.value
+            newColInput.remove()
+            newColCancelBtn.remove()
+            newColBtn.remove()
+            document.getElementById(buttonId).style.display = "inline-block";
+        };
+        newColBtn.appendChild(newButton);
+
+        // nickname-row에 새로운 입력과 버튼 추가
+        nicknameRow.appendChild(newColInput);
+        nicknameRow.appendChild(newColCancelBtn)
+        nicknameRow.appendChild(newColBtn);
+    }
+
+    function addModCurrentVersion() {
+        addModRow("current-version-row", "current-version", "mod-current-version-btn");
+    }
+
+    function addModMinimumVersion() {
+        addModRow("minimum-version-row", "minimum-version", "mod-minimum-version-btn");
+    }
+
+    function addModPreferVersion() {
+        addModRow("prefer-version-row", "prefer-version", "mod-prefer-version-btn");
+    }
+
+    function modVersionBtn() {
+        version.currentVersion = document.getElementById('current-version').value
+        version.minimumVersion = document.getElementById('minimum-version').value
+        version.preferVersion = document.getElementById('prefer-version').value
+
+        console.log(version)
+
+        $.ajax({
+            url: '/backoffice/v2/version/api/version',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(version),
+        }).done(function () {
+            alert("수정 완료됐습니다")
+        }).fail(function () {
+            alert('수정 실패했습니다.');
+        })
+    }
+
+    function delVersionBtn() {
+        $.ajax({
+            url: `/backoffice/v2/version/api/versions/${version.versionId}`,
+            type: 'DELETE',
+            contentType: 'application/json'
+        }).done(function () {
+            alert("삭제 완료됐습니다")
+            window.location.href = document.referrer;
+        }).fail(function () {
+            alert('삭제 실패했습니다.');
+        })
+    }
+</script>
+<body>
+<div class="container">
+    <div class="row justify-content-end mb-4">
+        <div class="col-auto">
+            <input type="button" class="btn btn-secondary" value="나가기" onclick="history.back()">
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            버전 상세
+        </div>
+        <div class="card-body">
+            <h3>버전</h3>
+            <div class="row mb-3">
+                <label for="themeId" class="form-label">버전 Id</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="themeId" th:value="${version.versionId}" disabled>
+                </div>
+            </div>
+            <div class="row mb-3" id="current-version-row">
+                <label for="current-version" class="form-label">현재 버전</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="current-version" th:value="${version.currentVersion}" disabled>
+                </div>
+                <div class="col-md-6">
+                    <input type="button" class="btn btn-primary" id="mod-current-version-btn" value="수정"
+                           onclick="addModCurrentVersion()">
+                </div>
+            </div>
+
+            <div class="row mb-3" id="minimum-version-row">
+                <label for="minimum-version" class="form-label">최소 버전</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="minimum-version" th:value="${version.minimumVersion}" disabled>
+                </div>
+                <div class="col-md-6">
+                    <input type="button" class="btn btn-primary" id="mod-minimum-version-btn" value="수정"
+                           onclick="addModMinimumVersion()">
+                </div>
+            </div>
+
+            <div class="row mb-3" id="prefer-version-row">
+                <label for="prefer-version" class="form-label">선호 버전</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="prefer-version" th:value="${version.preferVersion}" disabled>
+                </div>
+                <div class="col-md-6">
+                    <input type="button" class="btn btn-primary" id="mod-prefer-version-btn" value="수정"
+                           onclick="addModPreferVersion()">
+                </div>
+            </div>
+            <div class="row mb-3" id="mod-theme-btn-row">
+                <div class="justify-content-end">
+                    <input type="button" class="btn btn-warning" id="mod-version-btn" value="수정하기" onclick="modVersionBtn()">
+                    <input type="button" class="btn btn-danger" id="del-version-btn" value="삭제하기" onclick="delVersionBtn()">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

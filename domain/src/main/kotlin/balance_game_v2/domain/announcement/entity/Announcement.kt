@@ -17,7 +17,7 @@ class Announcement(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val announcementId: Long? = null,
     @Enumerated(EnumType.STRING)
-    val type: SearchCondition,
+    var type: SearchCondition,
     var title: String,
     var content: String,
     var viewCount: Int = 0,

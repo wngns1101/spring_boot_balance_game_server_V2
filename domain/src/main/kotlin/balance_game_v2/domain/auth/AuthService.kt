@@ -113,8 +113,14 @@ class AuthService(
         auth.password = encodePw
     }
 
-    fun getAuthStatus(accountName: String): String {
+    fun getAuthStatus(accountName: String): Pair<Long, String> {
         val auth = authRepository.findByAccountName(accountName) ?: throw NotFoundUserException()
-        return auth.status.name
+        return Pair(auth.authId!!, auth.status.name)
+    }
+
+    fun modifyAuthStatus(authId: Long, accountName: String, authStatus: String) {
+        val auth = authRepository.findById(authId).orElseThrow { NotFoundUserException() }
+        auth.accountName = accountName
+        auth.status = AuthStatus.valueOf(authStatus)
     }
 }

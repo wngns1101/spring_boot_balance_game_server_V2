@@ -4,6 +4,7 @@ import balance_game_v2.domain.version.VersionService
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -12,8 +13,13 @@ import org.springframework.web.bind.annotation.RequestParam
 class VersionController(
     private val versionService: VersionService
 ) {
+    @GetMapping("/create-version")
+    fun createVersion(): String {
+        return "create-version"
+    }
+
     @GetMapping("/versions")
-    fun getAnnouncementPage(
+    fun getVersionPage(
         @RequestParam(value = "query") query: String?,
         @RequestParam(value = "page", defaultValue = "1") page: Int,
         @RequestParam(value = "size", defaultValue = "10") size: Int,
@@ -29,5 +35,17 @@ class VersionController(
         model.addAttribute("totalPage", versionPage.totalPage)
 
         return "versions"
+    }
+
+    @GetMapping("/versions/{versionId}")
+    fun getVersion(
+        @PathVariable versionId: Long,
+        model: Model,
+    ): String {
+        val version = versionService.getVersionById(versionId)
+
+        model.addAttribute("version", version)
+
+        return "version-detail"
     }
 }

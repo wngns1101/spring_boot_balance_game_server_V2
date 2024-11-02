@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<script>
+    const version = {
+        currentVersion: null,
+        minimumVersion: null,
+        preferVersion: null,
+    }
+
+    function createVersionBtn() {
+        version.currentVersion = document.getElementById('current-version').value
+        version.minimumVersion = document.getElementById('minimum-version').value
+        version.preferVersion = document.getElementById('prefer-version').value
+
+        console.log(version)
+
+        $.ajax({
+            url: '/backoffice/v2/version/api/version',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(version),
+        }).done(function () {
+            alert("생성 완료됐습니다")
+            window.location.href = document.referrer;
+        }).fail(function () {
+            alert('생성 실패했습니다.');
+        })
+    }
+</script>
+<body>
+<div class="container">
+    <div class="row justify-content-end mb-4">
+        <div class="col-auto">
+            <input type="button" class="btn btn-secondary" value="나가기" onclick="history.back()">
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            버전 등록
+        </div>
+        <div class="card-body">
+            <h3>버전</h3>
+            <div class="row mb-3" id="current-version-row">
+                <label for="current-version" class="form-label">현재 버전</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="current-version" >
+                </div>
+            </div>
+            <div class="row mb-3" id="minimum-version-row">
+                <label for="minimum-version" class="form-label">최소 버전</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="minimum-version" >
+                </div>
+            </div>
+            <div class="row mb-3" id="prefer-version-row">
+                <label for="prefer-version" class="form-label">선호 버전</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="prefer-version" >
+                </div>
+            </div>
+            <div class="row mb-3" id="mod-theme-btn-row">
+                <div class="justify-content-end">
+                    <input type="button" class="btn btn-primary" id="create-version-btn" value="등록하기" onclick="createVersionBtn()">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<script>
+    const theme = {
+        theme: null,
+        iconUrl: null,
+    }
+
+    function createIconUrl() {
+        const icon = document.getElementById("icon-url-image")
+        const iconData = icon.files
+
+        if (iconData && iconData.length !== 0) {
+            const formData = new FormData();
+            formData.append('icon', iconData[0])
+            $.ajax({
+                url: '/backoffice/v2/theme/api/upload-icon',
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                data: formData,
+            }).done(function (response) {
+                theme.iconUrl = response
+
+                const iconUrlRow = document.getElementById("icon-url-row")
+
+                const iconUrlDiv = document.createElement("div")
+                iconUrlDiv.setAttribute("class", "col-md-6");
+
+                const iconUrlImg = document.createElement("img")
+                iconUrlImg.setAttribute("id", "icon-url")
+                iconUrlImg.setAttribute("class", "img-fluid")
+                iconUrlImg.setAttribute("style", "max-width:100%; max-height: 100%;")
+                iconUrlImg.setAttribute("src", theme.iconUrl)
+
+                iconUrlDiv.append(iconUrlImg)
+                iconUrlRow.append(iconUrlDiv)
+
+            }).fail(function () {
+                alert('아이콘 등록에 실패했습니다.');
+            })
+        }
+        console.log(iconData)
+    }
+
+    function createIconBtn() {
+        theme.theme = document.getElementById('theme').value
+
+        console.log(theme)
+
+        $.ajax({
+            url: '/backoffice/v2/theme/api/theme',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(theme),
+        }).done(function () {
+            alert("생성 완료됐습니다")
+            window.location.href = document.referrer;
+        }).fail(function () {
+            alert('생성 실패했습니다.');
+        })
+    }
+</script>
+<body>
+<div class="container">
+    <div class="row justify-content-end mb-4">
+        <div class="col-auto">
+            <input type="button" class="btn btn-secondary" value="나가기" onclick="history.back()">
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            테마 등록
+        </div>
+        <div class="card-body">
+            <h3>테마</h3>
+            <div class="row mb-3" id="theme-row">
+                <label for="theme" class="form-label">테마 제목</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="theme" >
+                </div>
+            </div>
+            <div class="row mb-3" id="icon-url-row">
+                <label for="icon-url-image" class="form-label">아이콘</label>
+                <div class="mb-3" id="icon-url-div">
+                    <input type="file" id="icon-url-image" accept="image/*"
+                           onchange="createIconUrl()">
+                </div>
+            </div>
+            <div class="row mb-3" id="mod-theme-btn-row">
+                <div class="justify-content-end">
+                    <input type="button" class="btn btn-primary" id="create-theme-object-btn" value="등록하기" onclick="createIconBtn()">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

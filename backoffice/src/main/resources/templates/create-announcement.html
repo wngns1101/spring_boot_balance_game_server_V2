@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<script>
+    const announcement = {
+        title: null,
+        content: null,
+        type: null
+    }
+
+    function createAnnouncementBtn() {
+        announcement.title = document.getElementById('title').value
+        announcement.content = document.getElementById('content').value
+        announcement.type = document.getElementById('type').value
+
+        console.log(announcement)
+
+        $.ajax({
+            url: '/backoffice/v2/announcement/api/announcement',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(announcement),
+        }).done(function () {
+            alert("생성 완료됐습니다")
+            window.location.href = document.referrer;
+        }).fail(function () {
+            alert('생성 실패했습니다.');
+        })
+    }
+</script>
+<body>
+<div class="container">
+    <div class="row justify-content-end mb-4">
+        <div class="col-auto">
+            <input type="button" class="btn btn-secondary" value="나가기" onclick="history.back()">
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            공지사항 등록
+        </div>
+        <div class="card-body">
+            <h3>공지사항</h3>
+            <div class="row mb-3" id="title-row">
+                <label for="title" class="form-label">제목</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="title">
+                </div>
+            </div>
+            <div class="row mb-3" id="content-row">
+                <label for="content" class="form-label">내용</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="content">
+                </div>
+            </div>
+            <div class="row mb-3" id="type-row">
+                <label for="type" class="form-label">타입</label>
+                <div class="col-md-6">
+                    <select id="type" class="form-control">
+                        <option>ALL</option>
+                        <option>EVENT</option>
+                        <option>GENERAL</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3" id="mod-theme-btn-row">
+                <div class="justify-content-end">
+                    <input type="button" class="btn btn-primary" id="create-theme-object-btn" value="등록하기"
+                           onclick="createAnnouncementBtn()">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

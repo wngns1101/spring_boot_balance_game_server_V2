@@ -4,6 +4,7 @@ import balance_game_v2.domain.announcement.AnnouncementService
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -12,6 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam
 class AnnouncementController(
     private val announcementService: AnnouncementService,
 ) {
+    @GetMapping("create-announcement")
+    fun createAnnouncement(): String {
+        return "create-announcement"
+    }
+
     @GetMapping("/announcements")
     fun getAnnouncementPage(
         @RequestParam(value = "query") query: String?,
@@ -29,5 +35,17 @@ class AnnouncementController(
         model.addAttribute("totalPage", announcementPage.totalPage)
 
         return "announcements"
+    }
+
+    @GetMapping("/announcements/{announcementId}")
+    fun getAnnouncement(
+        @PathVariable announcementId: Long,
+        model: Model,
+    ): String {
+        val announcement = announcementService.getAnnouncementByAdmin(announcementId)
+
+        model.addAttribute("announcement", announcement)
+
+        return "announcement-detail"
     }
 }

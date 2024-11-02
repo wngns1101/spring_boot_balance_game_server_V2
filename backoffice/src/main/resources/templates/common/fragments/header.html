@@ -10,13 +10,24 @@
         </a>
 
         <ul class="nav nav-pills">
-            <li class="nav-item"><a href="/backoffice/v2/user/users" class="nav-link" onclick="setActive(this)">회원 관리</a></li>
-            <li class="nav-item"><a href="/backoffice/v2/board/boards" class="nav-link" onclick="setActive(this)">게시글 관리</a></li>
+            <li class="nav-item dropdown">
+                <a href="#" id="navbarDropdown1" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="setActive(this)">회원</a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown1">
+                    <li><a class="dropdown-item" href="/backoffice/v2/user/users">회원 관리</a></li>
+                    <li><a class="dropdown-item" href="/backoffice/v2/user/users/reports">회원 신고 관리</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a href="" id="navbarDropdown2" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false"  onclick="setActive(this)">게시글</a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
+                    <li><a class="dropdown-item" href="/backoffice/v2/board/boards">게시글 관리</a></li>
+                    <li><a class="dropdown-item" href="/backoffice/v2/board/boards/reports">게시글 신고 관리</a></li>
+                </ul>
+            </li>
             <li class="nav-item"><a href="/backoffice/v2/theme/themes" class="nav-link" onclick="setActive(this)">테마 관리</a></li>
             <li class="nav-item"><a href="/backoffice/v2/version/versions" class="nav-link" onclick="setActive(this)">버전 관리</a></li>
             <li class="nav-item"><a href="/backoffice/v2/announcement/announcements" class="nav-link" onclick="setActive(this)">공지사항 관리</a></li>
             <li class="nav-item"><a href="/backoffice/v2/notification/notifications" class="nav-link" onclick="setActive(this)">알림 관리</a></li>
-            <li class="nav-item"><a href="#" class="nav-link">로그아웃</a></li>
         </ul>
     </header>
 

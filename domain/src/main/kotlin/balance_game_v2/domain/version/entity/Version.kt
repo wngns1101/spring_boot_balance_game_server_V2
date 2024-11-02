@@ -12,7 +12,7 @@ class Version(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val versionId: Long? = null,
-    val currentVersion: String,
-    val minimumVersion: String,
-    val preferVersion: String,
+    var currentVersion: String,
+    var minimumVersion: String,
+    var preferVersion: String,
 )

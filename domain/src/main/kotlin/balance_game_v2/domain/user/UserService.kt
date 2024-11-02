@@ -20,6 +20,7 @@ import balance_game_v2.domain.error.NotFoundAccountNameException
 import balance_game_v2.domain.error.NotFoundEmailException
 import balance_game_v2.domain.notification.repository.NotificationRepository
 import balance_game_v2.domain.user.dto.JoinUserCommand
+import balance_game_v2.domain.user.dto.ModifyUserCommandDTO
 import balance_game_v2.domain.user.dto.PageUserNotificationDTO
 import balance_game_v2.domain.user.dto.UserDTO
 import balance_game_v2.domain.user.dto.UserPageDTO
@@ -305,6 +306,7 @@ class UserService(
         return publicUrl
     }
 
+    @Transactional
     fun postProfileByAdmin(
         file: MultipartFile,
     ): String {
@@ -327,5 +329,18 @@ class UserService(
         val publicUrl = "https://balance-game-bucket.s3.amazonaws.com/$objectKey"
 
         return publicUrl
+    }
+
+    fun modifyUserByAdmin(
+        command: ModifyUserCommandDTO
+    ) {
+        val user = userRepository.findById(command.userId).orElseThrow { NotFoundUserException() }
+
+        user.nickname = command.nickname
+        user.profileUrl = command.profileUrl
+        user.accountName = command.accountName
+        user.birth = command.birth
+        user.realName = command.realName
+        user.email = command.email
     }
 }

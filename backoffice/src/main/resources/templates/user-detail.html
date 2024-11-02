@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<script>
+    const user = {
+        userId: null,
+        nickname: null,
+        realName: null,
+        accountName: null,
+        birth: null,
+        email: null,
+        profileUrl: null,
+        authId: null,
+        authStatus: null,
+    }
+
+    $(document).ready(function () {
+        $('#datePicker').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        user.userId = `[[${user.userId}]]`
+        user.nickname = `[[${user.nickname}]]`
+        user.realName = `[[${user.realName}]]`
+        user.accountName = `[[${user.accountName}]]`
+        user.birth = `[[${user.birth}]]`
+        user.email = `[[${user.email}]]`
+        user.profileUrl = `[[${user.profileUrl}]]`
+        user.authId = `[[${authId}]]`
+        user.authStatus = `[[${authStatus}]]`
+
+        console.log(user)
+    });
+
+    function addModRow(rowId, inputId, buttonId) {
+        const nicknameRow = document.getElementById(rowId)
+        document.getElementById(buttonId).style.display = "none";
+
+        const newColInput = document.createElement("div");
+        newColInput.setAttribute("class", "col-md-6");
+
+        const newInput = document.createElement("input");
+        newInput.setAttribute("type", "text");
+        newInput.setAttribute("id", "mod-nickname-input");
+        newInput.setAttribute("class", "form-control");
+        newColInput.appendChild(newInput);
+
+        const newColCancelBtn = document.createElement("div");
+        newColCancelBtn.setAttribute("class", "col-md-1");
+
+        const newCancelBtn = document.createElement("input");
+        newCancelBtn.setAttribute("type", "button");
+        newCancelBtn.setAttribute("id", "cancel-mod-btn");
+        newCancelBtn.setAttribute("class", "btn btn-secondary");
+        newCancelBtn.setAttribute("value", "취소");
+        newCancelBtn.onclick = () => {
+            newColInput.remove()
+            newColCancelBtn.remove()
+            newColBtn.remove()
+            document.getElementById(buttonId).style.display = "inline-block";
+        };
+        newColCancelBtn.appendChild(newCancelBtn);
+
+        // 새로운 확인 버튼 (col-md-6)
+        const newColBtn = document.createElement("div");
+        newColBtn.setAttribute("class", "col-md-1");
+
+        const newButton = document.createElement("input");
+        newButton.setAttribute("type", "button");
+        newButton.setAttribute("id", "confirm-mod-btn");
+        newButton.setAttribute("class", "btn btn-primary");
+        newButton.setAttribute("value", "확인");
+        newButton.onclick = () => {
+            if (newInput.value === '') {
+                alert("텍스트를 입력해주세요")
+                return
+            }
+
+            document.getElementById(inputId).value = newInput.value
+            newColInput.remove()
+            newColCancelBtn.remove()
+            newColBtn.remove()
+            document.getElementById(buttonId).style.display = "inline-block";
+        };
+        newColBtn.appendChild(newButton);
+
+        // nickname-row에 새로운 입력과 버튼 추가
+        nicknameRow.appendChild(newColInput);
+        nicknameRow.appendChild(newColCancelBtn)
+        nicknameRow.appendChild(newColBtn);
+    }
+
+    function addModNickname() {
+        addModRow("nickname-row", "nickname", "mod-nickname-btn");
+    }
+
+    function addModRealName() {
+        addModRow("real-name-row", "real-name", "mod-real-name-btn");
+    }
+
+    function addModAccountName() {
+        addModRow("account-name-row", "account-name", "mod-account-name-btn");
+    }
+
+    function addModEmail() {
+        addModRow("email-row", "email", "mod-email-btn");
+    }
+
+    function addModProfile() {
+        const profileDiv = document.getElementById("mod-profile-div")
+        profileDiv.style.display = "block";
+    }
+
+    function modProfile() {
+        const profile = document.getElementById("mod-profile")
+        const profileData = profile.files
+
+        if (profileData && profileData.length !== 0) {
+            const formData = new FormData();
+            formData.append('profile', profileData[0])
+            $.ajax({
+                url: '/backoffice/v2/user/api/upload-profile',
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                data: formData,
+            }).done(function (response) {
+                user.profileUrl = response;
+
+                const profileImage = document.getElementById("profile");
+                profileImage.src = user.profileUrl;
+            }).fail(function () {
+                alert('프로필 등록에 실패했습니다.');
+            })
+        }
+        console.log(profileData)
+    }
+
+    function addModAuthStatus() {
+        const authStatus = document.getElementById('auth-status-row')
+        const modAuthButton = document.getElementById('mod-auth-status')
+        modAuthButton.style.display = "none";
+
+        const newColInput = document.createElement("div");
+        newColInput.setAttribute("class", "col-md-6");
+
+        const newSelect = document.createElement("select");
+        newSelect.setAttribute("id", "mod-auth-status");
+        newSelect.setAttribute("class", "form-control");
+
+        // 미리 지정된 값들을 옵션으로 추가
+        const statuses = ["ACTIVITY", "BLOCK", "DORMANT", "DELETE"];
+        statuses.forEach(status => {
+            const option = document.createElement("option");
+            option.value = status;
+            option.textContent = status;
+            newSelect.appendChild(option);
+        });
+
+
+        newColInput.appendChild(newSelect);
+
+        const newColCancelBtn = document.createElement("div");
+        newColCancelBtn.setAttribute("class", "col-md-1");
+
+        const newCancelBtn = document.createElement("input");
+        newCancelBtn.setAttribute("type", "button");
+        newCancelBtn.setAttribute("id", "cancel-mod-btn");
+        newCancelBtn.setAttribute("class", "btn btn-secondary");
+        newCancelBtn.setAttribute("value", "취소");
+        newCancelBtn.onclick = () => {
+            newColInput.remove()
+            newColCancelBtn.remove()
+            newColBtn.remove()
+            document.getElementById('mod-auth-status').style.display = "inline-block";
+        };
+        newColCancelBtn.appendChild(newCancelBtn);
+
+        const newColBtn = document.createElement("div");
+        newColBtn.setAttribute("class", "col-md-1");
+
+        const newButton = document.createElement("input");
+        newButton.setAttribute("type", "button");
+        newButton.setAttribute("id", "confirm-mod-btn");
+        newButton.setAttribute("class", "btn btn-primary");
+        newButton.setAttribute("value", "확인");
+        newButton.onclick = () => {
+            document.getElementById('auth-status').value = newSelect.value
+            newColInput.remove()
+            newColBtn.remove()
+            newColCancelBtn.remove()
+            document.getElementById('mod-auth-status').style.display = "inline-block";
+        };
+        newColBtn.appendChild(newButton);
+
+        authStatus.appendChild(newColInput);
+        authStatus.appendChild(newColCancelBtn)
+        authStatus.appendChild(newColBtn)
+    }
+
+    function modUserBtn() {
+        user.nickname = document.getElementById('nickname').value
+        user.realName = document.getElementById('real-name').value
+        user.accountName = document.getElementById('account-name').value
+        user.email = document.getElementById('email').value
+        user.authStatus = document.getElementById('auth-status').value
+
+        console.log(user)
+
+        $.ajax({
+            url: '/backoffice/v2/user/api/user',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(user),
+        }).done(function () {
+            alert("수정 완료됐습니다")
+        }).fail(function () {
+            alert('수정 실패했습니다.');
+        })
+    }
+</script>
+<body>
+<div class="container">
+    <div class="row justify-content-end mb-4">
+        <div class="col-auto">
+            <input type="button" class="btn btn-secondary" value="나가기" onclick="history.back()">
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            회원 상세
+        </div>
+        <div class="card-body">
+            <h3>회원</h3>
+            <div class="row mb-3">
+                <label for="userId" class="form-label">유저 Id</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="userId" th:value="${user.userId}" disabled>
+                </div>
+            </div>
+            <div class="row mb-3" id="nickname-row">
+                <label for="nickname" class="form-label">닉네임</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="nickname" th:value="${user.nickname}" disabled>
+                </div>
+                <div class="col-md-6">
+                    <input type="button" class="btn btn-primary" id="mod-nickname-btn" value="수정"
+                           onclick="addModNickname()">
+                </div>
+            </div>
+            <div class="row mb-3" id="real-name-row">
+                <label for="real-name" class="form-label">이름</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="real-name" th:value="${user.realName}" disabled>
+                </div>
+                <div class="col-md-6">
+                    <input type="button" class="btn btn-primary" id="mod-real-name-btn" value="수정"
+                           onclick="addModRealName()">
+                </div>
+            </div>
+            <div class="row mb-3" id="account-name-row">
+                <label for="account-name" class="form-label">아이디</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="account-name" th:value="${user.accountName}" disabled>
+                </div>
+                <div class="col-md-6">
+                    <input type="button" class="btn btn-primary" id="mod-account-name-btn" value="수정"
+                           onclick="addModAccountName()">
+                </div>
+            </div>
+            <div class="row mb-3" id="email-row">
+                <label for="email" class="form-label">이메일</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="email" th:value="${user.email}" disabled>
+                </div>
+                <div class="col-md-6">
+                    <input type="button" class="btn btn-primary" id="mod-email-btn" value="수정"
+                           onclick="addModEmail()">
+                </div>
+            </div>
+            <div class="row mb-3" id="birth-row">
+                <label for="datePicker" class="form-label">생년월일 </label>
+                <div class="col-md-6">
+                    <input type="text" id="datePicker" class="form-control" th:value="${user.birth}" disabled>
+                </div>
+            </div>
+            <div class="row mb-3" id="profile-row">
+                <label for="profile" class="form-label">프로필</label>
+                <div class="mb-3" id="mod-profile-div" style="display:none">
+                    <input type="file" th:src="${user.profileUrl}" id="mod-profile" accept="image/*"
+                           onchange="modProfile()">
+                </div>
+                <div class="col-md-6">
+                    <img th:src="${user.profileUrl}" id="profile" class="img-fluid"
+                         style="max-width: 100%; max-height: 100%;" alt="...">
+                </div>
+                <div class="col-md-6">
+                    <input type="button" class="btn btn-primary" id="mod-profile-btn" value="수정"
+                           onclick="addModProfile()">
+                </div>
+            </div>
+            <div class="row mb-3" id="auth-status-row">
+                <label for="auth-status" class="form-label">상태</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="auth-status" th:value="${authStatus}" disabled>
+                </div>
+                <div class="col-md-6">
+                    <input type="button" class="btn btn-primary" id="mod-auth-status" value="수정"
+                           onclick="addModAuthStatus()">
+                </div>
+            </div>
+            <div class="row mb-3" id="mod-user-btn-row">
+                <input type="button" class="btn btn-danger" id="mod-user-btn" value="수정하기" onclick="modUserBtn()">
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
