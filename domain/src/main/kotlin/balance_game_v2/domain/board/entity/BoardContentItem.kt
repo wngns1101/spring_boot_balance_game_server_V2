@@ -12,6 +12,7 @@ class BoardContentItem(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val boardContentItemId: Long? = null,
+    val boardId: Long,
     val boardContentId: Long,
     var item: String,
 )

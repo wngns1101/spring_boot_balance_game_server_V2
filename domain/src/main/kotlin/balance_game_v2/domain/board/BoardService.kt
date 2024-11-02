@@ -90,6 +90,7 @@ class BoardService(
 
             it.items.map {
                 BoardContentItem(
+                    boardId = savedBoard.boardId,
                     boardContentId = savedBoardContent.boardContentId!!,
                     item = it,
                 )
