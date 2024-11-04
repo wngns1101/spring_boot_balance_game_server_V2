@@ -81,9 +81,6 @@ class SlackInternalErrorSender(
             }
         )
 
-        println(slackToken)
-        println(layoutBlocks.toString())
-
         Slack.getInstance().send(
             slackToken,
             WebhookPayloads.payload { p ->
