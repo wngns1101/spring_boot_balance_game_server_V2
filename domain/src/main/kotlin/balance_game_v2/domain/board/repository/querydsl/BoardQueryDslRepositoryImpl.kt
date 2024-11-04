@@ -33,15 +33,11 @@ class BoardQueryDslRepositoryImpl :
         return PageImpl(result.results, pageable, result.total)
     }
 
-    override fun todayRecommendGame(): List<Board> {
-        val maxViewCount = from(board)
-            .orderBy(board.viewCount.desc())
+    override fun todayRecommendGame(): Board {
+        return from(board)
+            .orderBy(board.likeCount.desc(), board.viewCount.desc())
             .limit(1)
             .fetchOne()
-
-        return from(board)
-            .where(board.viewCount.eq(maxViewCount.viewCount))
-            .fetch()
     }
 
     override fun relatedBoards(boardId: Long, themeId: Long, boardReportsIds: List<Long>?): List<Board> {
@@ -56,10 +52,11 @@ class BoardQueryDslRepositoryImpl :
             .fetch()
     }
 
-    override fun todayRecommendGameByUserId(myBoardIds: List<Long>?, boardReportIds: List<Long>?): Board {
+    override fun todayRecommendGameByUserId(myBoardIds: List<Long>?, boardReportIds: List<Long>?, acceptedBoardIds: List<Long>?): Board {
         return from(board)
-            .where(filteringBoards(myBoardIds), filteringBoards(boardReportIds))
-            .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
+            .where(filteringBoards(myBoardIds), filteringBoards(boardReportIds), filteringBoards(acceptedBoardIds))
+//            .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
+            .orderBy(board.likeCount.desc(), board.viewCount.desc())
             .limit(1)
             .fetchOne()
     }

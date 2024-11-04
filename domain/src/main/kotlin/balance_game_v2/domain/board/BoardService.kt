@@ -435,11 +435,10 @@ class BoardService(
         return userId?.let {
             val myBoardIds = boardRepository.findAllByUserId(it).map { it.boardId!! }
             val boardReportIds = boardReportRepository.findAllByUserId(it).map { it.boardId }
-            println(myBoardIds)
-            println(boardReportIds)
-            boardRepository.todayRecommendGameByUserId(myBoardIds, boardReportIds).toSimpleBoard()
+            val acceptedBoardIds = boardResultRepository.findAllByUserId(it).distinctBy { it.boardId }.map { it.boardId }
+            boardRepository.todayRecommendGameByUserId(myBoardIds, boardReportIds, acceptedBoardIds).toSimpleBoard()
         } ?: run {
-            boardRepository.todayRecommendGame().random().toSimpleBoard()
+            boardRepository.todayRecommendGame().toSimpleBoard()
         }
     }
 

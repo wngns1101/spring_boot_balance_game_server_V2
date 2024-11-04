@@ -1,17 +1,18 @@
 package balance_game_v2.controller
 
-import balance_game_v2.domain.board.BoardService
+import balance_game_v2.application.BoardBackofficeFacade
 import balance_game_v2.domain.board.model.BoardSortCondition
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 
 @Controller
 @RequestMapping("/backoffice/v2/board")
 class BoardController(
-    private val boardService: BoardService,
+    private val boardBackofficeFacade: BoardBackofficeFacade,
 ) {
     @GetMapping("/boards")
     fun boards(
@@ -22,7 +23,7 @@ class BoardController(
         model: Model
     ): String {
         val adjustedPage = page - 1
-        val boards = boardService.getBoards(query, adjustedPage, size, sortCondition, null, null)
+        val boards = boardBackofficeFacade.getBoards(query, adjustedPage, size, sortCondition, null, null)
 
         model.addAttribute("boards", boards.boards)
         model.addAttribute("currentPage", page)
@@ -30,5 +31,14 @@ class BoardController(
         model.addAttribute("totalPage", boards.totalPage)
 
         return "boards"
+    }
+
+    @GetMapping("/boards/{boardId}")
+    fun getBoardDetail(
+        @PathVariable("boardId") boardId: Long,
+    ): String {
+        val board = boardBackofficeFacade.getBoardDetail(boardId)
+
+        return "board-detail"
     }
 }

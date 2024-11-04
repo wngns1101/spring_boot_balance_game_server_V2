@@ -9,6 +9,7 @@ import balance_game_v2.domain.auth.AuthService
 import balance_game_v2.domain.auth.BlockReasonDTO
 import balance_game_v2.domain.board.BoardService
 import balance_game_v2.domain.board.exception.NotFoundException
+import balance_game_v2.domain.error.AlreadyExistEmailException
 import balance_game_v2.domain.user.UserService
 import balance_game_v2.domain.user.dto.PageUserNotificationDTO
 import balance_game_v2.domain.user.dto.UserDTO
@@ -153,6 +154,10 @@ class UserFacade(
     }
 
     fun checkEmailCertificate(email: String, code: String): Boolean {
+        if (userService.existEmail(email)) {
+            throw AlreadyExistEmailException()
+        }
+
         val existCertificate = certificateRepository.findById(email).orElseThrow { NotFoundException() }
 
         return existCertificate.code == code

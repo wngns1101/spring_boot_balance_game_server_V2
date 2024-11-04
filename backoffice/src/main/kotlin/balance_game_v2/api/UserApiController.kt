@@ -1,7 +1,7 @@
 package balance_game_v2.api
 
-import balance_game_v2.api.application.UserFacade
 import balance_game_v2.api.http.req.ModifyUserRequestDTO
+import balance_game_v2.application.UserBackofficeFacade
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -13,19 +13,19 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 @RequestMapping("/backoffice/v2/user/api")
 class UserApiController(
-    private val userFacade: UserFacade,
+    private val userBackofficeFacade: UserBackofficeFacade,
 ) {
     @PostMapping("/upload-profile")
     fun postProfile(
         @RequestParam(value = "profile") file: MultipartFile,
     ): String {
-        return userFacade.postProfileByAdmin(file)
+        return userBackofficeFacade.postProfileByAdmin(file)
     }
 
     @PutMapping("/user")
     fun modifyUser(
         @RequestBody request: ModifyUserRequestDTO,
     ) {
-        userFacade.modifyUserByAdmin(request)
+        userBackofficeFacade.modifyUserByAdmin(request)
     }
 }

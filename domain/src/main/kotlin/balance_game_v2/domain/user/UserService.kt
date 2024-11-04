@@ -262,7 +262,7 @@ class UserService(
 
     fun getUserByEmail(email: String): UserDTO {
         val user = userRepository.findByEmailAndDeletedAtIsNull(email) ?: throw NotFoundEmailException()
-        println(user.toString())
+
         return user.toDTO()
     }
 
@@ -342,5 +342,11 @@ class UserService(
         user.birth = command.birth
         user.realName = command.realName
         user.email = command.email
+    }
+
+    fun existEmail(
+        email: String
+    ): Boolean {
+        return userRepository.existsUserByEmail(email)
     }
 }

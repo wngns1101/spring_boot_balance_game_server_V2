@@ -1,4 +1,4 @@
-package balance_game_v2.api.application
+package balance_game_v2.application
 
 import balance_game_v2.api.http.req.ModifyUserRequestDTO
 import balance_game_v2.api.http.req.toCommand
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 
 @Component
-class UserFacade(
+class UserBackofficeFacade(
     private val userService: UserService,
     private val authService: AuthService,
 ) {
