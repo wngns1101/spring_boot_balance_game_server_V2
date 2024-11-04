@@ -29,7 +29,7 @@ class HostFilter(
         val whoIsResponse = feignClient.getWhois(accessCode, requestIp, "json")
         val apiResponse: WhoIsResponseDTO = objectMapper.readValue(whoIsResponse)
 
-        if (requestIp == "127.0.0.1" || apiResponse.response.whois.countryCode == "KR") {
+        if (requestIp == "127.0.0.1" || apiResponse.response.whois.countryCode == "KR" || apiResponse.response.whois.countryCode == "US") {
             chain.doFilter(request, response)
         } else {
             res.status = HttpServletResponse.SC_FORBIDDEN // 403 Forbidden 상태 설정
