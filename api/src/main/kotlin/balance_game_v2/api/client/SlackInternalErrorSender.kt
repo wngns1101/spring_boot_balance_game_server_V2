@@ -16,8 +16,8 @@ import org.springframework.web.util.ContentCachingRequestWrapper
 @Component
 class SlackInternalErrorSender(
     private val objectMapper: ObjectMapper,
-    @Value("\${slack.token}")
-    private val slackToken: String,
+    @Value("\${slack.url}")
+    private val slackUrl: String,
 ) {
     fun execute(cachingRequest: ContentCachingRequestWrapper, e: Exception, userId: Long?) {
         val url = cachingRequest.requestURL.toString()
@@ -82,7 +82,7 @@ class SlackInternalErrorSender(
         )
 
         Slack.getInstance().send(
-            slackToken,
+            slackUrl,
             WebhookPayloads.payload { p ->
                 p.blocks(
                     layoutBlocks
