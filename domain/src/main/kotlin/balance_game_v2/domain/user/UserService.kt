@@ -78,7 +78,6 @@ class UserService(
             accountName = joinUserCommand.accountName,
             nickname = joinUserCommand.nickName ?: nicknameMaker(),
             realName = joinUserCommand.realName,
-            birth = joinUserCommand.birth,
             email = joinUserCommand.email,
             invitationCode = "",
             pushToken = joinUserCommand.pushToken,
@@ -339,7 +338,6 @@ class UserService(
         user.nickname = command.nickname
         user.profileUrl = command.profileUrl
         user.accountName = command.accountName
-        user.birth = command.birth
         user.realName = command.realName
         user.email = command.email
     }

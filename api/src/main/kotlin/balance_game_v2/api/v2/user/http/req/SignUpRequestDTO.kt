@@ -6,7 +6,6 @@ data class SignUpRequestDTO(
     val accountName: String,
     val password: String,
     val realName: String,
-    val birth: String,
     val email: String,
     val pushToken: String?,
     val isCheckedMarketing: Boolean,
@@ -20,7 +19,6 @@ data class SignUpRequestDTO(
             joinUserCommand = JoinUserCommand(
                 accountName = request.accountName,
                 realName = request.realName,
-                birth = request.birth,
                 email = request.email,
                 pushToken = request.pushToken,
                 isCheckedMarketing = request.isCheckedMarketing,

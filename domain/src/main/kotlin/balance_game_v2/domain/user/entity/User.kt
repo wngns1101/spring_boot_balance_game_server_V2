@@ -16,7 +16,6 @@ class User(
     var nickname: String,
     var realName: String,
     var accountName: String,
-    var birth: String,
     var email: String,
     val invitationCode: String,
     var pushToken: String? = null,
