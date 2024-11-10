@@ -58,8 +58,8 @@ class HostFilter(
             return
         }
 
-        val whoIsResponse = feignClient.getWhois(accessCode, requestIp, "json")
-        val apiResponse: WhoIsResponseDTO = objectMapper.readValue(whoIsResponse)
+//        val whoIsResponse = feignClient.getWhois(accessCode, requestIp, "json")
+//        val apiResponse: WhoIsResponseDTO = objectMapper.readValue(whoIsResponse)
 
 //        if (requestIp == "127.0.0.1" || apiResponse.response.whois.countryCode in listOf("KR", "US")) {
 //            chain.doFilter(request, response)
