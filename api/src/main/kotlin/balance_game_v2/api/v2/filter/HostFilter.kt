@@ -1,14 +1,12 @@
 package balance_game_v2.api.v2.filter
 
 import balance_game_v2.api.client.FeignClient
-import balance_game_v2.api.client.dto.WhoIsResponseDTO
 import balance_game_v2.client.BOARD_V2_PREFIX
 import balance_game_v2.client.COMMON_V2_PREFIX
 import balance_game_v2.client.NOTIFICATION_V2_PREFIX
 import balance_game_v2.client.USER_V2_PREFIX
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.servlet.Filter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
