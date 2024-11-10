@@ -57,7 +57,7 @@ class HostFilter(
             res.writeAccessDenied()
             return
         }
-
+        chain.doFilter(request, response)
 //        val whoIsResponse = feignClient.getWhois(accessCode, requestIp, "json")
 //        val apiResponse: WhoIsResponseDTO = objectMapper.readValue(whoIsResponse)
 
