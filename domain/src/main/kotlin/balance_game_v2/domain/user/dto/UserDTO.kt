@@ -9,7 +9,7 @@ data class UserDTO(
     val realName: String,
     val accountName: String,
     val email: String,
-    val invitationCode: String,
+    val invitationCode: String?,
     val pushToken: String? = null,
     val updatedAt: LocalDateTime,
     val profileUrl: String?,

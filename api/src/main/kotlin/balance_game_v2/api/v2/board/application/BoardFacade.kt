@@ -107,6 +107,10 @@ class BoardFacade(
     fun getRecommendReview(userId: Long?): List<BoardReviewDTO> {
         return boardService.getRecommendReview(userId)
     }
+
+    fun deleteBoard(boardId: Long, userId: Long) {
+        return boardService.deleteBoard(boardId, userId)
+    }
 //
 //    fun excelBoards(dataList: MutableList<ExcelRequestDTO>) {
 //        return boardService.excelBoards(dataList.map { it.toCommand() }.toMutableList())

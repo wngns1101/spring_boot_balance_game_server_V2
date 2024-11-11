@@ -21,5 +21,6 @@ enum class ErrorCodes(val httpStatus: HttpStatus, val message: String) {
     NOT_FOUND_USER_ERROR(HttpStatus.BAD_REQUEST, "유저가 존재하지 않습니다."),
     NOT_FOUND_BOARD_ERROR(HttpStatus.BAD_REQUEST, "게시글이 존재하지 않습니다."),
     NOT_FOUND_REVIEW_ERROR(HttpStatus.BAD_REQUEST, "리뷰가 존재하지 않습니다."),
-    NOT_FOUND_ACCOUNT_NAME_ERROR(HttpStatus.BAD_REQUEST, "계정이 존재하지 않습니다.")
+    NOT_FOUND_ACCOUNT_NAME_ERROR(HttpStatus.BAD_REQUEST, "계정이 존재하지 않습니다."),
+    INVALID_USER_EXCEPTION(HttpStatus.BAD_REQUEST, "유저가 일치하지 않습니다")
 }

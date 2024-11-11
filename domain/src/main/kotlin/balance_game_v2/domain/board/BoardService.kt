@@ -509,10 +509,13 @@ class BoardService(
         val boardKeywordsMap = boardKeywords.groupBy { it.boardId }
             .mapValues { it.value.map { it.keyword } }
 
+        println(boardKeywords.toString())
+        println(boardKeywordsMap.toString())
+
         return boardRepository.findByBoardIdIn(participatedBoardIds)
             .map {
                 val isReviewExist = boardReviewRepository.existsByBoardIdAndUserId(it.boardId!!, userId)
-                it.toParticipatedBoardDTO(isReviewExist, boardKeywordsMap[it.boardId]!!)
+                it.toParticipatedBoardDTO(isReviewExist, boardKeywordsMap[it.boardId] ?: emptyList())
             }
     }
 
@@ -562,6 +565,31 @@ class BoardService(
                 userNicknameMap[it.userId]!!,
                 userProfileMap[it.userId],
             )
+        }
+    }
+
+    @Transactional
+    fun deleteBoard(boardId: Long, userId: Long) {
+        val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
+
+        if (board.userId != userId) { throw InvalidUserException() }
+
+        boardRepository.delete(board)
+
+        boardContentRepository.findAllByBoardId(boardId).let {
+            boardContentRepository.deleteAll(it)
+        }
+
+        boardContentItemRepository.findAllByBoardId(boardId).let {
+            boardContentItemRepository.deleteAll(it)
+        }
+
+        boardKeywordRepository.findAllByBoardIdIn(listOf(boardId)).let {
+            boardKeywordRepository.deleteAll(it)
+        }
+
+        boardResultRepository.findAllByBoardId(boardId).let {
+            boardResultRepository.deleteAll(it)
         }
     }
 

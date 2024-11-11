@@ -149,17 +149,16 @@ class BoardApiController(
         boardFacade.createBoardReview(boardId, user.userId, request)
     }
 
-//    @Operation(summary = "[게임-010] 게시글 리뷰 수정")
-//    @PutMapping("/boards/{boardId}/review")
-//    fun modifyBoardReview(
-//        @RequestAttribute("accountName") accountName: String,
-//        @PathVariable("boardId") boardId: Long,
-//        @RequestBody request: ModifyBoardReviewRequestDTO,
-//    ) {
-//        val user = userFacade.getUserByAccountName(accountName)
-//
-//        boardFacade.modifyBoardReview(boardId, user.userId, request)
-//    }
+    @Operation(summary = "[게임-010] 게시글 삭제")
+    @DeleteMapping("/boards/{boardId}")
+    fun modifyBoardReview(
+        @RequestAttribute("accountName") accountName: String,
+        @PathVariable("boardId") boardId: Long,
+    ) {
+        val user = userFacade.getUserByAccountName(accountName)
+
+        boardFacade.deleteBoard(boardId, user.userId)
+    }
 
     @Operation(summary = "[게임-011] 게시글 리뷰 삭제")
     @DeleteMapping("/boards/{boardId}/reviews/{boardReviewId}")
