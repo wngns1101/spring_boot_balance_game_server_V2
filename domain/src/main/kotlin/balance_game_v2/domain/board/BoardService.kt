@@ -545,22 +545,26 @@ class BoardService(
     fun getRecommendReview(userId: Long?): List<BoardReviewDTO> {
         val recommendBoardReviews = userId?.let {
             val myBoardIds = boardRepository.findAllByUserId(userId).map { it.boardId!! }
-            val myBoardReviewIds = boardReviewRepository.findAllByUserId(userId).map { it.boardReviewId!! }
-            val boardReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
-            val boardReviewReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
+            val boardReportIds = boardReportRepository.findAllByUserId(userId).map { it.boardId }
             val boardBlockIds = boardBlockRepository.findAllByUserId(userId).map { it.boardId }
-            val boardReviewBlockIds = boardReviewBlockRepository.findAllByUserId(userId).map { it.boardId }
+
+            val myBoardReviewIds = boardReviewRepository.findAllByUserId(userId).map { it.boardReviewId!! }
+            val boardReviewReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
+            val boardReviewBlockIds = boardReviewBlockRepository.findAllByUserId(userId).map { it.boardReviewId }
 
             val combinedBoardIds = listOfNotNull(
                 myBoardIds,
-                myBoardReviewIds,
                 boardReportIds,
-                boardReviewReportIds,
                 boardBlockIds,
+            ).flatten().distinct()
+
+            val combinedBoardReviewIds = listOfNotNull(
+                myBoardReviewIds,
+                boardReviewReportIds,
                 boardReviewBlockIds
             ).flatten().distinct()
 
-            boardReviewRepository.searchRecommendReviewByUserId(combinedBoardIds)
+            boardReviewRepository.searchRecommendReviewByUserId(combinedBoardIds, combinedBoardReviewIds)
         } ?: run {
             boardReviewRepository.searchRecommendReview()
         }

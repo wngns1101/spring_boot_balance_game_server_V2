@@ -24,9 +24,10 @@ class BoardReviewQueryDslRepositoryImpl : BoardReviewQueryDslRepository, Queryds
 
     override fun searchRecommendReviewByUserId(
         combinedBoardIds: List<Long>,
+        combinedBoardReviewIds: List<Long>,
     ): List<BoardReview> {
         return from(boardReview)
-            .where(filteringBoards(combinedBoardIds))
+            .where(filteringBoards(combinedBoardIds), filteringBoardReviews(combinedBoardReviewIds))
             .limit(5)
             .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
             .fetch()

@@ -7,5 +7,6 @@ interface BoardReviewQueryDslRepository {
     fun searchRecommendReview(): List<BoardReview>
     fun searchRecommendReviewByUserId(
         combinedBoardIds: List<Long>,
+        combinedBoardReviewIds: List<Long>
     ): List<BoardReview>
 }
