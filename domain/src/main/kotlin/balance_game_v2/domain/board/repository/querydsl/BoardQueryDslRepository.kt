@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 interface BoardQueryDslRepository {
-    fun search(query: String?, pageable: Pageable, sortCondition: BoardSortCondition?, themeId: Long?, boardReportsIds: List<Long>?): Page<Board>
+    fun search(query: String?, pageable: Pageable, sortCondition: BoardSortCondition?, themeId: Long?, combinedBoardIds: List<Long>): Page<Board>
     fun todayRecommendGame(): Board
-    fun relatedBoards(boardId: Long, themeId: Long, boardReportsIds: List<Long>?): List<Board>
-    fun todayRecommendGameByUserId(myBoardIds: List<Long>?, boardReportIds: List<Long>?, acceptedBoardIds: List<Long>?): Board
+    fun relatedBoards(boardId: Long, themeId: Long, combinedBoardIds: List<Long>): List<Board>
+    fun todayRecommendGameByUserId(combinedBoardIds: List<Long>): Board
 }

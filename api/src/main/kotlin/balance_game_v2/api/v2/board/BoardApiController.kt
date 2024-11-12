@@ -1,8 +1,10 @@
 package balance_game_v2.api.v2.board
 
 import balance_game_v2.api.v2.board.application.BoardFacade
+import balance_game_v2.api.v2.board.http.req.BoardBlockRequestDTO
 import balance_game_v2.api.v2.board.http.req.BoardModifyRequestDTO
 import balance_game_v2.api.v2.board.http.req.BoardReportRequestDTO
+import balance_game_v2.api.v2.board.http.req.BoardReviewBlockRequestDTO
 import balance_game_v2.api.v2.board.http.req.BoardReviewReportRequestDTO
 import balance_game_v2.api.v2.board.http.req.CreateBoardRequestDTO
 import balance_game_v2.api.v2.board.http.req.CreateBoardResultRequestDTO
@@ -281,6 +283,31 @@ class BoardApiController(
         }
 
         return RecommendReviewResponseDTO(boardFacade.getRecommendReview(userId))
+    }
+
+    @Operation(summary = "[게임-021] 게시글 차단")
+    @PostMapping("/boards/{boardId}/block")
+    fun blockBoard(
+        @RequestAttribute("accountName") accountName: String,
+        @PathVariable("boardId") boardId: Long,
+        @RequestBody request: BoardBlockRequestDTO
+    ) {
+        val user = userFacade.getUserByAccountName(accountName)
+
+        boardFacade.blockBoard(user.userId, boardId, request.content)
+    }
+
+    @Operation(summary = "[게임-022] 게시글 리뷰 차단")
+    @PostMapping("/boards/{boardId}/reviews/{boardReviewId}/block")
+    fun blockBoardReview(
+        @RequestAttribute("accountName") accountName: String,
+        @PathVariable("boardId") boardId: Long,
+        @PathVariable("boardReviewId") boardReviewId: Long,
+        @RequestBody request: BoardReviewBlockRequestDTO
+    ) {
+        val user = userFacade.getUserByAccountName(accountName)
+
+        boardFacade.blockBoardReview(user.userId, boardId, boardReviewId, request.content)
     }
 
 //    @PostMapping("/excel/boards", consumes = arrayOf(MediaType.MULTIPART_FORM_DATA_VALUE))

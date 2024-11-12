@@ -21,21 +21,25 @@ import balance_game_v2.domain.board.dto.toPageBoardDTO
 import balance_game_v2.domain.board.dto.toParticipatedBoardDTO
 import balance_game_v2.domain.board.dto.toSimpleBoard
 import balance_game_v2.domain.board.entity.Board
+import balance_game_v2.domain.board.entity.BoardBlock
 import balance_game_v2.domain.board.entity.BoardContent
 import balance_game_v2.domain.board.entity.BoardContentItem
 import balance_game_v2.domain.board.entity.BoardKeyword
 import balance_game_v2.domain.board.entity.BoardReport
 import balance_game_v2.domain.board.entity.BoardResult
 import balance_game_v2.domain.board.entity.BoardReview
+import balance_game_v2.domain.board.entity.BoardReviewBlock
 import balance_game_v2.domain.board.entity.BoardReviewKeyword
 import balance_game_v2.domain.board.entity.BoardReviewReport
 import balance_game_v2.domain.board.model.BoardSortCondition
+import balance_game_v2.domain.board.repository.BoardBlockRepository
 import balance_game_v2.domain.board.repository.BoardContentItemRepository
 import balance_game_v2.domain.board.repository.BoardContentRepository
 import balance_game_v2.domain.board.repository.BoardKeywordRepository
 import balance_game_v2.domain.board.repository.BoardReportRepository
 import balance_game_v2.domain.board.repository.BoardRepository
 import balance_game_v2.domain.board.repository.BoardResultRepository
+import balance_game_v2.domain.board.repository.BoardReviewBlockRepository
 import balance_game_v2.domain.board.repository.BoardReviewKeywordRepository
 import balance_game_v2.domain.board.repository.BoardReviewReportRepository
 import balance_game_v2.domain.board.repository.BoardReviewRepository
@@ -59,6 +63,8 @@ class BoardService(
     private val boardContentItemRepository: BoardContentItemRepository,
     private val boardKeywordRepository: BoardKeywordRepository,
     private val boardContentRepository: BoardContentRepository,
+    private val boardBlockRepository: BoardBlockRepository,
+    private val boardReviewBlockRepository: BoardReviewBlockRepository,
 ) {
     @Transactional
     fun createBoard(userId: Long, command: CreateBoardCommand) {
@@ -110,13 +116,11 @@ class BoardService(
     ): PageBoardDTO {
         val pageable = PageRequest.of(page, size)
 
-        val boardReportIds = if (userId != null) {
-            boardReportRepository.findAllByUserId(userId).map { it.boardId }
-        } else {
-            null
-        }
+        val combinedBoardIds = userId?.let {
+            combinedFilteringBoardIds(it)
+        } ?: emptyList()
 
-        val boards = boardRepository.search(query, pageable, sortCondition, themeId, boardReportIds)
+        val boards = boardRepository.search(query, pageable, sortCondition, themeId, combinedBoardIds)
         val boardIds = boards.content.mapNotNull { it.boardId }
 
         val boardKeywords = boardKeywordRepository.findAllByBoardIdIn(boardIds)
@@ -323,7 +327,7 @@ class BoardService(
     fun createBoardReview(boardId: Long, userId: Long, command: CreateBoardReviewCommand) {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
 
-        val boardResults = boardResultRepository.findAllByBoardIdAndUserId(boardId, userId)
+//        val boardResults = boardResultRepository.findAllByBoardIdAndUserId(boardId, userId)
 
 //        if (boardResults.isEmpty()) {
 //            throw NotJoinedGameException()
@@ -433,10 +437,15 @@ class BoardService(
 
     fun todayRecommendGame(userId: Long?): SimpleBoardDTO {
         return userId?.let {
-            val myBoardIds = boardRepository.findAllByUserId(it).map { it.boardId!! }
-            val boardReportIds = boardReportRepository.findAllByUserId(it).map { it.boardId }
-            val acceptedBoardIds = boardResultRepository.findAllByUserId(it).distinctBy { it.boardId }.map { it.boardId }
-            boardRepository.todayRecommendGameByUserId(myBoardIds, boardReportIds, acceptedBoardIds).toSimpleBoard()
+            val combinedBoardIds = listOf(
+                boardRepository.findAllByUserId(userId).map { it.boardId!! },
+                boardReportRepository.findAllByUserId(userId).map { it.boardId },
+                boardBlockRepository.findAllByUserId(userId).map { it.boardId },
+                boardReviewBlockRepository.findAllByUserId(userId).map { it.boardId },
+                boardResultRepository.findAllByUserId(userId).distinctBy { it.boardId }.map { it.boardId }
+            ).flatten().distinct()
+
+            boardRepository.todayRecommendGameByUserId(combinedBoardIds).toSimpleBoard()
         } ?: run {
             boardRepository.todayRecommendGame().toSimpleBoard()
         }
@@ -462,13 +471,11 @@ class BoardService(
     fun relatedBoards(boardId: Long, userId: Long?): List<SimpleBoardDTO> {
         val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
 
-        val boardReportIds = if (userId != null) {
-            boardReportRepository.findAllByUserId(userId).map { it.boardId }
-        } else {
-            null
-        }
+        val combinedBoardIds = userId?.let {
+            combinedFilteringBoardIds(userId)
+        } ?: emptyList()
 
-        return boardRepository.relatedBoards(boardId, board.themeId, boardReportIds).map {
+        return boardRepository.relatedBoards(boardId, board.themeId, combinedBoardIds).map {
             it.toSimpleBoard()
         }
     }
@@ -476,13 +483,11 @@ class BoardService(
     fun getReviews(boardId: Long, userId: Long?): List<BoardReviewDTO> {
         val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
 
-        val boardReviewReportIds = if (userId != null) {
-            boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
-        } else {
-            null
-        }
+        val combinedBoardIds = userId?.let {
+            combinedFilteringBoardIds(it)
+        } ?: emptyList()
 
-        val boardReviews = boardReviewRepository.search(board.boardId!!, boardReviewReportIds)
+        val boardReviews = boardReviewRepository.search(board.boardId!!, combinedBoardIds)
 
         val boardReviewIds = boardReviews.map { it.boardReviewId!! }
         val boardKeywordMap = boardReviewKeywordRepository.findAllByBoardReviewIdIn(boardReviewIds)
@@ -508,9 +513,6 @@ class BoardService(
         val boardKeywords = boardKeywordRepository.findAllByBoardIdIn(participatedBoardIds)
         val boardKeywordsMap = boardKeywords.groupBy { it.boardId }
             .mapValues { it.value.map { it.keyword } }
-
-        println(boardKeywords.toString())
-        println(boardKeywordsMap.toString())
 
         return boardRepository.findByBoardIdIn(participatedBoardIds)
             .map {
@@ -544,9 +546,21 @@ class BoardService(
         val recommendBoardReviews = userId?.let {
             val myBoardIds = boardRepository.findAllByUserId(userId).map { it.boardId!! }
             val myBoardReviewIds = boardReviewRepository.findAllByUserId(userId).map { it.boardReviewId!! }
+            val boardReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
             val boardReviewReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
-            val boardReportIds = boardReportRepository.findAllByUserId(userId).map { it.boardId }
-            boardReviewRepository.searchRecommendReviewByUserId(myBoardIds, myBoardReviewIds, boardReviewReportIds, boardReportIds)
+            val boardBlockIds = boardBlockRepository.findAllByUserId(userId).map { it.boardId }
+            val boardReviewBlockIds = boardReviewBlockRepository.findAllByUserId(userId).map { it.boardId }
+
+            val combinedBoardIds = listOfNotNull(
+                myBoardIds,
+                myBoardReviewIds,
+                boardReportIds,
+                boardReviewReportIds,
+                boardBlockIds,
+                boardReviewBlockIds
+            ).flatten().distinct()
+
+            boardReviewRepository.searchRecommendReviewByUserId(combinedBoardIds)
         } ?: run {
             boardReviewRepository.searchRecommendReview()
         }
@@ -593,6 +607,34 @@ class BoardService(
         }
     }
 
+    @Transactional
+    fun blockBoard(userId: Long, boardId: Long, content: String) {
+        val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
+
+        BoardBlock(
+            userId = userId,
+            boardId = board.boardId!!,
+            reason = content,
+        ).let {
+            boardBlockRepository.save(it)
+        }
+    }
+    @Transactional
+    fun blockBoardReview(userId: Long, boardId: Long, boardReviewId: Long, content: String) {
+        val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
+
+        val boardReview = boardReviewRepository.findById(boardReviewId).orElseThrow { NotFoundReviewException() }
+
+        BoardReviewBlock(
+            userId = userId,
+            boardId = board.boardId!!,
+            boardReviewId = boardReview.boardReviewId!!,
+            reason = content,
+        ).let {
+            boardReviewBlockRepository.save(it)
+        }
+    }
+
 //    @Transactional
 //    fun excelBoards(dataList: MutableList<ExcelBoardCommandDTO>) {
 //        dataList.map { b ->
@@ -631,4 +673,18 @@ class BoardService(
 //            }
 //        }
 //    }
+
+    private fun combinedFilteringBoardIds(userId: Long): List<Long> {
+        val boardReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
+        val boardReviewReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
+        val boardBlockIds = boardBlockRepository.findAllByUserId(userId).map { it.boardId }
+        val boardReviewBlockIds = boardReviewBlockRepository.findAllByUserId(userId).map { it.boardId }
+
+        return listOfNotNull(
+            boardReportIds,
+            boardReviewReportIds,
+            boardBlockIds,
+            boardReviewBlockIds
+        ).flatten().distinct()
+    }
 }

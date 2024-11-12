@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class BoardReviewQueryDslRepositoryImpl : BoardReviewQueryDslRepository, QuerydslRepositorySupport(BoardReview::class.java) {
-    override fun search(boardId: Long, boardReviewIds: List<Long>?): List<BoardReview> {
+    override fun search(boardId: Long, combinedBoardReviewIds: List<Long>): List<BoardReview> {
         return from(boardReview)
-            .where(boardReview.boardId.eq(boardId), filteringBoardReviews(boardReviewIds))
+            .where(boardReview.boardId.eq(boardId), filteringBoardReviews(combinedBoardReviewIds))
             .fetch()
     }
 
@@ -23,13 +23,10 @@ class BoardReviewQueryDslRepositoryImpl : BoardReviewQueryDslRepository, Queryds
     }
 
     override fun searchRecommendReviewByUserId(
-        myBoardIds: List<Long>,
-        myBoardReviewIds: List<Long>,
-        boardReviewReportIds: List<Long>,
-        boardReportIds: List<Long>
+        combinedBoardIds: List<Long>,
     ): List<BoardReview> {
         return from(boardReview)
-            .where(filteringBoards(myBoardIds), filteringBoards(boardReportIds), filteringBoardReviews(myBoardReviewIds), filteringBoardReviews(boardReviewReportIds))
+            .where(filteringBoards(combinedBoardIds))
             .limit(5)
             .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
             .fetch()
@@ -41,7 +38,7 @@ private fun filteringBoards(boardReportsIds: List<Long>?): BooleanExpression? {
     return boardReview.boardId.notIn(boardReportsIds)
 }
 
-private fun filteringBoardReviews(boardReviewReportIds: List<Long>?): BooleanExpression? {
-    if (boardReviewReportIds == null) return null
-    return boardReview.boardReviewId.notIn(boardReviewReportIds)
+private fun filteringBoardReviews(boardIds: List<Long>): BooleanExpression? {
+    if (boardIds.isEmpty()) return null
+    return boardReview.boardReviewId.notIn(boardIds)
 }

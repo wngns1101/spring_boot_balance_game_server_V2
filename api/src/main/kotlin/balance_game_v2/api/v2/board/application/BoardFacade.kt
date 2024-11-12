@@ -111,6 +111,14 @@ class BoardFacade(
     fun deleteBoard(boardId: Long, userId: Long) {
         return boardService.deleteBoard(boardId, userId)
     }
+
+    fun blockBoard(userId: Long, boardId: Long, content: String) {
+        boardService.blockBoard(userId, boardId, content)
+    }
+
+    fun blockBoardReview(userId: Long, boardId: Long, boardReviewId: Long, content: String) {
+        boardService.blockBoardReview(userId, boardId, boardReviewId, content)
+    }
 //
 //    fun excelBoards(dataList: MutableList<ExcelRequestDTO>) {
 //        return boardService.excelBoards(dataList.map { it.toCommand() }.toMutableList())
