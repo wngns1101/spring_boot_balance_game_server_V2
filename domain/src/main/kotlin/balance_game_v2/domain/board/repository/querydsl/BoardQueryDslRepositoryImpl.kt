@@ -21,10 +21,10 @@ class BoardQueryDslRepositoryImpl :
         pageable: Pageable,
         sortCondition: BoardSortCondition?,
         themeId: Long?,
-        combinedBoardIds: List<Long>,
+        combinedUserIds: List<Long>,
     ): Page<Board> {
         val result = from(board)
-            .where(searchCondition(query), searchForThemeId(themeId), filteringBoards(combinedBoardIds))
+            .where(searchCondition(query), searchForThemeId(themeId), filteringUsers(combinedUserIds))
             .orderBy(*sortCondition(sortCondition))
             .offset(pageable.offset)
             .limit((pageable.pageSize).toLong())
@@ -40,21 +40,21 @@ class BoardQueryDslRepositoryImpl :
             .fetchOne()
     }
 
-    override fun relatedBoards(boardId: Long, themeId: Long, combinedBoardIds: List<Long>): List<Board> {
+    override fun relatedBoards(boardId: Long, themeId: Long, combinedUserIds: List<Long>): List<Board> {
         return from(board)
             .where(
                 board.boardId.ne(boardId),
                 board.themeId.eq(themeId),
-                filteringBoards(combinedBoardIds)
+                filteringUsers(combinedUserIds)
             )
             .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
             .limit(10)
             .fetch()
     }
 
-    override fun todayRecommendGameByUserId(combinedBoardIds: List<Long>): Board {
+    override fun todayRecommendGameByUserId(combinedUserIds: List<Long>): Board {
         return from(board)
-            .where(filteringBoards(combinedBoardIds))
+            .where(filteringUsers(combinedUserIds))
 //            .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
             .orderBy(board.likeCount.desc(), board.viewCount.desc())
             .limit(1)
@@ -75,6 +75,11 @@ private fun searchForThemeId(themeId: Long?): BooleanExpression? {
 private fun filteringBoards(boardIds: List<Long>): BooleanExpression? {
     if (boardIds.isEmpty()) return null
     return board.boardId.notIn(boardIds)
+}
+
+private fun filteringUsers(userIds: List<Long>): BooleanExpression? {
+    if (userIds.isEmpty()) return null
+    return board.userId.notIn(userIds)
 }
 
 private fun sortCondition(sortCondition: BoardSortCondition?): Array<OrderSpecifier<*>> {

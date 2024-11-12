@@ -116,11 +116,11 @@ class BoardService(
     ): PageBoardDTO {
         val pageable = PageRequest.of(page, size)
 
-        val combinedBoardIds = userId?.let {
+        val combinedUserIds = userId?.let {
             combinedFilteringBoardIds(it)
         } ?: emptyList()
 
-        val boards = boardRepository.search(query, pageable, sortCondition, themeId, combinedBoardIds)
+        val boards = boardRepository.search(query, pageable, sortCondition, themeId, combinedUserIds)
         val boardIds = boards.content.mapNotNull { it.boardId }
 
         val boardKeywords = boardKeywordRepository.findAllByBoardIdIn(boardIds)
@@ -437,15 +437,12 @@ class BoardService(
 
     fun todayRecommendGame(userId: Long?): SimpleBoardDTO {
         return userId?.let {
-            val combinedBoardIds = listOf(
-                boardRepository.findAllByUserId(userId).map { it.boardId!! },
-                boardReportRepository.findAllByUserId(userId).map { it.boardId },
-                boardBlockRepository.findAllByUserId(userId).map { it.boardId },
-                boardReviewBlockRepository.findAllByUserId(userId).map { it.boardId },
-                boardResultRepository.findAllByUserId(userId).distinctBy { it.boardId }.map { it.boardId }
+            val combinedUserIds = listOf(
+                listOf(userId),
+                combinedFilteringBoardIds(it)
             ).flatten().distinct()
 
-            boardRepository.todayRecommendGameByUserId(combinedBoardIds).toSimpleBoard()
+            boardRepository.todayRecommendGameByUserId(combinedUserIds).toSimpleBoard()
         } ?: run {
             boardRepository.todayRecommendGame().toSimpleBoard()
         }
@@ -471,11 +468,12 @@ class BoardService(
     fun relatedBoards(boardId: Long, userId: Long?): List<SimpleBoardDTO> {
         val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
 
-        val combinedBoardIds = userId?.let {
+        val combinedUserIds = userId?.let {
+            listOf(userId)
             combinedFilteringBoardIds(userId)
         } ?: emptyList()
 
-        return boardRepository.relatedBoards(boardId, board.themeId, combinedBoardIds).map {
+        return boardRepository.relatedBoards(boardId, board.themeId, combinedUserIds).map {
             it.toSimpleBoard()
         }
     }
@@ -483,11 +481,11 @@ class BoardService(
     fun getReviews(boardId: Long, userId: Long?): List<BoardReviewDTO> {
         val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
 
-        val combinedBoardIds = userId?.let {
+        val combinedUserIds = userId?.let {
             combinedFilteringBoardIds(it)
         } ?: emptyList()
 
-        val boardReviews = boardReviewRepository.search(board.boardId!!, combinedBoardIds)
+        val boardReviews = boardReviewRepository.search(board.boardId!!, combinedUserIds)
 
         val boardReviewIds = boardReviews.map { it.boardReviewId!! }
         val boardKeywordMap = boardReviewKeywordRepository.findAllByBoardReviewIdIn(boardReviewIds)
@@ -544,27 +542,11 @@ class BoardService(
 
     fun getRecommendReview(userId: Long?): List<BoardReviewDTO> {
         val recommendBoardReviews = userId?.let {
-            val myBoardIds = boardRepository.findAllByUserId(userId).map { it.boardId!! }
-            val boardReportIds = boardReportRepository.findAllByUserId(userId).map { it.boardId }
-            val boardBlockIds = boardBlockRepository.findAllByUserId(userId).map { it.boardId }
+            val myBoardIds = boardRepository.findAllByUserId(userId).map { it.boardId!! } // 내 게시글 제외
+            val myBoardReviewIds = boardReviewRepository.findAllByUserId(userId).map { it.boardReviewId!! } // 내 리뷰 제외
+            val combinedUserIds = combinedFilteringBoardIds(it)
 
-            val myBoardReviewIds = boardReviewRepository.findAllByUserId(userId).map { it.boardReviewId!! }
-            val boardReviewReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
-            val boardReviewBlockIds = boardReviewBlockRepository.findAllByUserId(userId).map { it.boardReviewId }
-
-            val combinedBoardIds = listOfNotNull(
-                myBoardIds,
-                boardReportIds,
-                boardBlockIds,
-            ).flatten().distinct()
-
-            val combinedBoardReviewIds = listOfNotNull(
-                myBoardReviewIds,
-                boardReviewReportIds,
-                boardReviewBlockIds
-            ).flatten().distinct()
-
-            boardReviewRepository.searchRecommendReviewByUserId(combinedBoardIds, combinedBoardReviewIds)
+            boardReviewRepository.searchRecommendReviewByUserId(myBoardIds, myBoardReviewIds, combinedUserIds)
         } ?: run {
             boardReviewRepository.searchRecommendReview()
         }
@@ -679,16 +661,23 @@ class BoardService(
 //    }
 
     private fun combinedFilteringBoardIds(userId: Long): List<Long> {
-        val boardReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
-        val boardReviewReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
+        val boardReportIds = boardReportRepository.findAllByUserId(userId).map { it.boardId }
+        val boardReportUserIds = boardRepository.findAllById(boardReportIds).map { it.userId }
+
         val boardBlockIds = boardBlockRepository.findAllByUserId(userId).map { it.boardId }
-        val boardReviewBlockIds = boardReviewBlockRepository.findAllByUserId(userId).map { it.boardId }
+        val boardBlockUserIds = boardRepository.findAllById(boardBlockIds).map { it.userId }
+
+        val boardReviewReportIds = boardReviewReportRepository.findAllByUserId(userId).map { it.boardReviewId }
+        val boardReviewReportUserIds = boardReviewRepository.findAllById(boardReviewReportIds).map { it.userId }
+
+        val boardReviewBlockIds = boardReviewBlockRepository.findAllByUserId(userId).map { it.boardReviewId }
+        val boardReviewBlockUserIds = boardReviewRepository.findAllById(boardReviewBlockIds).map { it.userId }
 
         return listOfNotNull(
-            boardReportIds,
-            boardReviewReportIds,
-            boardBlockIds,
-            boardReviewBlockIds
+            boardReportUserIds,
+            boardBlockUserIds,
+            boardReviewReportUserIds,
+            boardReviewBlockUserIds
         ).flatten().distinct()
     }
 }

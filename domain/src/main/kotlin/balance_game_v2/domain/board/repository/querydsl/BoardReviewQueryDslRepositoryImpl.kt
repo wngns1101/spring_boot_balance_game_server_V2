@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class BoardReviewQueryDslRepositoryImpl : BoardReviewQueryDslRepository, QuerydslRepositorySupport(BoardReview::class.java) {
-    override fun search(boardId: Long, combinedBoardReviewIds: List<Long>): List<BoardReview> {
+    override fun search(boardId: Long, combinedUserIds: List<Long>): List<BoardReview> {
         return from(boardReview)
-            .where(boardReview.boardId.eq(boardId), filteringBoardReviews(combinedBoardReviewIds))
+            .where(boardReview.boardId.eq(boardId), filteringUsers(combinedUserIds))
             .fetch()
     }
 
@@ -23,23 +23,29 @@ class BoardReviewQueryDslRepositoryImpl : BoardReviewQueryDslRepository, Queryds
     }
 
     override fun searchRecommendReviewByUserId(
-        combinedBoardIds: List<Long>,
-        combinedBoardReviewIds: List<Long>,
+        myBoardIds: List<Long>,
+        myBoardReviewIds: List<Long>,
+        combinedUserIds: List<Long>,
     ): List<BoardReview> {
         return from(boardReview)
-            .where(filteringBoards(combinedBoardIds), filteringBoardReviews(combinedBoardReviewIds))
+            .where(filteringBoards(myBoardIds), filteringBoardReviews(myBoardReviewIds), filteringUsers(combinedUserIds))
             .limit(5)
             .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
             .fetch()
     }
 }
 
-private fun filteringBoards(boardReportsIds: List<Long>?): BooleanExpression? {
-    if (boardReportsIds == null) return null
-    return boardReview.boardId.notIn(boardReportsIds)
+private fun filteringBoards(boardIds: List<Long>): BooleanExpression? {
+    if (boardIds.isEmpty()) return null
+    return boardReview.boardId.notIn(boardIds)
 }
 
 private fun filteringBoardReviews(boardIds: List<Long>): BooleanExpression? {
     if (boardIds.isEmpty()) return null
     return boardReview.boardReviewId.notIn(boardIds)
+}
+
+private fun filteringUsers(userIds: List<Long>): BooleanExpression? {
+    if (userIds.isEmpty()) return null
+    return boardReview.userId.notIn(userIds)
 }
