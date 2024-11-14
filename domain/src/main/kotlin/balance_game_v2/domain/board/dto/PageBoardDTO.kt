@@ -10,6 +10,7 @@ data class PageBoardDTO(
 
 data class BoardListDTO(
     val boardId: Long,
+    val userId: Long,
     val title: String,
     val viewCount: Int,
     val likeCount: Int,
@@ -22,6 +23,7 @@ data class BoardListDTO(
 fun Board.toPageBoardDTO(boardKeywords: List<BoardKeywordDTO>): BoardListDTO {
     return BoardListDTO(
         boardId = boardId!!,
+        userId = userId,
         title = title,
         viewCount = viewCount,
         likeCount = likeCount,
