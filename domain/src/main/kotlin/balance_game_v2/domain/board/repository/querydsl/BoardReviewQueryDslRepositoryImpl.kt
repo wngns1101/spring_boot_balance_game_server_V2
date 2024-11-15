@@ -1,9 +1,13 @@
 package balance_game_v2.domain.board.repository.querydsl
 
 import balance_game_v2.domain.board.entity.BoardReview
+import balance_game_v2.domain.board.entity.QBoard.board
 import balance_game_v2.domain.board.entity.QBoardReview.boardReview
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.Expressions
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Component
 
@@ -33,6 +37,21 @@ class BoardReviewQueryDslRepositoryImpl : BoardReviewQueryDslRepository, Queryds
             .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
             .fetch()
     }
+
+    override fun searchByAdmin(query: String?, pageable: Pageable): Page<BoardReview> {
+        val result = from(boardReview)
+            .where(searchCondition(query))
+            .offset(pageable.offset)
+            .limit((pageable.pageSize).toLong())
+            .fetchResults()
+
+        return PageImpl(result.results, pageable, result.total)
+    }
+}
+
+private fun searchCondition(query: String?): BooleanExpression? {
+    if (query.isNullOrBlank()) return null
+    return boardReview.title.contains(query)
 }
 
 private fun filteringBoards(boardIds: List<Long>): BooleanExpression? {

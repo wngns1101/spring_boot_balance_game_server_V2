@@ -41,4 +41,34 @@ class BoardController(
 
         return "board-detail"
     }
+
+    @GetMapping("/reviews")
+    fun reviews(
+        @RequestParam(value = "query") query: String?,
+        @RequestParam(value = "page", defaultValue = "1") page: Int,
+        @RequestParam(value = "size", defaultValue = "10") size: Int,
+        model: Model,
+    ): String {
+        val adjustedPage = page - 1
+        val boardReview = boardBackofficeFacade.getReviews(query, adjustedPage, size)
+
+        model.addAttribute("boardReviews", boardReview.boardReviews)
+        model.addAttribute("currentPage", page)
+        model.addAttribute("pageGroup", (page - 1) / 5)
+        model.addAttribute("totalPage", boardReview.totalPage)
+
+        return "board-reviews"
+    }
+
+    @GetMapping("/reviews/{reviewId}")
+    fun getReviewDetail(
+        @PathVariable("reviewId") boardReviewId: Long,
+        model: Model,
+    ): String {
+        val boardReview = boardBackofficeFacade.getBoardReviewDetail(boardReviewId)
+
+        model.addAttribute("boardReview", boardReview)
+
+        return "board-review-detail"
+    }
 }

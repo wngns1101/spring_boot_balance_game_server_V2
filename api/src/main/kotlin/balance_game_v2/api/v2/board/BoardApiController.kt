@@ -151,7 +151,7 @@ class BoardApiController(
 
     @Operation(summary = "[게임-010] 게시글 삭제")
     @DeleteMapping("/boards/{boardId}")
-    fun modifyBoardReview(
+    fun deleteBoardReview(
         @RequestAttribute("accountName") accountName: String,
         @PathVariable("boardId") boardId: Long,
     ) {

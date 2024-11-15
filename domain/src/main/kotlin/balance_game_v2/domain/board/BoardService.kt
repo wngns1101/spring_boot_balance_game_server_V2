@@ -6,18 +6,22 @@ import balance_game_v2.domain.board.dto.BoardDetailDTO
 import balance_game_v2.domain.board.dto.BoardListDTO
 import balance_game_v2.domain.board.dto.BoardResultDTO
 import balance_game_v2.domain.board.dto.BoardReviewDTO
+import balance_game_v2.domain.board.dto.BoardReviewDetailDTO
 import balance_game_v2.domain.board.dto.CreateBoardCommand
 import balance_game_v2.domain.board.dto.CreateBoardResultRequestCommand
 import balance_game_v2.domain.board.dto.CreateBoardReviewCommand
 import balance_game_v2.domain.board.dto.ModifyBoardCommand
-import balance_game_v2.domain.board.dto.ModifyBoardReviewCommand
+import balance_game_v2.domain.board.dto.ModifyBoardReviewCommandDTO
 import balance_game_v2.domain.board.dto.PageBoardDTO
+import balance_game_v2.domain.board.dto.PageBoardReviewDTO
 import balance_game_v2.domain.board.dto.ParticipatedBoardDTO
 import balance_game_v2.domain.board.dto.SimpleBoardDTO
 import balance_game_v2.domain.board.dto.WriterDTO
 import balance_game_v2.domain.board.dto.toBoardDetail
 import balance_game_v2.domain.board.dto.toDTO
+import balance_game_v2.domain.board.dto.toDetailDTO
 import balance_game_v2.domain.board.dto.toPageBoardDTO
+import balance_game_v2.domain.board.dto.toPageBoardReviewDTO
 import balance_game_v2.domain.board.dto.toParticipatedBoardDTO
 import balance_game_v2.domain.board.dto.toSimpleBoard
 import balance_game_v2.domain.board.entity.Board
@@ -282,7 +286,7 @@ class BoardService(
 
     fun getBoardResult(boardId: Long): List<BoardResultDTO> {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
-        val boardContents = boardContentRepository.findAllByBoardId(boardId)
+        val boardContents = boardContentRepository.findAllByBoardId(board.boardId!!)
         val boardContentIds = boardContents.mapNotNull { it.boardContentId }
 
         val boardContentItems = boardContentItemRepository.findAllByBoardContentIdIn(boardContentIds)
@@ -362,26 +366,46 @@ class BoardService(
     }
 
     @Transactional
-    fun modifyBoardReview(boardId: Long, userId: Long, command: ModifyBoardReviewCommand) {
-        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
+    fun modifyBoardReview(command: ModifyBoardReviewCommandDTO) {
+        val board = boardRepository.findByBoardIdAndDeletedAtIsNull(command.boardId) ?: throw NotFoundBoardException()
         val boardReview = boardReviewRepository.findById(command.boardReviewId).orElseThrow { NotFoundReviewException() }
 
-        if (boardReview.userId != userId) throw InvalidUserException()
+        // 기존 좋아요, 싫어요 상태 확인
+        val previousIsLike = boardReview.isLike
+        val previousIsDislike = boardReview.isDislike
+
+        boardReview.title = command.title
         boardReview.comment = command.comment
+
+        if (previousIsLike && !command.isLike) {
+            board.likeCount -= 1
+        } else if (!previousIsLike && command.isLike) {
+            board.likeCount += 1
+        }
+
+        if (previousIsDislike && !command.isDislike) {
+            board.dislikeCount -= 1
+        } else if (!previousIsDislike && command.isDislike) {
+            board.dislikeCount += 1
+        }
+
+        boardReview.isLike = command.isLike
+        boardReview.isDislike = command.isDislike
 
         boardReviewKeywordRepository.findAllByBoardReviewId(boardReview.boardReviewId!!)
             .let {
                 boardReviewKeywordRepository.deleteAll(it)
             }
 
-        command.keywords.map {
-            BoardReviewKeyword(
-                boardReviewId = boardReview.boardReviewId,
-                userId = userId,
-                keyword = it,
-            )
-        }.let {
-            boardReviewKeywordRepository.saveAll(it)
+        if (!command.keywords.isNullOrEmpty()) {
+            val boardReviewKeywordList = command.keywords.split(",").map {
+                BoardReviewKeyword(
+                    boardReviewId = boardReview.boardReviewId,
+                    userId = board.userId,
+                    keyword = it,
+                )
+            }
+            boardReviewKeywordRepository.saveAll(boardReviewKeywordList)
         }
     }
 
@@ -677,5 +701,45 @@ class BoardService(
             boardReviewReportUserIds,
             boardReviewBlockUserIds
         ).flatten().distinct()
+    }
+
+    fun getReviewsByAdmin(query: String?, page: Int, size: Int): PageBoardReviewDTO {
+        val pageable = PageRequest.of(page, size)
+
+        val boardReview = boardReviewRepository.searchByAdmin(query, pageable)
+
+        return PageBoardReviewDTO(
+            boardReviews = boardReview.content.map { it.toPageBoardReviewDTO() },
+            totalPage = boardReview.totalPages
+        )
+    }
+
+    fun getReviewDetail(boardReviewId: Long): BoardReviewDetailDTO {
+        val boardReview = boardReviewRepository.findById(boardReviewId).orElseThrow { NotFoundReviewException() }
+        val boardReviewKeywords = boardReviewKeywordRepository.findAllByBoardReviewId(boardReview.boardReviewId!!).map { it.keyword }
+            .joinToString(separator = ",")
+
+        return boardReview.toDetailDTO(boardReviewKeywords)
+    }
+
+    @Transactional
+    fun deleteBoardReview(boardId: Long, boardReviewId: Long) {
+        val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
+        val boardReview = boardReviewRepository.findById(boardReviewId).orElseThrow { NotFoundBoardException() }
+
+        if (boardReview.isLike) {
+            board.likeCount -= 1
+        }
+
+        if (boardReview.isDislike) {
+            board.dislikeCount -= 1
+        }
+
+        boardReviewKeywordRepository.findAllByBoardReviewId(boardReview.boardReviewId!!)
+            .let {
+                boardReviewKeywordRepository.deleteAll(it)
+            }
+
+        boardReviewRepository.delete(boardReview)
     }
 }

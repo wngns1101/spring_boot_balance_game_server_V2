@@ -4,7 +4,6 @@ import balance_game_v2.api.v2.board.http.req.BoardModifyRequestDTO
 import balance_game_v2.api.v2.board.http.req.CreateBoardRequestDTO
 import balance_game_v2.api.v2.board.http.req.CreateBoardResultRequestDTO
 import balance_game_v2.api.v2.board.http.req.CreateBoardReviewRequestDTO
-import balance_game_v2.api.v2.board.http.req.ModifyBoardReviewRequestDTO
 import balance_game_v2.api.v2.board.http.req.toCommand
 import balance_game_v2.domain.board.BoardService
 import balance_game_v2.domain.board.dto.BoardContentList
@@ -44,8 +43,8 @@ class BoardFacade(
     }
 
     fun createBoardResult(boardId: Long, request: List<CreateBoardResultRequestDTO>, userId: Long): List<BoardResultDTO> {
-        val boardId = boardService.createBoardResult(boardId, request.map { it.toCommand() }, userId)
-        return boardService.getBoardResult(boardId)
+        val createBoardId = boardService.createBoardResult(boardId, request.map { it.toCommand() }, userId)
+        return boardService.getBoardResult(createBoardId)
     }
 
 //    fun getBoardResult(boardId: Long): List<BoardResultDTO> {
@@ -58,10 +57,6 @@ class BoardFacade(
 
     fun createBoardReview(boardId: Long, userId: Long, request: CreateBoardReviewRequestDTO) {
         return boardService.createBoardReview(boardId, userId, request.toCommand())
-    }
-
-    fun modifyBoardReview(boardId: Long, userId: Long, request: ModifyBoardReviewRequestDTO) {
-        return boardService.modifyBoardReview(boardId, userId, request.toCommand())
     }
 
     fun deleteBoardReview(userId: Long, boardId: Long, boardReviewId: Long) {
