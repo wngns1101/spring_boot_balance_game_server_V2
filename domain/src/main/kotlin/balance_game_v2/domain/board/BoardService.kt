@@ -594,19 +594,18 @@ class BoardService(
     }
 
     @Transactional
-    fun blockBoard(userId: Long, boardId: Long, content: String) {
+    fun blockBoard(userId: Long, boardId: Long) {
         val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
 
         BoardBlock(
             userId = userId,
             boardId = board.boardId!!,
-            reason = content,
         ).let {
             boardBlockRepository.save(it)
         }
     }
     @Transactional
-    fun blockBoardReview(userId: Long, boardId: Long, boardReviewId: Long, content: String) {
+    fun blockBoardReview(userId: Long, boardId: Long, boardReviewId: Long) {
         val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
 
         val boardReview = boardReviewRepository.findById(boardReviewId).orElseThrow { NotFoundReviewException() }
@@ -615,7 +614,6 @@ class BoardService(
             userId = userId,
             boardId = board.boardId!!,
             boardReviewId = boardReview.boardReviewId!!,
-            reason = content,
         ).let {
             boardReviewBlockRepository.save(it)
         }

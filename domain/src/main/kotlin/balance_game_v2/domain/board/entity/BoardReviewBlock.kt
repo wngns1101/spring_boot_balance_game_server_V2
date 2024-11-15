@@ -16,5 +16,4 @@ class BoardReviewBlock(
     val userId: Long,
     val boardId: Long,
     val boardReviewId: Long,
-    val reason: String,
 ) : BaseEntity()

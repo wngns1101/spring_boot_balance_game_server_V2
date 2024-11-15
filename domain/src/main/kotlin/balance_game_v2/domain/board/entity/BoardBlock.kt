@@ -15,5 +15,4 @@ class BoardBlock(
     val boardBlockId: Long? = null,
     val userId: Long,
     val boardId: Long,
-    val reason: String,
 ) : BaseEntity()
