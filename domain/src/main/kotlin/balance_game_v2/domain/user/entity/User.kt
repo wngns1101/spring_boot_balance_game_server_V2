@@ -17,7 +17,6 @@ class User(
     var realName: String,
     var accountName: String,
     var email: String,
-    val invitationCode: String? = null,
     var pushToken: String? = null,
     var profileUrl: String? = null,
     var deletedReason: String? = null,
