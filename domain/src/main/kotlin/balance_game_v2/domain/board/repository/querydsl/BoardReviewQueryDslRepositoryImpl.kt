@@ -21,6 +21,7 @@ class BoardReviewQueryDslRepositoryImpl : BoardReviewQueryDslRepository, Queryds
 
     override fun searchRecommendReview(): List<BoardReview> {
         return from(boardReview)
+            .where(boardReview.isLike.isTrue)
             .limit(5)
             .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
             .fetch()
@@ -32,7 +33,7 @@ class BoardReviewQueryDslRepositoryImpl : BoardReviewQueryDslRepository, Queryds
         combinedUserIds: List<Long>,
     ): List<BoardReview> {
         return from(boardReview)
-            .where(filteringBoards(myBoardIds), filteringBoardReviews(myBoardReviewIds), filteringUsers(combinedUserIds))
+            .where(boardReview.isLike.isTrue, filteringBoards(myBoardIds), filteringBoardReviews(myBoardReviewIds), filteringUsers(combinedUserIds))
             .limit(5)
             .orderBy(Expressions.numberTemplate(Double::class.java, "function('rand')").asc())
             .fetch()
