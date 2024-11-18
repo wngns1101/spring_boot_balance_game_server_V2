@@ -15,8 +15,6 @@
         announcement.content = document.getElementById('content').value
         announcement.type = document.getElementById('type').value
 
-        console.log(announcement)
-
         $.ajax({
             url: '/backoffice/v2/announcement/api/announcement',
             type: 'POST',
@@ -52,7 +50,7 @@
             <div class="row mb-3" id="content-row">
                 <label for="content" class="form-label">내용</label>
                 <div class="col-md-6">
-                    <input type="text" class="form-control" id="content">
+                    <textarea class="form-control" id="content"></textarea>
                 </div>
             </div>
             <div class="row mb-3" id="type-row">

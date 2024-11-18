@@ -43,13 +43,10 @@
                 alert('아이콘 등록에 실패했습니다.');
             })
         }
-        console.log(iconData)
     }
 
     function createIconBtn() {
         theme.theme = document.getElementById('theme').value
-
-        console.log(theme)
 
         $.ajax({
             url: '/backoffice/v2/theme/api/theme',

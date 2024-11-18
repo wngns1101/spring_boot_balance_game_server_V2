@@ -94,8 +94,6 @@
         version.minimumVersion = document.getElementById('minimum-version').value
         version.preferVersion = document.getElementById('prefer-version').value
 
-        console.log(version)
-
         $.ajax({
             url: '/backoffice/v2/version/api/version',
             type: 'PUT',

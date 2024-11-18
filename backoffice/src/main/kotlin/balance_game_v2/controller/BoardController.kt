@@ -36,8 +36,13 @@ class BoardController(
     @GetMapping("/boards/{boardId}")
     fun getBoardDetail(
         @PathVariable("boardId") boardId: Long,
+        model: Model,
     ): String {
-        val board = boardBackofficeFacade.getBoardDetail(boardId)
+        val board = boardBackofficeFacade.getBoardDetailByAdmin(boardId)
+
+        model.addAttribute("board", board.board)
+        model.addAttribute("user", board.user)
+        model.addAttribute("boardContents", board.boardContents)
 
         return "board-detail"
     }
@@ -70,5 +75,65 @@ class BoardController(
         model.addAttribute("boardReview", boardReview)
 
         return "board-review-detail"
+    }
+
+    @GetMapping("/board-reports")
+    fun getBoardReports(
+        @RequestParam(value = "query") query: String?,
+        @RequestParam(value = "page", defaultValue = "1") page: Int,
+        @RequestParam(value = "size", defaultValue = "10") size: Int,
+        model: Model,
+    ): String {
+        val adjustedPage = page - 1
+        val boardReports = boardBackofficeFacade.getBoardReports(query, adjustedPage, size)
+
+        model.addAttribute("boardReports", boardReports.boardReports)
+        model.addAttribute("currentPage", page)
+        model.addAttribute("pageGroup", (page - 1) / 5)
+        model.addAttribute("totalPage", boardReports.totalPage)
+
+        return "board-reports"
+    }
+
+    @GetMapping("/board-reports/{boardReportId}")
+    fun getBoardReportDetail(
+        @PathVariable("boardReportId") boardReportId: Long,
+        model: Model
+    ): String {
+        val boardReport = boardBackofficeFacade.getBoardReportDetail(boardReportId)
+
+        model.addAttribute("boardReport", boardReport)
+
+        return "board-report-detail"
+    }
+
+    @GetMapping("/board-review-reports")
+    fun getBoardReviewReports(
+        @RequestParam(value = "query") query: String?,
+        @RequestParam(value = "page", defaultValue = "1") page: Int,
+        @RequestParam(value = "size", defaultValue = "10") size: Int,
+        model: Model,
+    ): String {
+        val adjustedPage = page - 1
+        val boardReviewReports = boardBackofficeFacade.getBoardReviewReports(query, adjustedPage, size)
+
+        model.addAttribute("boardReviewReports", boardReviewReports.boardReviewReports)
+        model.addAttribute("currentPage", page)
+        model.addAttribute("pageGroup", (page - 1) / 5)
+        model.addAttribute("totalPage", boardReviewReports.totalPage)
+
+        return "board-review-reports"
+    }
+
+    @GetMapping("/board-review-reports/{boardReviewReportId}")
+    fun getBoardReviewReportDetail(
+        @PathVariable("boardReviewReportId") boardReviewReportId: Long,
+        model: Model
+    ): String {
+        val boardReviewReport = boardBackofficeFacade.getBoardReviewReportDetail(boardReviewReportId)
+
+        model.addAttribute("boardReviewReport", boardReviewReport)
+
+        return "board-review-report-detail"
     }
 }

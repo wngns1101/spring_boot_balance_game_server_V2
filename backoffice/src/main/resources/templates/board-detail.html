@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<script>
+    let board = {
+        boardId: null,
+        themeId: null,
+        title: null,
+        introduce: null,
+        keywords: null,
+    }
+    let user = null
+    let boardContents = [];
+
+    $(document).ready(function () {
+        board.title = `[[${board.title}]]`
+        board.themeId = `[[${board.themeId}]]`
+        board.boardId = `[[${board.boardId}]]`
+        board.introduce = `[[${board.introduce}]]`
+        board.userId = `[[${board.userId}]]`
+        board.keywords = `[[${board.keywords}]]`
+
+        user = `[[${user}]]`
+        boardContents = `[[${boardContents}]]`
+    });
+
+    function enableBoardInputStatus() {
+        let title = document.getElementById('board-title')
+        let theme = document.getElementById('board-theme')
+        let introduce = document.getElementById('board-introduce')
+        let keywords = document.getElementById('board-keywords')
+        let editBtn = document.getElementById('board-edit-btn')
+
+        title.disabled = false;
+        theme.disabled = false
+        introduce.disabled = false;
+        keywords.disabled = false;
+        editBtn.hidden = true;
+
+        const newButton = document.createElement('input')
+        newButton.classList.add('btn', 'btn-primary')
+        newButton.type = 'button'
+        newButton.id = 'board-modify-confirm-btn'
+        newButton.value = '확인'
+        newButton.onclick = function () {
+            newButton.hidden = true;
+
+            board.title = title.value;
+            board.introduce = introduce.value;
+            board.themeId = theme.value;
+            board.keywords = keywords.value
+
+            title.disabled = true;
+            introduce.disabled = true;
+            keywords.disabled = true;
+            theme.disabled = true;
+            editBtn.hidden = false;
+        }
+
+        const containerDiv = document.getElementById('board-edit-btn-div');
+        containerDiv.appendChild(newButton);
+    }
+
+    function enableBoardContentInputStatus() {
+        const btn = document.getElementById('board-content-edit-btn')
+        btn.hidden = true;
+
+        const rowCount = document.getElementById('iterStat-size').value
+
+        for (let i = 1; i <= rowCount; i++) {
+            const title = document.getElementById('board-content-' + i + '-title')
+            const content1 = document.getElementById('board-content-' + i + '-item-'+ 1 +'-item')
+            const content2 = document.getElementById('board-content-' + i + '-item-'+ 2 +'-item')
+
+            title.disabled = false;
+            content1.disabled = false;
+            content2.disabled = false;
+        }
+
+        const newButton = document.createElement('input')
+        newButton.classList.add('btn', 'btn-primary')
+        newButton.type = 'button'
+        newButton.id = 'board-content-edit-confirm-btn'
+        newButton.value = '확인'
+        newButton.onclick = function () {
+            const btn = document.getElementById('board-content-edit-btn')
+            btn.hidden = false
+            newButton.hidden = true
+
+            boardContents = []
+
+            for (let i = 1; i <= rowCount; i++) {
+                const boardContentId = document.getElementById('board-content-' + i + '-id')
+                const title = document.getElementById('board-content-' + i + '-title')
+                const content1Id = document.getElementById('board-content-' + i + '-item-' + 1 + '-id')
+                const content1 = document.getElementById('board-content-' + i + '-item-' + 1 + '-item')
+                const content2Id = document.getElementById('board-content-' + i + '-item-' + 2 + '-id')
+                const content2 = document.getElementById('board-content-' + i + '-item-' + 2 + '-item')
+
+                boardContents.push({
+                    boardContentId: boardContentId.value,
+                    title: title.value,
+                    boardContentItems: [
+                        {
+                            boardContentItemId: content1Id.value,
+                            item: content1.value
+                        },
+                        {
+                            boardContentItemId: content2Id.value,
+                            item: content2.value
+                        }
+                    ]
+                });
+
+                title.disabled = true;
+                content1.disabled = true;
+                content2.disabled = true;
+            }
+        }
+        const containerDiv = document.getElementById('board-content-edit-btn-div');
+        containerDiv.appendChild(newButton);
+    }
+
+    function modBoardBtn() {
+        board.boardId = $('#board-id').val();
+        board.themeId = $('#board-theme').val();
+        board.title = $('#board-title').val();
+        board.introduce = $('#board-introduce').val();
+        board.keywords = $('#board-keywords').val() || null;
+
+        $.ajax({
+            url: `/backoffice/v2/board/api/boards/${board.boardId}`,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                board: board,
+                boardContents: boardContents
+            })
+        }).done(function () {
+            alert("수정 완료됐습니다.")
+        }).fail(function () {
+            alert("수정 실패했습니다.")
+        })
+    }
+
+    function delBoardBtn() {
+        $.ajax({
+            url: `/backoffice/v2/board/api/boards/${board.boardId}`,
+            type: 'DELETE',
+            contentType: 'application/json',
+        }).done(function () {
+            alert("삭제 완료됐습니다.")
+            window.location.href = document.referrer;
+        }).fail(function () {
+            alert("삭제 실패했습니다.")
+        })
+    }
+
+</script>
+<body>
+<div class="container">
+    <div class="row justify-content-end mb-4">
+        <div class="col-auto">
+            <input type="button" class="btn btn-secondary" value="나가기" onclick="history.back()">
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            게시글 상세
+        </div>
+        <div class="card-body">
+            <div class="p-5 mb-4 bg-light rounded-3">
+                <div class="row mb-3">
+                    <div class="col-auto">
+                        <h3>게임</h3>
+                    </div>
+                    <div id="board-edit-btn-div" class="col d-flex justify-content-end">
+                        <input class="btn btn-warning" id="board-edit-btn" type="button" value="게임 수정"
+                               onclick="enableBoardInputStatus()">
+                    </div>
+                </div>
+                <div class="board-div">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="board-id" class="form-label">게임 Id</label>
+                            <input type="text" class="form-control" id="board-id" th:value="${board.boardId}" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="board-theme" class="form-label">테마 Id</label>
+                            <input type="text" class="form-control" id="board-theme" th:value="${board.themeId}"
+                                   disabled>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="board-title" class="form-label">게임 제목</label>
+                            <input type="text" class="form-control" id="board-title" th:value="${board.title}" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="board-keywords" class="form-label">게임 키워드</label>
+                            <input type="text" class="form-control" id="board-keywords" th:value="${#strings.listJoin(board.keywords, ',')}" disabled>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="board-introduce" class="form-label">게임 내용</label>
+                        <div class="col-md-12">
+                            <input type="text" class="form-control" id="board-introduce" th:value="${board.introduce}"
+                                   disabled>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="board-viewCount" class="form-label">게임 조회수</label>
+                            <input type="text" class="form-control" id="board-viewCount" th:value="${board.viewCount}"
+                                   disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="board-likeCount" class="form-label">게임 좋아요수</label>
+                            <input type="text" class="form-control" id="board-likeCount" th:value="${board.likeCount}"
+                                   disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="board-dislikeCount" class="form-label">게임 싫어요 수</label>
+                            <input type="text" class="form-control" id="board-dislikeCount"
+                                   th:value="${board.dislikeCount}"
+                                   disabled>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="board-createdAt" class="form-label">게임 생성날짜</label>
+                            <input type="text" class="form-control" id="board-createdAt" th:value="${board.createdAt}"
+                                   disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="board-updatedAt" class="form-label">게임 수정날짜</label>
+                            <input type="text" class="form-control" id="board-updatedAt" th:value="${board.updatedAt}"
+                                   disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="board-deletedAt" class="form-label">게임 삭제날짜</label>
+                            <input type="text" class="form-control" id="board-deletedAt"
+                                   th:value="${board.deletedAt ?: '-'}"
+                                   disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5 mb-4 bg-light rounded-3">
+                <div class="row mb-3">
+                    <div class="col-auto">
+                        <h3>게임 내용</h3>
+                    </div>
+                    <div  id="board-content-edit-btn-div" class="col d-flex justify-content-end">
+                        <input class="btn btn-warning" id="board-content-edit-btn" type="button" value="게임 수정"
+                               onclick="enableBoardContentInputStatus()">
+                    </div>
+                </div>
+                <div th:class="'board-content-' + ${iterStat.count}" th:each="content, iterStat: ${boardContents}">
+                    <input type="hidden" id="iterStat-size" th:value="${iterStat.size}" th:if="${iterStat.count == 1}">
+                    <h5 th:text="${iterStat.count}"></h5>
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <label th:for="board-content- + ${iterStat.count} +-id" class="form-label">게임 내용 ID</label>
+                            <input type="text" class="form-control" th:id="board-content- + ${iterStat.count} +-id"
+                                   th:value="${content.boardContentId}" disabled>
+                        </div>
+                        <div class="col-md-10">
+                            <label th:for="'board-content-'+ ${iterStat.count} +'-title'" class="form-label">게임 내용
+                                제목</label>
+                            <input type="text" class="form-control"
+                                   th:id="'board-content-'+ ${iterStat.count} +'-title'" th:value="${content.title}"
+                                   disabled>
+                        </div>
+                    </div>
+                    <div class="board-content-item-div" th:each="item, index: ${content.boardContentItems}">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label th:for="'board-content-'+ ${iterStat.count} +'-item-' + ${index.count} + 'id'" class="form-label">게임 내용
+                                    아이템 ID</label>
+                                <input type="text" class="form-control"
+                                       th:id="'board-content-'+ ${iterStat.count} +'-item-' + ${index.count} +'-id'"
+                                       th:value="${item.boardContentItemId}" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label th:for="'board-content-' + ${iterStat.count} + '-item-' + ${index.count} + '-item'" class="form-label">게임
+                                    내용 아이템 내용</label>
+                                <input type="text" class="form-control"
+                                       th:id="'board-content-' + ${iterStat.count} + '-item-' + ${index.count} + '-item'"
+                                       th:value="${item.item}" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label th:for="'board-content-' + ${index.count} + '-item-result'"
+                                       class="form-label">게임 내용 아이템 결과</label>
+                                <input type="text" class="form-control"
+                                       th:id="'board-content-' + ${index.count} + '-item-result'"
+                                       th:value="${item.boardResultCount}" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3" id="mod-board-btn-row">
+                <div class="col d-flex justify-content-end">
+                    <input type="button" class="btn btn-warning me-1" id="mod-board-btn" value="수정하기" onclick="modBoardBtn()">
+                    <input type="button" class="btn btn-danger" id="del-board-btn" value="삭제하기" onclick="delBoardBtn()">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

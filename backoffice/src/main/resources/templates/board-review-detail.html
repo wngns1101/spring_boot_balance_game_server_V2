@@ -144,21 +144,10 @@
             const originalSelect = document.getElementById('board-review-type');
             const selectedValue = newSelect.value;
 
-            // Array.from(originalSelect.options).forEach((option, index) => {
-            //     if (option.value === selectedValue) {
-            //         console.log(option.value)
-            //         console.log(selectedValue)
-            //         console.log(index)
-            //
-            //         option.selected = true;
-            //     }else{
-            //         option.selected = false;
-            //     }
-            // });
             for (let i = 0; i < originalSelect.options.length; i++) {
                 const option = originalSelect.options[i];
                 if (option.value === selectedValue) {
-                    originalSelect.selectedIndex = i; // 선택된 옵션의 인덱스를 설정
+                    originalSelect.selectedIndex = i;
                     break;
                 }
             }

@@ -14,7 +14,7 @@ class Board(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val boardId: Long? = null,
     val userId: Long,
-    val themeId: Long,
+    var themeId: Long,
     var title: String,
     var introduce: String,
     var likeCount: Int = 0,

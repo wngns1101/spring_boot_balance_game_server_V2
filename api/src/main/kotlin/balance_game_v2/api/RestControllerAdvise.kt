@@ -21,7 +21,10 @@ import balance_game_v2.domain.error.AlreadySignUpException
 import balance_game_v2.domain.error.BusinessException
 import balance_game_v2.domain.error.InvalidUserException
 import balance_game_v2.domain.error.NotFoundAccountNameException
+import balance_game_v2.domain.error.NotFoundBoardContentItemException
 import balance_game_v2.domain.error.NotFoundBoardException
+import balance_game_v2.domain.error.NotFoundBoardReportException
+import balance_game_v2.domain.error.NotFoundBoardReviewReportException
 import balance_game_v2.domain.error.NotFoundEmailException
 import balance_game_v2.domain.error.NotFoundReviewException
 import balance_game_v2.domain.user.UserService
@@ -62,6 +65,9 @@ class RestControllerAdvise(
             is NotFoundReviewException -> createResponse(ErrorCodes.NOT_FOUND_REVIEW_ERROR)
             is NotFoundAccountNameException -> createResponse(ErrorCodes.NOT_FOUND_ACCOUNT_NAME_ERROR)
             is InvalidUserException -> createResponse(ErrorCodes.INVALID_USER_EXCEPTION)
+            is NotFoundBoardReportException -> createResponse(ErrorCodes.NOT_FOUND_BOARD_REPORT_ERROR)
+            is NotFoundBoardReviewReportException -> createResponse(ErrorCodes.NOT_FOUND_BOARD_REVIEW_REPORT_ERROR)
+            is NotFoundBoardContentItemException -> createResponse(ErrorCodes.NOT_FOUND_BOARD_CONTENT_ITEM_ERROR)
             else -> createResponse(ErrorCodes.UNKNOWN_ERROR)
         }
     }

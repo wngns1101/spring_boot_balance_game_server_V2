@@ -17,7 +17,6 @@
         announcement.content = `[[${announcement.content}]]`
         announcement.type = `[[${announcement.type}]]`
 
-        console.log(announcement)
     });
 
     function addModRow(rowId, inputId, buttonId) {
@@ -152,8 +151,6 @@
         announcement.title = document.getElementById('title').value
         announcement.content = document.getElementById('content').value
         announcement.type = document.getElementById('type').value
-
-        console.log(announcement)
 
         $.ajax({
             url: '/backoffice/v2/announcement/api/announcement',

@@ -14,8 +14,6 @@
         theme.themeId = `[[${theme.themeId}]]`
         theme.theme = `[[${theme.theme}]]`
         theme.iconUrl = `[[${theme.iconUrl}]]`
-
-        console.log(theme)
     });
 
     function addModRow(rowId, inputId, buttonId) {
@@ -107,13 +105,10 @@
                 alert('아이콘 등록에 실패했습니다.');
             })
         }
-        console.log(iconData)
     }
 
     function modThemeBtn() {
         theme.theme = document.getElementById('theme').value
-
-        console.log(theme)
 
         $.ajax({
             url: '/backoffice/v2/theme/api/theme',

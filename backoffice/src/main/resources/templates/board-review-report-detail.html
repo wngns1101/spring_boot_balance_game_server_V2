@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="Content">
+<script>
+    const boardReviewReport = {
+        boardReviewReportId: null,
+        boardReviewId: null,
+        userId: null,
+        content: null,
+        createdAt: null,
+        updatedAt: null,
+        deletedAt: null,
+    }
+
+    $(document).ready(function () {
+        boardReviewReport.boardReviewReportId = `[[${boardReviewReport.boardReviewReportId}]]`
+        boardReviewReport.boardReviewId = `[[${boardReviewReport.boardReviewId}]]`
+        boardReviewReport.userId = `[[${boardReviewReport.userId}]]`
+        boardReviewReport.content = `[[${boardReviewReport.content}]]`
+        boardReviewReport.createdAt = `[[${boardReviewReport.createdAt}]]`
+        boardReviewReport.updatedAt = `[[${boardReviewReport.updatedAt}]]`
+        boardReviewReport.deletedAt = `[[${boardReviewReport.deletedAt}]]`
+
+    });
+</script>
+<body>
+<div class="container">
+    <div class="row justify-content-end mb-4">
+        <div class="col-auto">
+            <input type="button" class="btn btn-secondary" value="나가기" onclick="history.back()">
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            게시글 리뷰 신고 상세
+        </div>
+        <div class="card-body">
+            <h3>게시글 리뷰 신고</h3>
+            <div class="row mb-3">
+                <label for="board-report-id" class="form-label">게시글 리뷰 신고 Id</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="board-report-id" th:value="${boardReviewReport.boardReviewReportId}" disabled>
+                </div>
+            </div>
+            <div class="row mb-3" id="title-row">
+                <label for="board-report-content" class="form-label">신고 내용</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="board-report-content" th:value="${boardReviewReport.content}" disabled>
+                </div>
+            </div>
+            <div class="row mb-3" id="content-row">
+                <label for="updated-at" class="form-label">접수 시간</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="updated-at" th:value="${boardReviewReport.updatedAt}" disabled>
+                </div>
+            </div>
+            <div class="row mb-3" id="link">
+                <div class="justify-content-end">
+                    <a th:href="@{/backoffice/v2/board/reviews/{boardReviewId}(boardReviewId=${boardReviewReport.boardReviewId})}">리뷰 보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -2,18 +2,24 @@ package balance_game_v2.domain.board
 
 import balance_game_v2.domain.auth.exception.NotFoundUserException
 import balance_game_v2.domain.board.dto.BoardContentList
+import balance_game_v2.domain.board.dto.BoardDetailByAdminDTO
 import balance_game_v2.domain.board.dto.BoardDetailDTO
 import balance_game_v2.domain.board.dto.BoardListDTO
+import balance_game_v2.domain.board.dto.BoardReportDTO
 import balance_game_v2.domain.board.dto.BoardResultDTO
 import balance_game_v2.domain.board.dto.BoardReviewDTO
 import balance_game_v2.domain.board.dto.BoardReviewDetailDTO
+import balance_game_v2.domain.board.dto.BoardReviewReportDTO
 import balance_game_v2.domain.board.dto.CreateBoardCommand
 import balance_game_v2.domain.board.dto.CreateBoardResultRequestCommand
 import balance_game_v2.domain.board.dto.CreateBoardReviewCommand
 import balance_game_v2.domain.board.dto.ModifyBoardCommand
+import balance_game_v2.domain.board.dto.ModifyBoardCommandDTO
 import balance_game_v2.domain.board.dto.ModifyBoardReviewCommandDTO
 import balance_game_v2.domain.board.dto.PageBoardDTO
+import balance_game_v2.domain.board.dto.PageBoardReportDTO
 import balance_game_v2.domain.board.dto.PageBoardReviewDTO
+import balance_game_v2.domain.board.dto.PageBoardReviewReportDTO
 import balance_game_v2.domain.board.dto.ParticipatedBoardDTO
 import balance_game_v2.domain.board.dto.SimpleBoardDTO
 import balance_game_v2.domain.board.dto.WriterDTO
@@ -48,8 +54,13 @@ import balance_game_v2.domain.board.repository.BoardReviewKeywordRepository
 import balance_game_v2.domain.board.repository.BoardReviewReportRepository
 import balance_game_v2.domain.board.repository.BoardReviewRepository
 import balance_game_v2.domain.error.InvalidUserException
+import balance_game_v2.domain.error.NotFoundBoardContentException
+import balance_game_v2.domain.error.NotFoundBoardContentItemException
 import balance_game_v2.domain.error.NotFoundBoardException
+import balance_game_v2.domain.error.NotFoundBoardReportException
+import balance_game_v2.domain.error.NotFoundBoardReviewReportException
 import balance_game_v2.domain.error.NotFoundReviewException
+import balance_game_v2.domain.user.dto.toDTO
 import balance_game_v2.domain.user.repository.UserRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -331,7 +342,7 @@ class BoardService(
     fun createBoardReview(boardId: Long, userId: Long, command: CreateBoardReviewCommand) {
         val board = boardRepository.findByBoardIdAndDeletedAtIsNull(boardId) ?: throw NotFoundBoardException()
 
-//        val boardResults = boardResultRepository.findAllByBoardIdAndUserId(boardId, userId)
+        val boardResults = boardResultRepository.findAllByBoardIdAndUserId(boardId, userId)
 
 //        if (boardResults.isEmpty()) {
 //            throw NotJoinedGameException()
@@ -741,5 +752,115 @@ class BoardService(
             }
 
         boardReviewRepository.delete(boardReview)
+    }
+
+    fun getBoardDetailByAdmin(
+        boardId: Long
+    ): BoardDetailByAdminDTO {
+        val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }.toPageBoardDTO(
+            boardKeywordRepository.findAllByBoardIdIn(listOf(boardId)).map { it.toDTO() }
+        )
+        val user = userRepository.findById(board.userId).orElseThrow { NotFoundUserException() }.toDTO()
+        val boardContent = boardContentRepository.findAllByBoardId(boardId).map {
+            it.toDTO(
+                boardContentItemRepository.findAllByBoardContentIdIn(listOf(it.boardContentId!!)).map { it.toDTO() }
+            )
+        }
+
+        return BoardDetailByAdminDTO(
+            board = board,
+            user = user,
+            boardContents = boardContent,
+        )
+    }
+
+    fun getBoardReports(query: String?, page: Int, size: Int): PageBoardReportDTO {
+        val pageable = PageRequest.of(page, size)
+
+        val boardReports = boardReportRepository.search(query, pageable)
+
+        return PageBoardReportDTO(
+            boardReports.content.map { it.toDTO() },
+            boardReports.totalPages
+        )
+    }
+
+    fun getBoardReviewReports(query: String?, page: Int, size: Int): PageBoardReviewReportDTO {
+        val pageable = PageRequest.of(page, size)
+
+        val boardReviewReports = boardReviewReportRepository.search(query, pageable)
+
+        return PageBoardReviewReportDTO(
+            boardReviewReports.content.map { it.toDTO() },
+            boardReviewReports.totalPages
+        )
+    }
+
+    fun getBoardReportDetail(boardReportId: Long): BoardReportDTO {
+        val boardReport = boardReportRepository.findById(boardReportId).orElseThrow { NotFoundBoardReportException() }
+
+        return boardReport.toDTO()
+    }
+
+    fun getBoardReviewReportDetail(boardReviewReportId: Long): BoardReviewReportDTO {
+        val boardReviewReport = boardReviewReportRepository.findById(boardReviewReportId).orElseThrow { NotFoundBoardReviewReportException() }
+
+        return boardReviewReport.toDTO()
+    }
+
+    @Transactional
+    fun modifyBoardByAdmin(boardId: Long, command: ModifyBoardCommandDTO) {
+        val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
+
+        board.themeId = command.board.themeId
+        board.title = command.board.title
+        board.introduce = command.board.introduce
+
+        boardKeywordRepository.findAllByBoardIdIn(listOf(board.boardId!!))
+            .let { boardKeywordRepository.deleteAll(it) }
+
+        if (command.board.keywords != null) {
+            val boardKeywords = command.board.keywords.split(",")
+                .map {
+                    BoardKeyword(
+                        boardId = boardId,
+                        keyword = it
+                    )
+                }
+            boardKeywordRepository.saveAll(boardKeywords)
+        }
+
+        command.boardContents.forEach {
+            val boardContent = boardContentRepository.findById(it.boardContentId).orElseThrow { NotFoundBoardContentException() }
+            boardContent.title = it.title
+
+            it.boardContentItems.forEach {
+                val boardContentItem = boardContentItemRepository.findById(it.boardContentItemId).orElseThrow { NotFoundBoardContentItemException() }
+                boardContentItem.item = it.item
+            }
+        }
+    }
+
+    @Transactional
+    fun deleteBoardByAdmin(boardId: Long) {
+        val board = boardRepository.findById(boardId).orElseThrow { NotFoundBoardException() }
+
+        boardRepository.delete(board)
+
+        boardContentRepository.findAllByBoardId(boardId).let {
+            boardContentRepository.deleteAll(it)
+        }
+
+        boardContentItemRepository.findAllByBoardId(boardId).let {
+            boardContentItemRepository.deleteAll(it)
+        }
+
+        boardKeywordRepository.findAllByBoardIdIn(listOf(boardId)).let {
+            boardKeywordRepository.deleteAll(it)
+        }
+
+        boardResultRepository.findAllByBoardId(boardId).let {
+            boardResultRepository.deleteAll(it)
+        }
     }
 }

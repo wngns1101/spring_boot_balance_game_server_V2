@@ -14,5 +14,5 @@ class BoardContent(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val boardContentId: Long? = null,
     val boardId: Long,
-    val title: String?,
+    var title: String?,
 ) : BaseEntity()

@@ -6,7 +6,7 @@ data class BoardContentItemDTO(
     val boardContentItemId: Long,
     val boardContentId: Long,
     val item: String,
-    val boardResultCount: Int,
+    val boardResultCount: Int?,
 )
 
 fun BoardContentItem.toDTO(boardResultCount: Int): BoardContentItemDTO {
@@ -17,3 +17,10 @@ fun BoardContentItem.toDTO(boardResultCount: Int): BoardContentItemDTO {
         boardResultCount = boardResultCount
     )
 }
+
+fun BoardContentItem.toDTO() = BoardContentItemDTO(
+    boardContentItemId = boardContentItemId!!,
+    boardContentId = boardContentId,
+    item = item,
+    boardResultCount = 0
+)

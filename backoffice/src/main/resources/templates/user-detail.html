@@ -9,7 +9,6 @@
         nickname: null,
         realName: null,
         accountName: null,
-        birth: null,
         email: null,
         profileUrl: null,
         authId: null,
@@ -17,23 +16,14 @@
     }
 
     $(document).ready(function () {
-        $('#datePicker').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true
-        });
-
         user.userId = `[[${user.userId}]]`
         user.nickname = `[[${user.nickname}]]`
         user.realName = `[[${user.realName}]]`
         user.accountName = `[[${user.accountName}]]`
-        user.birth = `[[${user.birth}]]`
         user.email = `[[${user.email}]]`
         user.profileUrl = `[[${user.profileUrl}]]`
         user.authId = `[[${authId}]]`
         user.authStatus = `[[${authStatus}]]`
-
-        console.log(user)
     });
 
     function addModRow(rowId, inputId, buttonId) {
@@ -137,7 +127,6 @@
                 alert('프로필 등록에 실패했습니다.');
             })
         }
-        console.log(profileData)
     }
 
     function addModAuthStatus() {
@@ -209,8 +198,6 @@
         user.email = document.getElementById('email').value
         user.authStatus = document.getElementById('auth-status').value
 
-        console.log(user)
-
         $.ajax({
             url: '/backoffice/v2/user/api/user',
             type: 'PUT',
@@ -280,12 +267,6 @@
                 <div class="col-md-6">
                     <input type="button" class="btn btn-primary" id="mod-email-btn" value="수정"
                            onclick="addModEmail()">
-                </div>
-            </div>
-            <div class="row mb-3" id="birth-row">
-                <label for="datePicker" class="form-label">생년월일 </label>
-                <div class="col-md-6">
-                    <input type="text" id="datePicker" class="form-control" th:value="${user.birth}" disabled>
                 </div>
             </div>
             <div class="row mb-3" id="profile-row">

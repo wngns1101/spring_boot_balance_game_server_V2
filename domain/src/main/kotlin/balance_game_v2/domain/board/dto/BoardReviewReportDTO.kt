@@ -7,14 +7,20 @@ data class BoardReviewReportDTO(
     val boardReviewReportId: Long,
     val boardReviewId: Long,
     val userId: Long,
+    val content: String,
     val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
+    val deletedAt: LocalDateTime?,
 )
 
 fun BoardReviewReport.toDTO(): BoardReviewReportDTO {
     return BoardReviewReportDTO(
         boardReviewReportId = boardReviewReportId,
-        boardReviewId = boardReviewReportId,
+        boardReviewId = boardReviewId,
         userId = userId,
+        content = content,
         createdAt = createdAt,
+        updatedAt = updatedAt,
+        deletedAt = deletedAt
     )
 }

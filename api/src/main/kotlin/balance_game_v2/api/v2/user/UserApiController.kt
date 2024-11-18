@@ -191,7 +191,7 @@ class UserApiController(
         res: HttpServletResponse,
     ): ReIssueResponseDTO {
         var token = req.getHeader("Authorization")
-        println(token)
+
         token = try {
             token.split(" ")[1]
         } catch (e: InvalidTokenTypeException) {
@@ -272,7 +272,7 @@ class UserApiController(
         @RequestBody request: FindAccountNameRequestDTO,
     ) {
         val user = userFacade.getUserByEmail(request.email)
-        println(user.toString())
+
         userFacade.sendAccountNameForEmail(user.email, user.accountName)
     }
 
